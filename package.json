@@ -28,7 +28,7 @@
   "author": "ronin",
   "license": "Apache-2.0",
   "dependencies": {
-    "@ronin/compiler": "0.12.3",
+    "@ronin/compiler": "0.12.4",
     "@types/bun": "1.1.10",
     "ronin": "5.1.4",
     "zod": "3.23.8"
