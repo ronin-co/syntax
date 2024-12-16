@@ -1,6 +1,5 @@
 import type { link } from '@/src/index';
 import type { Primitives } from '@/src/model/model';
-import { slugToName } from '@/src/model/utils/formatter';
 import type { ModelField, ModelTrigger } from '@ronin/compiler';
 import type { GetInstructions, Query, WithInstruction } from 'ronin/types';
 import { getBatchProxy } from 'ronin/utils';
@@ -21,7 +20,7 @@ export const serializeFields = (fields?: Record<string, Primitives>) => {
 
     return {
       slug: key,
-      name: name ?? slugToName(key),
+      name,
       unique: unique ?? false,
       required: required ?? false,
       defaultValue,

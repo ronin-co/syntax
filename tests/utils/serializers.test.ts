@@ -18,9 +18,9 @@ describe('serializers', () => {
       {
         actions: undefined,
         defaultValue: undefined,
-        name: 'Account',
         required: false,
         slug: 'account',
+        name: undefined,
         target: 'account',
         type: 'link',
         unique: false,

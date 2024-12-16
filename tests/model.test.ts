@@ -169,7 +169,6 @@ describe('models', () => {
         {
           ...default_FIELD_PROPERTIES,
           slug: 'name',
-          name: 'Name',
           type: 'string',
           required: true,
         },
@@ -198,14 +197,12 @@ describe('models', () => {
         {
           ...default_FIELD_PROPERTIES,
           slug: 'name',
-          name: 'Name',
           type: 'string',
           required: true,
         },
         {
           ...default_FIELD_PROPERTIES,
           slug: 'avatar',
-          name: 'Avatar',
           type: 'blob',
         },
       ],
@@ -233,14 +230,12 @@ describe('models', () => {
         {
           ...default_FIELD_PROPERTIES,
           slug: 'name',
-          name: 'Name',
           type: 'string',
           required: true,
         },
         {
           ...default_FIELD_PROPERTIES,
           slug: 'bio',
-          name: 'Bio',
           type: 'json',
         },
       ],
@@ -268,14 +263,12 @@ describe('models', () => {
         {
           ...default_FIELD_PROPERTIES,
           slug: 'name',
-          name: 'Name',
           type: 'string',
           required: true,
         },
         {
           ...default_FIELD_PROPERTIES,
           slug: 'birthday',
-          name: 'Birthday',
           type: 'date',
         },
       ],
@@ -330,7 +323,6 @@ describe('models', () => {
         {
           ...default_FIELD_PROPERTIES,
           slug: 'createdAt',
-          name: 'Created At',
           type: 'string',
           required: true,
         },
@@ -363,32 +355,27 @@ describe('models', () => {
         {
           ...default_FIELD_PROPERTIES,
           slug: 'name',
-          name: 'Name',
           type: 'string',
           required: true,
         },
         {
           ...default_FIELD_PROPERTIES,
           slug: 'email',
-          name: 'Email',
           type: 'string',
         },
         {
           ...default_FIELD_PROPERTIES,
           slug: 'emailVerified',
-          name: 'Email Verified',
           type: 'boolean',
         },
         {
           ...default_FIELD_PROPERTIES,
           slug: 'password',
-          name: 'Password',
           type: 'string',
         },
         {
           ...default_FIELD_PROPERTIES,
           slug: 'follower',
-          name: 'Follower',
           type: 'number',
         },
       ],
@@ -416,7 +403,6 @@ describe('models', () => {
         {
           ...default_FIELD_PROPERTIES,
           slug: 'name',
-          name: 'Name',
           type: 'string',
           unique: true,
         },
@@ -460,7 +446,6 @@ describe('models', () => {
           ...default_FIELD_PROPERTIES,
           slug: 'name',
           type: 'string',
-          name: 'Name',
           required: true,
         },
       ],
@@ -477,7 +462,6 @@ describe('models', () => {
         {
           ...default_FIELD_PROPERTIES,
           slug: 'author',
-          name: 'Author',
           type: 'link',
           target: 'account',
           actions: {
@@ -516,7 +500,6 @@ describe('models', () => {
         {
           ...default_FIELD_PROPERTIES,
           slug: 'name',
-          name: 'Name',
           type: 'string',
           required: true,
         },
@@ -609,7 +592,6 @@ describe('models', () => {
         {
           ...default_FIELD_PROPERTIES,
           slug: 'name',
-          name: 'Name',
           type: 'string',
           required: true,
         },
