@@ -77,7 +77,6 @@ describe('serializers', () => {
           {
             add: {
               account: {
-                // @ts-expect-error: The queries need to be adjusted in the TS client.
                 to: {
                   name: 'Lorena',
                 },
@@ -99,7 +98,7 @@ describe('serializers', () => {
   test('serialize query', () => {
     // @ts-expect-error: The queries need to be adjusted in the TS client.
     const query = serializeQueries(() => [add.account.to({ name: 'Lorena' })]);
-    // @ts-expect-error: The queries need to be adjusted in the TS client.
+
     expect(query).toEqual([{ add: { account: { to: { name: 'Lorena' } } } }]);
   });
 });

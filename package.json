@@ -28,10 +28,10 @@
   "author": "ronin",
   "license": "Apache-2.0",
   "dependencies": {
-    "@ronin/compiler": "0.10.3",
+    "@ronin/compiler": "0.12.3",
     "@types/bun": "1.1.10",
     "@types/title": "3.4.3",
-    "ronin": "5.0.1",
+    "ronin": "5.1.4",
     "title": "3.5.3",
     "zod": "3.23.8"
   },
