@@ -4,7 +4,12 @@ import {
   serializePresets,
   serializeTriggers,
 } from '@/src/model/utils/serializers';
-import type { ModelField, ModelIndex, ModelTrigger } from '@ronin/compiler';
+import type {
+  ModelField,
+  ModelIndex,
+  ModelTrigger,
+  Model as RawModel,
+} from '@ronin/compiler';
 import type { GetInstructions, WithInstruction } from 'ronin/types';
 
 // This is used to ensure that any object adhering to this interface has both fields.
@@ -22,18 +27,9 @@ export type Primitives =
   | ReturnType<typeof date>
   | ReturnType<typeof blob>;
 
-export interface Model<Fields> {
-  name?: string;
-  pluralName?: string;
-  slug: string;
-  pluralSlug?: string;
-  identifiers?: {
-    title?: string;
-    slug?: string;
-  };
+export interface Model<Fields>
+  extends Omit<RawModel, 'fields' | 'indexes' | 'triggers' | 'presets'> {
   fields?: Fields;
-  idPrefix?: string;
-
   presets?: Record<string, GetInstructions | WithInstruction>;
   indexes?: Array<ModelIndex<Array<ModelField & { slug: keyof Fields }>>>;
   triggers?: Array<ModelTrigger<Array<ModelField & { slug: keyof Fields }>>>;

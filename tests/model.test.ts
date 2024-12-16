@@ -111,7 +111,7 @@ describe('models', () => {
       pluralSlug: 'accounts',
       name: 'Account',
       identifiers: {
-        title: 'Account',
+        name: 'Account',
         slug: 'account',
       },
       fields: {},
@@ -124,7 +124,7 @@ describe('models', () => {
       pluralSlug: 'accounts',
       name: 'Account',
       identifiers: {
-        title: 'Account',
+        name: 'Account',
         slug: 'account',
       },
       fields: [],
