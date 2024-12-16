@@ -1,0 +1,18 @@
+name: Publish Experimental Packages
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  publish-experimental:
+    uses: ronin-co/github-actions/.github/workflows/publish-experimental.yml@main
+    with:
+      package_dir: './'  # Adjust if your package is in a subdirectory
+    secrets:
+      NPM_TOKEN: ${{ secrets.NPM_TOKEN_READ_AND_WRITE }}

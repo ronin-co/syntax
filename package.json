@@ -1,0 +1,43 @@
+{
+  "name": "@ronin/schema",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Allows for defining the schema of a RONIN database in code.",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "lint": "bun run --bun lint:tsc && bun run --bun lint:biome",
+    "lint:biome": "biome check",
+    "lint:tsc": "tsc --pretty",
+    "format": "biome check --write && biome format --write",
+    "test": "bun test",
+    "build": "tsup ./src/index.ts --dts --format esm",
+    "prepare": "bun run build"
+  },
+  "keywords": [
+    "database",
+    "schema",
+    "primitives"
+  ],
+  "author": "ronin",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@ronin/compiler": "0.10.3",
+    "@types/bun": "1.1.10",
+    "@types/title": "3.4.3",
+    "ronin": "5.0.1",
+    "title": "3.5.3",
+    "zod": "3.23.8"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.9.2",
+    "tsup": "8.3.0",
+    "typescript": "5.6.3"
+  }
+}
