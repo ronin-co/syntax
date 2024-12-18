@@ -1,6 +1,6 @@
 {
   "name": "@ronin/schema",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "type": "module",
   "description": "Allows for defining the schema of a RONIN database in code.",
   "publishConfig": {
