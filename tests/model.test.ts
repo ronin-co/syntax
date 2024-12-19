@@ -638,7 +638,7 @@ describe('models', () => {
       fields: [
         {
           ...default_FIELD_PROPERTIES,
-          slug: 'invoice.number',
+          slug: 'invoice.recipient',
           type: 'string',
           required: true,
         },
