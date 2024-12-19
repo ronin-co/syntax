@@ -644,7 +644,7 @@ describe('models', () => {
         },
         {
           ...default_FIELD_PROPERTIES,
-          slug: 'invoice.date',
+          slug: 'invoice.address',
           type: 'date',
         },
       ],
