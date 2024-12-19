@@ -25,7 +25,12 @@ export type Primitives =
   | ReturnType<typeof number>
   | ReturnType<typeof json>
   | ReturnType<typeof date>
-  | ReturnType<typeof blob>;
+  | ReturnType<typeof blob>
+  | NestedFields;
+
+export interface NestedFields {
+  [key: string]: Primitives;
+}
 
 export interface Model<Fields>
   extends Omit<RawModel, 'fields' | 'indexes' | 'triggers' | 'presets'> {
@@ -79,21 +84,23 @@ export interface SerializedLinkField
 // This type maps the fields of a model to their types.
 type FieldsToTypes<F> = F extends Record<string, Primitives>
   ? {
-      [K in keyof F]: F[K]['type'] extends 'string'
-        ? string
-        : F[K]['type'] extends 'number'
-          ? number
-          : F[K]['type'] extends 'boolean'
-            ? boolean
-            : F[K]['type'] extends 'link'
-              ? string
-              : F[K]['type'] extends 'json'
-                ? object
-                : F[K]['type'] extends 'blob'
-                  ? Blob
-                  : F[K]['type'] extends 'date'
-                    ? Date
-                    : never;
+      [K in keyof F]: F[K] extends Record<string, Primitives>
+        ? FieldsToTypes<F[K]>
+        : F[K]['type'] extends 'string'
+          ? string
+          : F[K]['type'] extends 'number'
+            ? number
+            : F[K]['type'] extends 'boolean'
+              ? boolean
+              : F[K]['type'] extends 'link'
+                ? string
+                : F[K]['type'] extends 'json'
+                  ? object
+                  : F[K]['type'] extends 'blob'
+                    ? Blob
+                    : F[K]['type'] extends 'date'
+                      ? Date
+                      : never;
     }
   : RoninFields;
 
