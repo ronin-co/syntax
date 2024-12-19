@@ -616,4 +616,38 @@ describe('models', () => {
       ],
     });
   });
+
+  test('create model with nested fields', () => {
+    const Account = model({
+      slug: 'account',
+      pluralSlug: 'accounts',
+      fields: {
+        invoice: {
+          number: string({ required: true }),
+          date: date(),
+        },
+      },
+    });
+
+    expect(Account).toBeTypeOf('object');
+
+    expect(Account).toEqual({
+      // @ts-expect-error: The Account object has 'slug'.
+      slug: 'account',
+      pluralSlug: 'accounts',
+      fields: [
+        {
+          ...default_FIELD_PROPERTIES,
+          slug: 'invoice.number',
+          type: 'string',
+          required: true,
+        },
+        {
+          ...default_FIELD_PROPERTIES,
+          slug: 'invoice.date',
+          type: 'date',
+        },
+      ],
+    });
+  });
 });

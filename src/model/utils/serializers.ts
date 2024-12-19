@@ -1,5 +1,5 @@
 import type { link } from '@/src/index';
-import type { Primitives } from '@/src/model/model';
+import type { NestedFields, Primitives } from '@/src/model/model';
 import type { ModelField, ModelTrigger } from '@ronin/compiler';
 import type { GetInstructions, Query, WithInstruction } from 'ronin/types';
 import { getBatchProxy } from 'ronin/utils';
@@ -14,22 +14,38 @@ const ASYNC_CONTEXT = new (await import('node:async_hooks')).AsyncLocalStorage()
  * @returns The serialized fields.
  */
 export const serializeFields = (fields?: Record<string, Primitives>) => {
-  return Object.entries(fields ?? {}).map(([key, value]) => {
-    const { type, unique, defaultValue, required, name } = value as unknown as Primitives;
-    const { actions, model } = value as unknown as ReturnType<typeof link>;
+  return Object.entries(fields ?? {}).flatMap(
+    ([key, value]): Array<ModelField> | ModelField => {
+      if (!('type' in value)) {
+        const result: Record<string, Primitives> = {};
 
-    return {
-      slug: key,
-      name,
-      unique: unique ?? false,
-      required: required ?? false,
-      defaultValue,
-      type,
-      // @ts-expect-error: The `target` property exists in the model.
-      target: model?.slug,
-      actions,
-    };
-  });
+        for (const k of Object.keys(value)) {
+          result[`${key}.${k}`] = value[k];
+        }
+
+        return serializeFields(result);
+      }
+
+      const { type, unique, defaultValue, required, name } = value as unknown as Exclude<
+        Primitives,
+        NestedFields
+      >;
+      const { actions, model } = value as unknown as ReturnType<typeof link>;
+
+      return {
+        slug: key,
+        name,
+        unique: unique ?? false,
+        required: required ?? false,
+        defaultValue,
+        // @ts-expect-error: The `type` property exists in the model.
+        type,
+        // @ts-expect-error: The `target` property exists in the model.
+        target: model?.slug,
+        actions,
+      };
+    },
+  );
 };
 
 /**
