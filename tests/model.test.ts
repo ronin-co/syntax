@@ -622,9 +622,9 @@ describe('models', () => {
       slug: 'account',
       pluralSlug: 'accounts',
       fields: {
-        invoice: {
-          number: string({ required: true }),
-          date: date(),
+        address: {
+          country: string({ required: true }),
+          city: string(),
         },
       },
     });
@@ -638,14 +638,14 @@ describe('models', () => {
       fields: [
         {
           ...default_FIELD_PROPERTIES,
-          slug: 'invoice.recipient',
+          slug: 'address.country',
           type: 'string',
           required: true,
         },
         {
           ...default_FIELD_PROPERTIES,
-          slug: 'invoice.address',
-          type: 'date',
+          slug: 'address.city',
+          type: 'string',
         },
       ],
     });
