@@ -11,6 +11,5 @@ jobs:
     uses: ronin-co/actions/.github/workflows/remove-experimental.yml@main
     with:
       branch_name: ${{ github.event.pull_request.head.ref }}
-      package_dir: './'  # Adjust if your package is in a subdirectory
     secrets:
       NPM_TOKEN_READ_AND_WRITE: ${{ secrets.NPM_TOKEN_READ_AND_WRITE }}
