@@ -1,7 +1,12 @@
 import type { link } from '@/src/index';
 import type { NestedFields, Primitives } from '@/src/model/model';
-import type { ModelField, ModelTrigger } from '@ronin/compiler';
-import type { GetInstructions, Query, WithInstruction } from 'ronin/types';
+import type {
+  GetInstructions,
+  ModelField,
+  ModelTrigger,
+  Query,
+  WithInstruction,
+} from '@ronin/compiler';
 import { getBatchProxy } from 'ronin/utils';
 
 const ASYNC_CONTEXT = new (await import('node:async_hooks')).AsyncLocalStorage();

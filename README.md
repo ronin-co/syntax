@@ -1,5 +1,9 @@
 # RONIN Schema
 
+[![tests](https://img.shields.io/github/actions/workflow/status/ronin-co/schema/validate.yml?label=tests)](https://github.com/ronin-co/schema/actions/workflows/validate.yml)
+[![code coverage](https://img.shields.io/codecov/c/github/ronin-co/schema)](https://codecov.io/github/ronin-co/schema)
+[![install size](https://packagephobia.com/badge?p=@ronin/schema)](https://packagephobia.com/result?p=@ronin/schema)
+
 This package provides all primitives necessary for defining a [RONIN database schema](https://ronin.co/docs/platform/schemas-in-code) in code.
 
 ## Setup

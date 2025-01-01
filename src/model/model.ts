@@ -5,12 +5,13 @@ import {
   serializeTriggers,
 } from '@/src/model/utils/serializers';
 import type {
+  GetInstructions,
   ModelField,
   ModelIndex,
   ModelTrigger,
   Model as RawModel,
+  WithInstruction,
 } from '@ronin/compiler';
-import type { GetInstructions, WithInstruction } from 'ronin/types';
 
 // This is used to ensure that any object adhering to this interface has both fields.
 export interface RoninFields {
