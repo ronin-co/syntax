@@ -44,7 +44,7 @@ export interface NestedFields {
 export interface Model<Fields>
   extends Omit<RawModel, 'fields' | 'indexes' | 'triggers' | 'presets'> {
   /**
-   * The fields that make up this model's schema.
+   * The fields that make up this model.
    */
   fields?: Fields;
 
