@@ -105,7 +105,7 @@ interface LinkField {
     onDelete?: 'cascade' | 'restrict' | 'set null' | 'no action';
 
     /**
-     * Action to take when the referenced record's key is updated.
+     * Action to take when the referenced record is updated.
      */
     onUpdate?: 'cascade' | 'restrict' | 'set null' | 'no action';
   };
