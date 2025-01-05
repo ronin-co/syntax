@@ -16,7 +16,14 @@ import type {
 
 // This is used to ensure that any object adhering to this interface has both fields.
 export interface RoninFields {
+  /**
+   * The unique identifier for this record.
+   */
   id: string;
+
+  /**
+   * Contains metadata about the record like creation date, last update, etc.
+   */
   ronin: string;
 }
 
@@ -36,9 +43,24 @@ export interface NestedFields {
 
 export interface Model<Fields>
   extends Omit<RawModel, 'fields' | 'indexes' | 'triggers' | 'presets'> {
+  /**
+   * The fields that make up this model.
+   */
   fields?: Fields;
+
+  /**
+   * Predefined query instructions that can be reused across multiple different queries.
+   */
   presets?: Record<string, GetInstructions | WithInstruction>;
+
+  /**
+   * Database indexes to optimize query performance.
+   */
   indexes?: Array<ModelIndex<Array<ModelField & { slug: keyof Fields }>>>;
+
+  /**
+   * Queries that run automatically in response to other queries.
+   */
   triggers?: Array<ModelTrigger<Array<ModelField & { slug: keyof Fields }>>>;
 }
 
@@ -73,10 +95,24 @@ export interface SerializedField<T> {
 }
 
 interface LinkField {
+  /**
+   * Defines referential integrity behavior when linked records are modified.
+   */
   actions?: {
+    /**
+     * Action to take when the referenced record is deleted.
+     */
     onDelete?: 'cascade' | 'restrict' | 'set null' | 'no action';
+
+    /**
+     * Action to take when the referenced record is updated.
+     */
     onUpdate?: 'cascade' | 'restrict' | 'set null' | 'no action';
   };
+
+  /**
+   * The model that this field links to.
+   */
   model: RoninFields | { slug: string };
 }
 export interface SerializedLinkField
