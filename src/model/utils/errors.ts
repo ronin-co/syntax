@@ -39,6 +39,21 @@ export class RoninError extends Error {
   }
 }
 
+/**
+ * Validates a model definition and throws errors for forbidden configurations.
+ *
+ * This function checks for:
+ * - Use of reserved field names (e.g. 'id')
+ * - Empty index definitions
+ * - References to undefined fields in indexes
+ *
+ * @param model - The model definition to validate
+ *
+ * @throws {RoninError} When validation fails with details about the specific issue:
+ *  - FIELD_RESERVED: When a reserved field name is used
+ *  - INDEX_NO_FIELDS: When an index is defined without any fields
+ *  - FIELD_NOT_DEFINED: When an index references a non-existent field
+ */
 export const throwForbiddenModelDefinition = <Fields>(model: Model<Fields>) => {
   const { fields, indexes, slug } = model;
 
