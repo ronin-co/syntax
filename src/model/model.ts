@@ -49,7 +49,7 @@ export interface Model<Fields>
   fields?: Fields;
 
   /**
-   * Predefined queries that can be reused across the application.
+   * Predefined query instructions that can be reused across multiple different queries.
    */
   presets?: Record<string, GetInstructions | WithInstruction>;
 
