@@ -59,7 +59,7 @@ export interface Model<Fields>
   indexes?: Array<ModelIndex<Array<ModelField & { slug: keyof Fields }>>>;
 
   /**
-   * Functions that run automatically in response to database events.
+   * Queries that run automatically in response to other queries.
    */
   triggers?: Array<ModelTrigger<Array<ModelField & { slug: keyof Fields }>>>;
 }
