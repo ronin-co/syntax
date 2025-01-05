@@ -650,4 +650,52 @@ describe('models', () => {
       ],
     });
   });
+
+  test('throws error when using reserved id field', () => {
+    expect(() =>
+      model({
+        slug: 'account',
+        pluralSlug: 'accounts',
+        fields: {
+          // @ts-expect-error: This is intended.
+          id: string(),
+        },
+      }),
+    ).toThrow('The field "id" is reserved and cannot be used.');
+  });
+
+  test('throws error when index has no fields', () => {
+    expect(() =>
+      model({
+        slug: 'account',
+        pluralSlug: 'accounts',
+        fields: {
+          name: string(),
+        },
+        indexes: [
+          {
+            fields: [],
+          },
+        ],
+      }),
+    ).toThrow('An index must have at least one field.');
+  });
+
+  test('throws error when index references non-existent field', () => {
+    expect(() =>
+      model({
+        slug: 'account',
+        pluralSlug: 'accounts',
+        fields: {
+          name: string(),
+        },
+        indexes: [
+          {
+            // @ts-expect-error: This is intended.
+            fields: [{ slug: 'email' }],
+          },
+        ],
+      }),
+    ).toThrow('The field email does not exist in this model.');
+  });
 });

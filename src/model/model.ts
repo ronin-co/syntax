@@ -1,4 +1,5 @@
 import type { blob, boolean, date, json, link, number, string } from '@/src/index';
+import { throwForbiddenModelDefinition } from '@/src/model/utils/errors';
 import {
   serializeFields,
   serializePresets,
@@ -116,7 +117,7 @@ type ForbiddenKeys =
   | 'ronin.locked';
 
 // Exclude forbidden keys.
-type RecordWithoutForbiddenKeys<V> = {
+export type RecordWithoutForbiddenKeys<V> = {
   [K in Exclude<string, ForbiddenKeys>]: V;
 } & {
   [K in ForbiddenKeys]?: never;
@@ -161,19 +162,7 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     triggers,
   } = model;
 
-  if (indexes && indexes.length > 0) {
-    for (const index of indexes) {
-      if (index.fields.length === 0) {
-        throw new Error('An index must have at least one field.');
-      }
-
-      for (const field of index.fields) {
-        if ('slug' in field && fields && fields[field.slug] === undefined) {
-          throw new Error(`The field ${field.slug} does not exist in this model.`);
-        }
-      }
-    }
-  }
+  throwForbiddenModelDefinition(model);
 
   return {
     slug,
