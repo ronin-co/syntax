@@ -4,7 +4,7 @@ import { link } from '@/src/index';
 describe('link', () => {
   test('create field', () => {
     const field = link({
-      model: { slug: 'account' },
+      target: 'account',
     });
     expect(field).toBeTypeOf('object');
 
@@ -12,13 +12,13 @@ describe('link', () => {
       type: 'link',
       actions: undefined,
       name: undefined,
-      model: { slug: 'account' },
+      target: 'account',
     });
   });
 
   test('create field with attributes', () => {
     const field = link({
-      model: { slug: 'account' },
+      target: 'account',
       required: true,
       name: 'Profile',
     });
@@ -26,7 +26,7 @@ describe('link', () => {
 
     expect(field).toEqual({
       type: 'link',
-      model: { slug: 'account' },
+      target: 'account',
       name: 'Profile',
       actions: undefined,
       required: true,

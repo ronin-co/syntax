@@ -35,10 +35,10 @@ export const Profile = model({
 
   fields: {
     account: link({
-      model: Account,
+      target: 'account',
       actions: {
-        onDelete: 'cascade',
-        onUpdate: 'no action',
+        onDelete: 'CASCADE',
+        onUpdate: 'NO ACTION',
       },
     }),
     bio: json(),

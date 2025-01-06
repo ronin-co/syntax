@@ -64,60 +64,9 @@ export interface Model<Fields>
   triggers?: Array<ModelTrigger<Array<ModelField & { slug: keyof Fields }>>>;
 }
 
-export interface FieldGeneric {
-  /**
-   * The visual display name of the field.
-   */
-  name?: string;
-}
-
-export interface SerializedField<T> {
-  /**
-   * Whether the field is required.
-   */
-  required: boolean;
-
-  /**
-   * The value that the field should provide in the case of a missing value.
-   */
-  defaultValue?: T | null;
-
-  /**
-   * Whether the field's value should be unique across all records of the model.
-   */
-  unique: boolean;
-
-  /**
-   * Whether the field's value should be incremented automatically with each new record.
-   * Only available for number fields.
-   */
-  increment: T extends number ? boolean : never;
-}
-
-interface LinkField {
-  /**
-   * Defines referential integrity behavior when linked records are modified.
-   */
-  actions?: {
-    /**
-     * Action to take when the referenced record is deleted.
-     */
-    onDelete?: 'cascade' | 'restrict' | 'set null' | 'no action';
-
-    /**
-     * Action to take when the referenced record is updated.
-     */
-    onUpdate?: 'cascade' | 'restrict' | 'set null' | 'no action';
-  };
-
-  /**
-   * The model that this field links to.
-   */
-  model: RoninFields | { slug: string };
-}
-export interface SerializedLinkField
-  extends Omit<Partial<SerializedField<string>>, 'increment'>,
-    LinkField {}
+export type SerializedField<Type> = Partial<
+  Omit<Extract<ModelField, { type: Type }>, 'slug' | 'type'>
+>;
 
 // This type maps the fields of a model to their types.
 type FieldsToTypes<F> = F extends Record<string, Primitives>

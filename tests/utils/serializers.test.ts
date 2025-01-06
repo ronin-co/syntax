@@ -11,7 +11,7 @@ import { add } from 'ronin';
 describe('serializers', () => {
   test('serializeFields', () => {
     const fields = serializeFields({
-      account: link({ model: { slug: 'account' } }),
+      account: link({ target: 'account' }),
     });
 
     expect(fields).toEqual([

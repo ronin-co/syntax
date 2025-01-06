@@ -1,8 +1,4 @@
-import type { FieldGeneric, SerializedField } from '@/src/model/model';
-
-interface JsonAttributes {
-  displayAs?: 'rich-text';
-}
+import type { SerializedField } from '@/src/model/model';
 
 /**
  * Creates a JSON field definition returning an object that includes the field type
@@ -12,11 +8,7 @@ interface JsonAttributes {
  *
  * @returns A field of type "json" with the specified or default attributes.
  */
-export const json = (
-  attributes: Omit<Partial<SerializedField<string | object>>, 'increment'> &
-    FieldGeneric &
-    JsonAttributes = {},
-) => {
+export const json = (attributes: SerializedField<'json'> = {}) => {
   const { name, displayAs, ...rest } = attributes;
 
   return {

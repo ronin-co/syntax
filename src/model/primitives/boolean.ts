@@ -1,4 +1,4 @@
-import type { FieldGeneric, SerializedField } from '@/src/model/model';
+import type { SerializedField } from '@/src/model/model';
 
 /**
  * Creates a boolean field definition returning an object that includes the field type
@@ -8,9 +8,7 @@ import type { FieldGeneric, SerializedField } from '@/src/model/model';
  *
  * @returns A field of type "boolean" with the specified or default attributes.
  */
-export const boolean = (
-  attributes: Omit<Partial<SerializedField<boolean>>, 'increment'> & FieldGeneric = {},
-) => {
+export const boolean = (attributes: SerializedField<'boolean'> = {}) => {
   const { name, ...rest } = attributes;
 
   return {

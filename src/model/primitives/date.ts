@@ -1,4 +1,4 @@
-import type { FieldGeneric, SerializedField } from '@/src/model/model';
+import type { SerializedField } from '@/src/model/model';
 
 /**
  * Creates a date field definition returning an object that includes the field type
@@ -8,10 +8,7 @@ import type { FieldGeneric, SerializedField } from '@/src/model/model';
  *
  * @returns A field of type "date" with the specified or default attributes.
  */
-export const date = (
-  attributes: Omit<Partial<SerializedField<string | Date>>, 'increment'> &
-    FieldGeneric = {},
-) => {
+export const date = (attributes: SerializedField<'date'> = {}) => {
   const { name, ...rest } = attributes;
 
   return {
