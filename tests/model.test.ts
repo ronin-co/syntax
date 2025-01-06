@@ -465,8 +465,8 @@ describe('models', () => {
           type: 'link',
           target: 'account',
           actions: {
-            onDelete: 'cascade',
-            onUpdate: 'cascade',
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
           },
         },
       ],
