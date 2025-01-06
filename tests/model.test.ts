@@ -426,10 +426,10 @@ describe('models', () => {
 
       fields: {
         author: link({
-          model: Account,
+          target: 'account',
           actions: {
-            onDelete: 'cascade',
-            onUpdate: 'cascade',
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
           },
         }),
       },
@@ -465,8 +465,8 @@ describe('models', () => {
           type: 'link',
           target: 'account',
           actions: {
-            onDelete: 'cascade',
-            onUpdate: 'cascade',
+            onDelete: 'CASCADE',
+            onUpdate: 'CASCADE',
           },
         },
       ],

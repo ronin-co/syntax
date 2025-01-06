@@ -1,8 +1,4 @@
-import type { FieldGeneric, SerializedField } from '@/src/model/model';
-
-interface StringAttributes {
-  displayAs?: 'single-line' | 'multi-line' | 'secret';
-}
+import type { SerializedField } from '@/src/model/model';
 
 /**
  * Creates a string field definition returning an object that includes the field type
@@ -12,11 +8,7 @@ interface StringAttributes {
  *
  * @returns A field of type "string" with the specified or default attributes.
  */
-export const string = (
-  attributes: Omit<Partial<SerializedField<string>>, 'increment'> &
-    FieldGeneric &
-    StringAttributes = {},
-) => {
+export const string = (attributes: SerializedField<'string'> = {}) => {
   const { name, displayAs, ...rest } = attributes;
 
   return {

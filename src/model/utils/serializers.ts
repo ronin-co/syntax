@@ -35,7 +35,7 @@ export const serializeFields = (fields?: Record<string, Primitives>) => {
         Primitives,
         NestedFields
       >;
-      const { actions, model } = value as unknown as ReturnType<typeof link>;
+      const { actions, target } = value as unknown as ReturnType<typeof link>;
 
       return {
         slug: key,
@@ -43,10 +43,8 @@ export const serializeFields = (fields?: Record<string, Primitives>) => {
         unique: unique ?? false,
         required: required ?? false,
         defaultValue,
-        // @ts-expect-error: The `type` property exists in the model.
         type,
-        // @ts-expect-error: The `target` property exists in the model.
-        target: model?.slug,
+        target,
         actions,
       };
     },

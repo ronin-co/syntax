@@ -1,4 +1,4 @@
-import type { FieldGeneric, SerializedField } from '@/src/model/model';
+import type { SerializedField } from '@/src/model/model';
 
 /**
  * Creates a blob field definition returning an object that includes the field type
@@ -8,9 +8,7 @@ import type { FieldGeneric, SerializedField } from '@/src/model/model';
  *
  * @returns A field of type "blob" with the specified or default attributes.
  */
-export const blob = (
-  attributes: Omit<Partial<SerializedField<string>>, 'increment'> & FieldGeneric = {},
-) => {
+export const blob = (attributes: SerializedField<'blob'> = {}) => {
   const { name, ...rest } = attributes;
 
   return {
