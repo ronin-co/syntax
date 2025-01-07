@@ -7,7 +7,7 @@ import type { ModelField } from '@ronin/compiler';
  *
  * @param type - The field type.
  *
- * @returns A field of the specified type with the specified or default attributes.
+ * @returns A field of the provided type with the specified attributes.
  */
 const primitive = <T extends ModelField['type']>(type: T) => {
   return (attributes: SerializedField<T> = {}) => ({ type, ...attributes });
@@ -19,7 +19,7 @@ const primitive = <T extends ModelField['type']>(type: T) => {
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "string" with the specified or default attributes.
+ * @returns A field of type "string" with the specified attributes.
  */
 export const string = primitive('string');
 
@@ -29,7 +29,7 @@ export const string = primitive('string');
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "number" with the specified or default attributes.
+ * @returns A field of type "number" with the specified attributes.
  */
 export const number = primitive('number');
 
@@ -39,7 +39,7 @@ export const number = primitive('number');
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "link" with the specified or default attributes.
+ * @returns A field of type "link" with the specified attributes.
  */
 export const link = primitive('link');
 
@@ -49,7 +49,7 @@ export const link = primitive('link');
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "json" with the specified or default attributes.
+ * @returns A field of type "json" with the specified attributes.
  */
 export const json = primitive('json');
 
@@ -59,7 +59,7 @@ export const json = primitive('json');
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "date" with the specified or default attributes.
+ * @returns A field of type "date" with the specified attributes.
  */
 export const date = primitive('date');
 
@@ -69,7 +69,7 @@ export const date = primitive('date');
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "boolean" with the specified or default attributes.
+ * @returns A field of type "boolean" with the specified attributes.
  */
 export const boolean = primitive('boolean');
 
@@ -79,6 +79,6 @@ export const boolean = primitive('boolean');
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "blob" with the specified or default attributes.
+ * @returns A field of type "blob" with the specified attributes.
  */
 export const blob = primitive('blob');
