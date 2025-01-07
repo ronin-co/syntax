@@ -70,3 +70,41 @@ export const setProperty = <T extends object, K>(obj: T, path: string, value: K)
   setPropertyViaPathSegments(obj, segments, value);
   return obj;
 };
+
+/**
+ * Gets the property value of an object based on the given path segments
+ * of the property.
+ *
+ * @param obj - The object to get the property value from.
+ * @param pathSegments - An array of property keys leading up to the final
+ * property at the end.
+ *
+ * @returns The property value at the specified path or `undefined` if the path
+ * does not exist.
+ *
+ * @example
+ * const exampleObject = \{
+ *   user: \{
+ *     name: \{
+ *       first: 'John',
+ *       last: 'Doe'
+ *     \},
+ *     age: 30
+ *   \}
+ * \};
+ * console.log(getProperty(exampleObject, ['user', 'name', 'first'])); // Output: 'John'
+ * console.log(getProperty(exampleObject, ['user', 'age'])); // Output: 30
+ * console.log(getProperty(exampleObject, ['user', 'non', 'existing'])); // Output: undefined
+ */
+export const getProperty = (obj: object, path: string): unknown => {
+  const pathSegments = getPathSegments(path);
+
+  let current = obj as Record<string, object>;
+
+  for (const key of pathSegments) {
+    if (current[key] === null || current[key] === undefined) return undefined;
+    current = current[key] as Record<string, object>;
+  }
+
+  return current;
+};

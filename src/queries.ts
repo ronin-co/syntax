@@ -295,3 +295,5 @@ const wrapExpressions = (obj: NestedObject): NestedObject =>
       ];
     }),
   );
+
+export { getProperty, setProperty } from '@/src/utils';
