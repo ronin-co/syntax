@@ -1,10 +1,10 @@
-# RONIN Schema
+# RONIN Syntax
 
 [![tests](https://img.shields.io/github/actions/workflow/status/ronin-co/syntax/validate.yml?label=tests)](https://github.com/ronin-co/syntax/actions/workflows/validate.yml)
 [![code coverage](https://img.shields.io/codecov/c/github/ronin-co/syntax)](https://codecov.io/github/ronin-co/syntax)
 [![install size](https://packagephobia.com/badge?p=@ronin/syntax)](https://packagephobia.com/result?p=@ronin/syntax)
 
-This package provides all primitives necessary for defining a [RONIN database schema](https://ronin.co/docs/platform/schemas-in-code) in code.
+This package provides all primitives necessary for defining [RONIN](https://ronin.co) queries and schemas in TypeScript code.
 
 ## Setup
 
