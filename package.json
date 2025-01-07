@@ -12,8 +12,8 @@
     "dist"
   ],
   "exports": {
-    "schema": "./dist/schema",
-    "queries": "./dist/queries"
+    "./schema": "./dist/schema.js",
+    "./queries": "./dist/queries.js"
   },
   "typesVersions": {
     "*": {
