@@ -4,7 +4,7 @@
 [![code coverage](https://img.shields.io/codecov/c/github/ronin-co/syntax)](https://codecov.io/github/ronin-co/syntax)
 [![install size](https://packagephobia.com/badge?p=@ronin/syntax)](https://packagephobia.com/result?p=@ronin/syntax)
 
-This package provides all primitives necessary for defining [RONIN](https://ronin.co) queries and schemas in TypeScript code.
+This package makes it possible to define [RONIN](https://ronin.co) queries and schemas in TypeScript code.
 
 ## Setup
 
