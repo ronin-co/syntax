@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'bun:test';
-import { link } from '@/src/index';
+import { link } from '@/src/schema';
 import {
   serializeFields,
   serializePresets,
   serializeQueries,
   serializeTriggers,
-} from '@/src/model/utils/serializers';
+} from '@/src/utils/serializers';
 import { add } from 'ronin';
 
 describe('serializers', () => {

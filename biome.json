@@ -1,8 +1,8 @@
 {
   "$schema": "https://biomejs.dev/schemas/1.9.2/schema.json",
   "files": {
-    "include": ["./**/*.ts", "./tests/**/*.json"],
-    "ignore": ["node_modules/", "bun.lockb", "tsconfig.json"]
+    "include": ["./**/*.ts", "./**/*.json"],
+    "ignore": ["node_modules/", "bun.lockb", "package.json"]
   },
   "formatter": {
     "enabled": true,
@@ -40,13 +40,15 @@
       "nursery": {
         "all": true,
         "useSortedClasses": "warn",
-        "noSecrets": "off"
+        "noSecrets": "off",
+        "useExplicitType": "off"
       },
       "performance": {
         "all": true,
 
         "noBarrelFile": "off",
-        "noReExportAll": "off"
+        "noReExportAll": "off",
+        "noDelete": "off"
       },
       "security": { "all": true },
       "style": {
@@ -67,7 +69,8 @@
       },
       "suspicious": {
         "all": true,
-        "noConsole": "off"
+        "noConsole": "off",
+        "noExplicitAny": "off"
       }
     }
   },

@@ -1,5 +1,5 @@
-import type { link } from '@/src/index';
-import type { NestedFields, Primitives } from '@/src/model/model';
+import type { link } from '@/src/schema';
+import type { NestedFields, Primitives } from '@/src/schema/model';
 import type {
   GetInstructions,
   ModelField,

@@ -1,4 +1,4 @@
-import type { Model } from '@/src/model/model';
+import type { Model } from '@/src/schema/model';
 
 type RoninErrorCode =
   | 'FIELD_ALREADY_DEFINED'
