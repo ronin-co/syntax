@@ -10,7 +10,9 @@ import type { ModelField } from '@ronin/compiler';
  * @returns A field of the provided type with the specified attributes.
  */
 const primitive = <T extends ModelField['type']>(type: T) => {
-  return (attributes: SerializedField<T> = {}) => ({ type, ...attributes });
+  return (attributes: SerializedField<T> = {}) => {
+    return { type, ...attributes } as Omit<Extract<ModelField, { type: T }>, 'slug'>;
+  };
 };
 
 /**
