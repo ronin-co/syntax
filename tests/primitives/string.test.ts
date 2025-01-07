@@ -22,7 +22,6 @@ describe('string', () => {
     expect(field).toEqual({
       type: 'string',
       name: 'Surname',
-      displayAs: 'single-line',
       required: true,
     });
   });
