@@ -5,8 +5,7 @@
   "format": "esm",
   "entry": {
     "schema": "src/schema/index.ts",
-    "queries": "src/queries/index.ts",
-    "types": "src/types.ts"
+    "queries": "src/queries.ts"
   },
   "external": ["node:async_hooks"]
 }

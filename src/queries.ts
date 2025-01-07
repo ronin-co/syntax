@@ -1,5 +1,4 @@
 import type { AsyncLocalStorage } from 'node:async_hooks';
-import type { PromiseTuple, QueryItem } from '@/src/types';
 import { setProperty } from '@/src/utils';
 import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
@@ -7,6 +6,24 @@ import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 const RONIN_EXPRESSION_SEPARATOR = '//.//';
 
 interface BatchDetails {
+  query: Query;
+  options?: Record<string, unknown>;
+}
+
+/**
+ * Utility type to convert a tuple of promises into a tuple of their resolved types.
+ */
+export type PromiseTuple<
+  T extends [Promise<any>, ...Array<Promise<any>>] | Array<Promise<any>>,
+> = {
+  [P in keyof T]: Awaited<T[P]>;
+};
+
+/**
+ * Utility type that represents a particular query and any options that should
+ * be used when executing it.
+ */
+export interface QueryItem {
   query: Query;
   options?: Record<string, unknown>;
 }
