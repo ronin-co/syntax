@@ -1,10 +1,10 @@
 import type { blob, boolean, date, json, link, number, string } from '@/src/index';
-import { throwForbiddenModelDefinition } from '@/src/model/utils/errors';
+import { throwForbiddenModelDefinition } from '@/src/utils/errors';
 import {
   serializeFields,
   serializePresets,
   serializeTriggers,
-} from '@/src/model/utils/serializers';
+} from '@/src/utils/serializers';
 import type {
   GetInstructions,
   ModelField,

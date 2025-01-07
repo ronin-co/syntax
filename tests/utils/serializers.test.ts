@@ -5,7 +5,7 @@ import {
   serializePresets,
   serializeQueries,
   serializeTriggers,
-} from '@/src/model/utils/serializers';
+} from '@/src/utils/serializers';
 import { add } from 'ronin';
 
 describe('serializers', () => {
