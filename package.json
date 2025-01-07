@@ -1,5 +1,5 @@
 {
-  "name": "@ronin/schema",
+  "name": "@ronin/syntax",
   "version": "0.1.6",
   "type": "module",
   "description": "Allows for defining the schema of a RONIN database in code.",

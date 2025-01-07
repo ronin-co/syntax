@@ -2,7 +2,7 @@
 
 [![tests](https://img.shields.io/github/actions/workflow/status/ronin-co/schema/validate.yml?label=tests)](https://github.com/ronin-co/schema/actions/workflows/validate.yml)
 [![code coverage](https://img.shields.io/codecov/c/github/ronin-co/schema)](https://codecov.io/github/ronin-co/schema)
-[![install size](https://packagephobia.com/badge?p=@ronin/schema)](https://packagephobia.com/result?p=@ronin/schema)
+[![install size](https://packagephobia.com/badge?p=@ronin/syntax)](https://packagephobia.com/result?p=@ronin/syntax)
 
 This package provides all primitives necessary for defining a [RONIN database schema](https://ronin.co/docs/platform/schemas-in-code) in code.
 
@@ -28,10 +28,10 @@ Once that's done, link the package to make it available to all of your local pro
 bun link
 ```
 
-Inside your project, you can then run the following command, which is similar to `bun add @ronin/schema` or `npm install @ronin/schema`, except that it doesn't install `@ronin/schema` from npm, but instead uses your local clone of the package:
+Inside your project, you can then run the following command, which is similar to `bun add @ronin/syntax` or `npm install @ronin/syntax`, except that it doesn't install `@ronin/syntax` from npm, but instead uses your local clone of the package:
 
 ```bash
-bun link @ronin/schema
+bun link @ronin/syntax
 ```
 
 If your project is not yet compatible with [Bun](https://bun.sh), feel free to replace all of the occurrences of the word `bun` in the commands above with `npm` instead.
