@@ -12,8 +12,14 @@
     "dist"
   ],
   "exports": {
-    "./schema": "./dist/schema",
-    "./queries": "./dist/queries"
+    "schema": "./dist/schema",
+    "queries": "./dist/queries"
+  },
+  "typesVersions": {
+    "*": {
+      "schema": ["./dist/schema"],
+      "queries": ["./dist/queries"]
+    }
   },
   "scripts": {
     "lint": "bun run --bun lint:tsc && bun run --bun lint:biome",
