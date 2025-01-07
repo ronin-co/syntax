@@ -1,4 +1,4 @@
-import type { SerializedField } from '@/src/model';
+import type { SerializedField } from '@/src/schema/model';
 
 /**
  * Creates a string field definition returning an object that includes the field type

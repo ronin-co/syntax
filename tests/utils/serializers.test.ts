@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { link } from '@/src/index';
+import { link } from '@/src/schema/index';
 import {
   serializeFields,
   serializePresets,

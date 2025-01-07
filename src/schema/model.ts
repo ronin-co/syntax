@@ -1,4 +1,4 @@
-import type { blob, boolean, date, json, link, number, string } from '@/src/index';
+import type { blob, boolean, date, json, link, number, string } from '@/src/schema/index';
 import { throwForbiddenModelDefinition } from '@/src/utils/errors';
 import {
   serializeFields,

@@ -1,4 +1,4 @@
-import { blob, boolean, date, json, link, model, number, string } from '@/src/index';
+import { blob, boolean, date, json, link, model, number, string } from '@/src/schema';
 import { add } from 'ronin';
 
 export const Account = model({
