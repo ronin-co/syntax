@@ -1,3 +1,4 @@
+import { getBatchProxy } from '@/src/queries';
 import type { link } from '@/src/schema';
 import type { NestedFields, Primitives } from '@/src/schema/model';
 import type {
@@ -7,7 +8,6 @@ import type {
   Query,
   WithInstruction,
 } from '@ronin/compiler';
-import { getBatchProxy } from 'ronin/utils';
 
 const ASYNC_CONTEXT = new (await import('node:async_hooks')).AsyncLocalStorage();
 
@@ -20,8 +20,11 @@ const ASYNC_CONTEXT = new (await import('node:async_hooks')).AsyncLocalStorage()
  */
 export const serializeFields = (fields?: Record<string, Primitives>) => {
   return Object.entries(fields ?? {}).flatMap(
-    ([key, value]): Array<ModelField> | ModelField => {
-      if (!('type' in value)) {
+    ([key, initialValue]): Array<ModelField> | ModelField => {
+      let value = initialValue?.structure;
+
+      if (typeof value === 'undefined') {
+        value = initialValue;
         const result: Record<string, Primitives> = {};
 
         for (const k of Object.keys(value)) {
@@ -103,7 +106,7 @@ export const serializeQueries = (query: () => Array<Query>) => {
     },
     { asyncContext: ASYNC_CONTEXT },
     (queries) => {
-      return queries.map((query) => query.query);
+      return queries.map((query) => query.structure);
     },
   );
   return queryObject;

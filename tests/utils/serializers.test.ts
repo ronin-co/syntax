@@ -1,4 +1,5 @@
 import { describe, expect, test } from 'bun:test';
+import { getSyntaxProxy } from '@/src/queries';
 import { link } from '@/src/schema';
 import {
   serializeFields,
@@ -6,7 +7,6 @@ import {
   serializeQueries,
   serializeTriggers,
 } from '@/src/utils/serializers';
-import { add } from 'ronin';
 
 describe('serializers', () => {
   test('serializeFields', () => {
@@ -59,6 +59,8 @@ describe('serializers', () => {
   });
 
   test('serializeTriggers', () => {
+    const add = getSyntaxProxy('add');
+
     const triggers = serializeTriggers([
       {
         action: 'INSERT',
@@ -96,7 +98,8 @@ describe('serializers', () => {
   });
 
   test('serialize query', () => {
-    // @ts-expect-error: The queries need to be adjusted in the TS client.
+    const add = getSyntaxProxy('add');
+
     const query = serializeQueries(() => [add.account.to({ name: 'Lorena' })]);
 
     expect(query).toEqual([{ add: { account: { to: { name: 'Lorena' } } } }]);

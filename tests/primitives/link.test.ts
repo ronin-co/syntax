@@ -6,9 +6,9 @@ describe('link', () => {
     const field = link({
       target: 'account',
     });
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'link',
       actions: undefined,
       name: undefined,
@@ -22,9 +22,9 @@ describe('link', () => {
       required: true,
       name: 'Profile',
     });
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'link',
       target: 'account',
       name: 'Profile',

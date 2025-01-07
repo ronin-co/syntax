@@ -5,9 +5,9 @@ describe('blob', () => {
   test('create field', () => {
     const field = blob();
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'blob',
       name: undefined,
     });
@@ -16,9 +16,9 @@ describe('blob', () => {
   test('create field with attributes', () => {
     const field = blob({ required: true, name: 'Registered' });
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'blob',
       name: 'Registered',
       required: true,

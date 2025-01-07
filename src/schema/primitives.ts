@@ -1,3 +1,4 @@
+import { getSyntaxProxy } from '@/src/queries';
 import type { SerializedField } from '@/src/schema/model';
 import type { ModelField } from '@ronin/compiler';
 
@@ -10,8 +11,9 @@ import type { ModelField } from '@ronin/compiler';
  * @returns A field of the provided type with the specified attributes.
  */
 const primitive = <T extends ModelField['type']>(type: T) => {
-  return (attributes: SerializedField<T> = {}) => {
-    return { type, ...attributes } as Omit<Extract<ModelField, { type: T }>, 'slug'>;
+  return (initialAttributes: SerializedField<T> = {}) => {
+    return getSyntaxProxy()({ ...initialAttributes, type });
+    // return { type, ...attributes } as Omit<Extract<ModelField, { type: T }>, 'slug'>;
   };
 };
 

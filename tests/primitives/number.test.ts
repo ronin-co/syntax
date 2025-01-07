@@ -5,9 +5,9 @@ describe('number', () => {
   test('create field', () => {
     const field = number();
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'number',
       name: undefined,
     });
@@ -16,9 +16,9 @@ describe('number', () => {
   test('create field with attributes', () => {
     const field = number({ required: true, name: 'Follower' });
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'number',
       name: 'Follower',
       required: true,

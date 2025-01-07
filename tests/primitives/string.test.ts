@@ -5,9 +5,9 @@ describe('string', () => {
   test('create field', () => {
     const field = string({ displayAs: 'secret' });
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'string',
       name: undefined,
       displayAs: 'secret',
@@ -17,9 +17,9 @@ describe('string', () => {
   test('create field with attributes', () => {
     const field = string({ required: true, name: 'Surname' });
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'string',
       name: 'Surname',
       required: true,

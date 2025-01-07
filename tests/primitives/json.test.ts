@@ -5,9 +5,9 @@ describe('json', () => {
   test('create field', () => {
     const field = json();
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'json',
       name: undefined,
       displayAs: undefined,
@@ -17,9 +17,9 @@ describe('json', () => {
   test('create field with attributes', () => {
     const field = json({ required: true, name: 'Registered' });
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'json',
       name: 'Registered',
       displayAs: undefined,

@@ -5,9 +5,9 @@ describe('boolean', () => {
   test('create field', () => {
     const field = boolean();
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'boolean',
       name: undefined,
     });
@@ -16,9 +16,9 @@ describe('boolean', () => {
   test('create field with attributes', () => {
     const field = boolean({ required: true, name: 'Registered' });
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'boolean',
       name: 'Registered',
       required: true,

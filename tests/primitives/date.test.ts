@@ -5,9 +5,9 @@ describe('date', () => {
   test('create field', () => {
     const field = date();
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'date',
       name: undefined,
     });
@@ -16,9 +16,9 @@ describe('date', () => {
   test('create field with attributes', () => {
     const field = date({ required: true, name: 'Registered' });
 
-    expect(field).toBeTypeOf('object');
+    expect(field.structure).toBeTypeOf('object');
 
-    expect(field).toEqual({
+    expect(field.structure).toEqual({
       type: 'date',
       name: 'Registered',
       required: true,

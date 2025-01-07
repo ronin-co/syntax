@@ -5,11 +5,6 @@ import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 /** Used to separate the components of an expression from each other. */
 const RONIN_EXPRESSION_SEPARATOR = '//.//';
 
-interface BatchDetails {
-  query: Query;
-  options?: Record<string, unknown>;
-}
-
 /**
  * Utility type to convert a tuple of promises into a tuple of their resolved types.
  */
@@ -24,7 +19,7 @@ export type PromiseTuple<
  * be used when executing it.
  */
 export interface QueryItem {
-  query: Query;
+  structure: Query;
   options?: Record<string, unknown>;
 }
 
@@ -73,10 +68,10 @@ let IN_BATCH_SYNC = false;
  * ```
  */
 export const getSyntaxProxy = (
-  queryType: string,
-  queryHandler: (query: Query, options?: Record<string, unknown>) => Promise<any> | any,
+  queryType?: string,
+  queryHandler?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any,
 ) => {
-  function createProxy(path: Array<string>, targetProps?: BatchDetails) {
+  function createProxy(path: Array<string>, targetProps?: QueryItem) {
     const proxyTargetFunction = () => undefined;
 
     // This is workaround to avoid "uncalled functions" in the test
@@ -122,8 +117,8 @@ export const getSyntaxProxy = (
 
           const instructions = value(fieldProxy);
 
-          if (instructions.query) {
-            value = { [QUERY_SYMBOLS.QUERY]: instructions.query };
+          if (instructions.structure) {
+            value = { [QUERY_SYMBOLS.QUERY]: instructions.structure };
           } else {
             value = instructions;
           }
@@ -138,22 +133,31 @@ export const getSyntaxProxy = (
         }
 
         // If the function call is happening after an existing function call in the
-        // same query, the existing query will be available as `target.query`, and
+        // same query, the existing query will be available as `target.structure`, and
         // we should extend it. If none is available, we should create a new query.
-        const query = target.query || {};
-        const targetValue = typeof value === 'undefined' ? {} : value;
+        const structure = target.structure || {};
+        const targetValue = typeof value === 'undefined' ? true : value;
+        const pathJoined = path.length > 0 ? path.join('.') : '.';
 
-        setProperty(query, `${queryType}.${path.join('.')}`, targetValue);
+        if (pathJoined === '.') {
+          Object.assign(structure, targetValue);
+        } else {
+          setProperty(
+            structure,
+            queryType ? `${queryType}.${pathJoined}` : pathJoined,
+            targetValue,
+          );
+        }
 
         // If the function call is happening inside a batch, return a new proxy, to
         // allow for continuing to chain `get` accessors and function calls after
         // existing function calls in the same query.
-        if (IN_BATCH_ASYNC?.getStore() || IN_BATCH_SYNC) {
+        if (IN_BATCH_ASYNC?.getStore() || IN_BATCH_SYNC || !queryHandler) {
           // To ensure that `get` accessor calls are mounted to the same level as
           // the function after which they are called, we need to remove the last
           // path segment.
           const newPath = path.slice(0, -1);
-          const details: BatchDetails = { query };
+          const details: QueryItem = { structure };
 
           // Only add options if any are available, to avoid adding a property that
           // holds an `undefined` value.
@@ -162,7 +166,7 @@ export const getSyntaxProxy = (
           return createProxy(newPath, details);
         }
 
-        return queryHandler(query, options);
+        return queryHandler(structure, options);
       },
 
       get(target: any, nextProp: string, receiver: any): any {
