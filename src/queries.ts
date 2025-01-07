@@ -1,6 +1,6 @@
 import type { AsyncLocalStorage } from 'node:async_hooks';
 import { setProperty } from '@/src/utils';
-import { type Query } from '@ronin/compiler';
+import type { Query } from '@ronin/compiler';
 
 /**
  * A list of placeholders that can be located inside queries after those queries were
@@ -11,13 +11,13 @@ import { type Query } from '@ronin/compiler';
  * which allows for distinguishing that nested query from an object of instructions.
  */
 const QUERY_SYMBOLS = {
-   QUERY: "__RONIN_QUERY",
-   EXPRESSION: "__RONIN_EXPRESSION",
-   FIELD: "__RONIN_FIELD_",
-   FIELD_PARENT: "__RONIN_FIELD_PARENT_",
-   FIELD_PARENT_OLD: "__RONIN_FIELD_PARENT_OLD_",
-   FIELD_PARENT_NEW: "__RONIN_FIELD_PARENT_NEW_",
-   VALUE: "__RONIN_VALUE"
+  QUERY: '__RONIN_QUERY',
+  EXPRESSION: '__RONIN_EXPRESSION',
+  FIELD: '__RONIN_FIELD_',
+  FIELD_PARENT: '__RONIN_FIELD_PARENT_',
+  FIELD_PARENT_OLD: '__RONIN_FIELD_PARENT_OLD_',
+  FIELD_PARENT_NEW: '__RONIN_FIELD_PARENT_NEW_',
+  VALUE: '__RONIN_VALUE',
 };
 
 /** Used to separate the components of an expression from each other. */
