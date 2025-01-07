@@ -18,7 +18,8 @@
   "typesVersions": {
     "*": {
       "schema": ["./dist/schema"],
-      "queries": ["./dist/queries"]
+      "queries": ["./dist/queries"],
+      "types": ["./dist/types"]
     }
   },
   "scripts": {
