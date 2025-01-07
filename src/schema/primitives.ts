@@ -1,4 +1,19 @@
 import type { SerializedField } from '@/src/schema/model';
+import type { ModelField } from '@ronin/compiler';
+
+/**
+ * Creates a primitive field definition returning an object that includes the field type
+ * and attributes.
+ *
+ * @param type - The field type.
+ *
+ * @returns A field of the provided type with the specified attributes.
+ */
+const primitive = <T extends ModelField['type']>(type: T) => {
+  return (attributes: SerializedField<T> = {}) => {
+    return { type, ...attributes } as Omit<Extract<ModelField, { type: T }>, 'slug'>;
+  };
+};
 
 /**
  * Creates a string field definition returning an object that includes the field type
@@ -6,18 +21,9 @@ import type { SerializedField } from '@/src/schema/model';
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "string" with the specified or default attributes.
+ * @returns A field of type "string" with the specified attributes.
  */
-export const string = (attributes: SerializedField<'string'> = {}) => {
-  const { name, displayAs, ...rest } = attributes;
-
-  return {
-    name,
-    displayAs: displayAs ?? 'single-line',
-    type: 'string' as const,
-    ...rest,
-  };
-};
+export const string = primitive('string');
 
 /**
  * Creates a number field definition returning an object that includes the field type
@@ -25,17 +31,9 @@ export const string = (attributes: SerializedField<'string'> = {}) => {
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "number" with the specified or default attributes.
+ * @returns A field of type "number" with the specified attributes.
  */
-export const number = (attributes: SerializedField<'number'> = {}) => {
-  const { name, ...rest } = attributes;
-
-  return {
-    name,
-    type: 'number' as const,
-    ...rest,
-  };
-};
+export const number = primitive('number');
 
 /**
  * Creates a link field definition returning an object that includes the field type
@@ -43,21 +41,9 @@ export const number = (attributes: SerializedField<'number'> = {}) => {
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "link" with the specified or default attributes.
+ * @returns A field of type "link" with the specified attributes.
  */
-export const link = (attributes: SerializedField<'link'> = {}) => {
-  const { name, target, actions, ...rest } = attributes;
-
-  if (!target) throw new Error('A model is required for a link field');
-
-  return {
-    name,
-    target,
-    actions,
-    type: 'link' as const,
-    ...rest,
-  };
-};
+export const link = primitive('link');
 
 /**
  * Creates a JSON field definition returning an object that includes the field type
@@ -65,18 +51,9 @@ export const link = (attributes: SerializedField<'link'> = {}) => {
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "json" with the specified or default attributes.
+ * @returns A field of type "json" with the specified attributes.
  */
-export const json = (attributes: SerializedField<'json'> = {}) => {
-  const { name, displayAs, ...rest } = attributes;
-
-  return {
-    name,
-    displayAs,
-    type: 'json' as const,
-    ...rest,
-  };
-};
+export const json = primitive('json');
 
 /**
  * Creates a date field definition returning an object that includes the field type
@@ -84,17 +61,9 @@ export const json = (attributes: SerializedField<'json'> = {}) => {
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "date" with the specified or default attributes.
+ * @returns A field of type "date" with the specified attributes.
  */
-export const date = (attributes: SerializedField<'date'> = {}) => {
-  const { name, ...rest } = attributes;
-
-  return {
-    name,
-    type: 'date' as const,
-    ...rest,
-  };
-};
+export const date = primitive('date');
 
 /**
  * Creates a boolean field definition returning an object that includes the field type
@@ -102,17 +71,9 @@ export const date = (attributes: SerializedField<'date'> = {}) => {
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "boolean" with the specified or default attributes.
+ * @returns A field of type "boolean" with the specified attributes.
  */
-export const boolean = (attributes: SerializedField<'boolean'> = {}) => {
-  const { name, ...rest } = attributes;
-
-  return {
-    name,
-    type: 'boolean' as const,
-    ...rest,
-  };
-};
+export const boolean = primitive('boolean');
 
 /**
  * Creates a blob field definition returning an object that includes the field type
@@ -120,14 +81,6 @@ export const boolean = (attributes: SerializedField<'boolean'> = {}) => {
  *
  * @param attributes - Optional field attributes.
  *
- * @returns A field of type "blob" with the specified or default attributes.
+ * @returns A field of type "blob" with the specified attributes.
  */
-export const blob = (attributes: SerializedField<'blob'> = {}) => {
-  const { name, ...rest } = attributes;
-
-  return {
-    name,
-    type: 'blob' as const,
-    ...rest,
-  };
-};
+export const blob = primitive('blob');
