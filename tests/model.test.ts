@@ -1,14 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import {
-  blob,
-  boolean,
-  date,
-  json,
-  link,
-  model,
-  number,
-  string,
-} from '@/src/schema/index';
+import { blob, boolean, date, json, link, model, number, string } from '@/src/schema';
 import { add } from 'ronin';
 
 const default_FIELD_PROPERTIES = {

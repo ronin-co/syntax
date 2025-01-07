@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { boolean } from '@/src/schema/index';
+import { boolean } from '@/src/schema';
 
 describe('boolean', () => {
   test('create field', () => {

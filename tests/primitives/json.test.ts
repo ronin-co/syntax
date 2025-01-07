@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { json } from '@/src/schema/index';
+import { json } from '@/src/schema';
 
 describe('json', () => {
   test('create field', () => {

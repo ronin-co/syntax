@@ -1,4 +1,4 @@
-import type { link } from '@/src/schema/index';
+import type { link } from '@/src/schema';
 import type { NestedFields, Primitives } from '@/src/schema/model';
 import type {
   GetInstructions,

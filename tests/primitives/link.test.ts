@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { link } from '@/src/schema/index';
+import { link } from '@/src/schema';
 
 describe('link', () => {
   test('create field', () => {
