@@ -16,8 +16,6 @@ describe('models', () => {
       slug: 'account',
       // @ts-expect-error: The Account object has 'pluralSlug'.
       pluralSlug: 'accounts',
-      // @ts-expect-error: The Account object has 'fields'.
-      fields: [],
     });
   });
 
@@ -36,8 +34,6 @@ describe('models', () => {
       pluralSlug: 'accounts',
       // @ts-expect-error: The Account object has 'name'.
       name: 'Account',
-      // @ts-expect-error: The Account object has 'fields'.
-      fields: [],
     });
   });
 
@@ -59,8 +55,6 @@ describe('models', () => {
       name: 'Account',
       // @ts-expect-error: The Account object has 'pluralName'.
       pluralName: 'Accounts',
-      // @ts-expect-error: The Account object has 'fields'.
-      fields: [],
     });
   });
 

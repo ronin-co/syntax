@@ -23,7 +23,7 @@ describe('serializers', () => {
     ]);
 
     // Test empty fields case
-    expect(serializeFields()).toEqual([]);
+    expect(serializeFields()).toBeUndefined();
   });
 
   test('serializePresets', () => {

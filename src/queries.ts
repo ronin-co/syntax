@@ -1,4 +1,5 @@
 import type { AsyncLocalStorage } from 'node:async_hooks';
+import { model } from '@/src/schema';
 import { setProperty } from '@/src/utils';
 import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
@@ -145,6 +146,11 @@ export const getSyntaxProxy = (config?: {
         const pathJoined = pathParts.length > 0 ? pathParts.join('.') : '.';
 
         setProperty(structure, pathJoined, targetValue);
+
+        // If a `create.model` query was provided, serialize the model structure.
+        if (config?.rootProperty === 'create' && structure?.create?.model) {
+          structure.create.model = model(structure.create.model);
+        }
 
         // If the function call is happening inside a batch, return a new proxy, to
         // allow for continuing to chain `get` accessors and function calls after

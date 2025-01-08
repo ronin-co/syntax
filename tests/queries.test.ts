@@ -3,6 +3,7 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 import { describe, expect, spyOn, test } from 'bun:test';
 
 import { type SyntaxItem, getBatchProxy, getSyntaxProxy } from '@/src/queries';
+import { string } from '@/src/schema';
 import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
@@ -335,6 +336,41 @@ describe('syntax proxy', () => {
     const finalQuery = {
       get: {
         account: null,
+      },
+    };
+
+    expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+  });
+
+  test('creating a model via query using primitive helpers', async () => {
+    const getQueryHandler = { callback: () => undefined };
+    const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
+
+    const createProxy = getSyntaxProxy({
+      rootProperty: 'create',
+      callback: getQueryHandlerSpy,
+    });
+
+    createProxy.model({
+      slug: 'account',
+
+      fields: {
+        handle: string().required(),
+      },
+    });
+
+    const finalQuery = {
+      create: {
+        model: {
+          slug: 'account',
+          fields: [
+            {
+              type: 'string',
+              slug: 'handle',
+              required: true,
+            },
+          ],
+        },
       },
     };
 

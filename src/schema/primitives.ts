@@ -47,7 +47,10 @@ export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutpu
  */
 const primitive = <T extends ModelField['type']>(type: T) => {
   return (initialAttributes: FieldInput<T> = {}) => {
-    return getSyntaxProxy()({ ...initialAttributes, type }) as Chain<FieldOutput<T>>;
+    return getSyntaxProxy({ propertyValue: true })({
+      ...initialAttributes,
+      type,
+    }) as Chain<FieldOutput<T>>;
   };
 };
 

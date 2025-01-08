@@ -16,7 +16,9 @@ import type {
  * @returns The serialized fields.
  */
 export const serializeFields = (fields?: Record<string, PrimitivesItem>) => {
-  return Object.entries(fields ?? {}).flatMap(
+  if (!fields) return fields;
+
+  return Object.entries(fields).flatMap(
     ([key, initialValue]): Array<ModelField> | ModelField => {
       let value = initialValue?.structure;
 
@@ -28,7 +30,7 @@ export const serializeFields = (fields?: Record<string, PrimitivesItem>) => {
           result[`${key}.${k}`] = value[k];
         }
 
-        return serializeFields(result);
+        return serializeFields(result) || [];
       }
 
       return {
