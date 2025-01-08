@@ -1,4 +1,6 @@
 import { blob, boolean, date, json, link, model, number, string } from '@/src/schema';
+
+// @ts-expect-error This dependency must be added in the project.
 import { add } from 'ronin';
 
 export const Account = model({
