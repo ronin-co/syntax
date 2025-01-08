@@ -57,26 +57,12 @@ export type PrimitivesItem =
   | SyntaxItem<PrimitiveField<'blob'>>
   | NestedFieldsPrimitivesItem;
 
-export type PrimitivesRaw =
-  | PrimitiveField<'link'>
-  | PrimitiveField<'string'>
-  | PrimitiveField<'boolean'>
-  | PrimitiveField<'number'>
-  | PrimitiveField<'json'>
-  | PrimitiveField<'date'>
-  | PrimitiveField<'blob'>
-  | NestedFieldsPrimitivesRaw;
-
 export interface NestedFieldsPrimitives {
   [key: string]: Primitives;
 }
 
 export interface NestedFieldsPrimitivesItem {
   [key: string]: PrimitivesItem;
-}
-
-export interface NestedFieldsPrimitivesRaw {
-  [key: string]: PrimitivesRaw;
 }
 
 export interface Model<Fields>
@@ -107,9 +93,9 @@ export type SerializedField<Type> = Partial<
 >;
 
 // This type maps the fields of a model to their types.
-type FieldsToTypes<F> = F extends Record<string, PrimitivesRaw>
+type FieldsToTypes<F> = F extends Record<string, Primitives>
   ? {
-      [K in keyof F]: F[K] extends Record<string, PrimitivesRaw>
+      [K in keyof F]: F[K] extends Record<string, Primitives>
         ? FieldsToTypes<F[K]>
         : F[K]['type'] extends 'string'
           ? string

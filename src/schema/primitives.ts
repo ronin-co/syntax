@@ -19,13 +19,13 @@ type AttributeSignature<T> = T extends boolean
  * from that attribute's type. Calling it returns a new `Chain` marking `K` as used.
  */
 type Chain<Attrs, Used extends keyof Attrs = never> = {
-  [K in Exclude<
-    keyof Attrs,
-    Used
-  >]: // Convert the attribute type into a function signature and produce the next chain
-  // stage with `K` now included in `Used`.
-  (...args: Parameters<AttributeSignature<Attrs[K]>>) => Chain<Attrs, Used | K>;
-};
+  // 1) Chainable methods for all keys that are not in `Used` or `type`
+  [K in Exclude<keyof Attrs, Used | 'type'>]: (
+    ...args: Parameters<AttributeSignature<Attrs[K]>>
+  ) => Chain<Attrs, Used | K>;
+  // 2) If `type` is defined in `Attrs`, add it as a read-only property
+  // biome-ignore lint/complexity/noBannedTypes: This is a valid use case.
+} & ('type' extends keyof Attrs ? { readonly type: Attrs['type'] } : {});
 
 export type PrimitiveField<T extends ModelField['type']> = Omit<
   Extract<ModelField, { type: T }>,
@@ -42,7 +42,9 @@ export type PrimitiveField<T extends ModelField['type']> = Omit<
  */
 const primitive = <T extends ModelField['type']>(type: T) => {
   return (initialAttributes: SerializedField<T> = {}) => {
-    return getSyntaxProxy()({ ...initialAttributes, type }) as Chain<SerializedField<T>>;
+    return getSyntaxProxy()({ ...initialAttributes, type }) as Chain<
+      SerializedField<T> & { type: T }
+    >;
   };
 };
 
