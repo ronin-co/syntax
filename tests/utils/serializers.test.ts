@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { getSyntaxProxy } from '@/src/queries';
+import { getProperty, getSyntaxProxy, setProperty } from '@/src/queries';
 import { link } from '@/src/schema';
 import {
   serializeFields,
@@ -103,5 +103,25 @@ describe('serializers', () => {
     const query = serializeQueries(() => [add.account.to({ name: 'Lorena' })]);
 
     expect(query).toEqual([{ add: { account: { to: { name: 'Lorena' } } } }]);
+  });
+});
+
+describe('miscellaneous', () => {
+  test('getProperty', () => {
+    const contents = {
+      item: true,
+    };
+
+    expect(getProperty(contents, 'item')).toBe(true);
+  });
+
+  test('setPropertyProperty', () => {
+    const contents = {
+      item: true,
+    };
+
+    setProperty(contents, 'item', false);
+
+    expect(contents.item).toBe(false);
   });
 });
