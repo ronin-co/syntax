@@ -1,5 +1,41 @@
-import type { SerializedField } from '@/src/schema/model';
+import { type SyntaxItem, getSyntaxProxy } from '@/src/queries';
 import type { ModelField } from '@ronin/compiler';
+
+/** A utility type that maps an attribute's type to a function signature. */
+type AttributeSignature<T> = T extends boolean
+  ? () => any
+  : T extends boolean
+    ? never
+    : (value: string) => any;
+
+/**
+ * Represents a chain of field attributes in the form of a function chain.
+ *
+ * - `Attrs`: The interface describing your attributes (e.g., { required: boolean; }).
+ * - `Used`: A union of the keys already used in the chain.
+ *
+ * For each attribute key `K` not in `Used`, create a method using the signature derived
+ * from that attribute's type. Calling it returns a new `Chain` marking `K` as used.
+ */
+type Chain<Attrs, Used extends keyof Attrs = never> = {
+  // 1) Chainable methods for all keys that are not in `Used` or `type`
+  [K in Exclude<keyof Attrs, Used | 'type'>]: (
+    ...args: Parameters<AttributeSignature<Attrs[K]>>
+  ) => Chain<Attrs, Used | K>;
+  // 2) If `type` is defined in `Attrs`, add it as a read-only property
+  // biome-ignore lint/complexity/noBannedTypes: This is a valid use case.
+} & ('type' extends keyof Attrs ? { readonly type: Attrs['type'] } : {});
+
+type FieldInput<Type> = Partial<
+  Omit<Extract<ModelField, { type: Type }>, 'slug' | 'type'>
+>;
+
+type FieldOutput<Type extends ModelField['type']> = Omit<
+  Extract<ModelField, { type: Type }>,
+  'slug'
+>;
+
+export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutput<Type>>;
 
 /**
  * Creates a primitive field definition returning an object that includes the field type
@@ -10,8 +46,8 @@ import type { ModelField } from '@ronin/compiler';
  * @returns A field of the provided type with the specified attributes.
  */
 const primitive = <T extends ModelField['type']>(type: T) => {
-  return (attributes: SerializedField<T> = {}) => {
-    return { type, ...attributes } as Omit<Extract<ModelField, { type: T }>, 'slug'>;
+  return (initialAttributes: FieldInput<T> = {}) => {
+    return getSyntaxProxy()({ ...initialAttributes, type }) as Chain<FieldOutput<T>>;
   };
 };
 

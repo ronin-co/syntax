@@ -1,5 +1,5 @@
-import type { link } from '@/src/schema';
-import type { NestedFields, Primitives } from '@/src/schema/model';
+import { getBatchProxy } from '@/src/queries';
+import type { PrimitivesItem } from '@/src/schema/model';
 import type {
   GetInstructions,
   ModelField,
@@ -7,7 +7,6 @@ import type {
   Query,
   WithInstruction,
 } from '@ronin/compiler';
-import { getBatchProxy } from 'ronin/utils';
 
 /**
  * Serialize fields from `Record<string, Primitives>` to `Model<Fields>`.
@@ -16,11 +15,14 @@ import { getBatchProxy } from 'ronin/utils';
  *
  * @returns The serialized fields.
  */
-export const serializeFields = (fields?: Record<string, Primitives>) => {
+export const serializeFields = (fields?: Record<string, PrimitivesItem>) => {
   return Object.entries(fields ?? {}).flatMap(
-    ([key, value]): Array<ModelField> | ModelField => {
-      if (!('type' in value)) {
-        const result: Record<string, Primitives> = {};
+    ([key, initialValue]): Array<ModelField> | ModelField => {
+      let value = initialValue?.structure;
+
+      if (typeof value === 'undefined') {
+        value = initialValue as Record<string, PrimitivesItem>;
+        const result: typeof value = {};
 
         for (const k of Object.keys(value)) {
           result[`${key}.${k}`] = value[k];
@@ -29,21 +31,9 @@ export const serializeFields = (fields?: Record<string, Primitives>) => {
         return serializeFields(result);
       }
 
-      const { type, unique, defaultValue, required, name } = value as unknown as Exclude<
-        Primitives,
-        NestedFields
-      >;
-      const { actions, target } = value as unknown as ReturnType<typeof link>;
-
       return {
         slug: key,
-        name,
-        unique: unique ?? false,
-        required: required ?? false,
-        defaultValue,
-        type,
-        target,
-        actions,
+        ...value,
       };
     },
   );
@@ -101,7 +91,7 @@ export const serializeQueries = (query: () => Array<Query>) => {
     },
     {},
     (queries) => {
-      return queries.map((query) => query.query);
+      return queries.map((query) => query.structure);
     },
   );
   return queryObject;

@@ -1,4 +1,13 @@
-import type { blob, boolean, date, json, link, number, string } from '@/src/schema';
+import type {
+  SyntaxField,
+  blob,
+  boolean,
+  date,
+  json,
+  link,
+  number,
+  string,
+} from '@/src/schema';
 import { throwForbiddenModelDefinition } from '@/src/utils/errors';
 import {
   serializeFields,
@@ -35,10 +44,24 @@ export type Primitives =
   | ReturnType<typeof json>
   | ReturnType<typeof date>
   | ReturnType<typeof blob>
-  | NestedFields;
+  | NestedFieldsPrimitives;
 
-export interface NestedFields {
+export type PrimitivesItem =
+  | SyntaxField<'link'>
+  | SyntaxField<'string'>
+  | SyntaxField<'boolean'>
+  | SyntaxField<'number'>
+  | SyntaxField<'json'>
+  | SyntaxField<'date'>
+  | SyntaxField<'blob'>
+  | NestedFieldsPrimitivesItem;
+
+export interface NestedFieldsPrimitives {
   [key: string]: Primitives;
+}
+
+export interface NestedFieldsPrimitivesItem {
+  [key: string]: PrimitivesItem;
 }
 
 export interface Model<Fields>
@@ -63,10 +86,6 @@ export interface Model<Fields>
    */
   triggers?: Array<ModelTrigger<Array<ModelField & { slug: keyof Fields }>>>;
 }
-
-export type SerializedField<Type> = Partial<
-  Omit<Extract<ModelField, { type: Type }>, 'slug' | 'type'>
->;
 
 // This type maps the fields of a model to their types.
 type FieldsToTypes<F> = F extends Record<string, Primitives>
@@ -156,7 +175,7 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     pluralName,
     identifiers,
     idPrefix,
-    fields: serializeFields(fields),
+    fields: serializeFields(fields as RecordWithoutForbiddenKeys<PrimitivesItem>),
     presets: serializePresets(presets),
     triggers: serializeTriggers(triggers),
     indexes,

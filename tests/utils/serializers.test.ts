@@ -1,29 +1,24 @@
 import { describe, expect, test } from 'bun:test';
-import { link } from '@/src/schema';
+import { getProperty, getSyntaxProxy, setProperty } from '@/src/queries';
+import { type SyntaxField, link } from '@/src/schema';
 import {
   serializeFields,
   serializePresets,
   serializeQueries,
   serializeTriggers,
 } from '@/src/utils/serializers';
-import { add } from 'ronin';
 
 describe('serializers', () => {
   test('serializeFields', () => {
     const fields = serializeFields({
-      account: link({ target: 'account' }),
+      account: link({ target: 'account' }) as unknown as SyntaxField<'link'>,
     });
 
     expect(fields).toEqual([
       {
-        actions: undefined,
-        defaultValue: undefined,
-        required: false,
         slug: 'account',
-        name: undefined,
         target: 'account',
         type: 'link',
-        unique: false,
       },
     ]);
 
@@ -59,6 +54,8 @@ describe('serializers', () => {
   });
 
   test('serializeTriggers', () => {
+    const add = getSyntaxProxy({ rootProperty: 'add' });
+
     const triggers = serializeTriggers([
       {
         action: 'INSERT',
@@ -96,9 +93,30 @@ describe('serializers', () => {
   });
 
   test('serialize query', () => {
-    // @ts-expect-error: The queries need to be adjusted in the TS client.
+    const add = getSyntaxProxy({ rootProperty: 'add' });
+
     const query = serializeQueries(() => [add.account.to({ name: 'Lorena' })]);
 
     expect(query).toEqual([{ add: { account: { to: { name: 'Lorena' } } } }]);
+  });
+});
+
+describe('miscellaneous', () => {
+  test('getProperty', () => {
+    const contents = {
+      item: true,
+    };
+
+    expect(getProperty(contents, 'item')).toBe(true);
+  });
+
+  test('setPropertyProperty', () => {
+    const contents = {
+      item: true,
+    };
+
+    setProperty(contents, 'item', false);
+
+    expect(contents.item).toBe(false);
   });
 });
