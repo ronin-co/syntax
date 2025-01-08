@@ -1,5 +1,4 @@
 import { getSyntaxProxy } from '@/src/queries';
-import type { SerializedField } from '@/src/schema/model';
 import type { ModelField } from '@ronin/compiler';
 
 /** A utility type that maps an attribute's type to a function signature. */
@@ -27,7 +26,11 @@ type Chain<Attrs, Used extends keyof Attrs = never> = {
   // biome-ignore lint/complexity/noBannedTypes: This is a valid use case.
 } & ('type' extends keyof Attrs ? { readonly type: Attrs['type'] } : {});
 
-export type PrimitiveField<T extends ModelField['type']> = Omit<
+type FieldInput<Type> = Partial<
+  Omit<Extract<ModelField, { type: Type }>, 'slug' | 'type'>
+>;
+
+export type FieldOutput<T extends ModelField['type']> = Omit<
   Extract<ModelField, { type: T }>,
   'slug'
 >;
@@ -41,10 +44,8 @@ export type PrimitiveField<T extends ModelField['type']> = Omit<
  * @returns A field of the provided type with the specified attributes.
  */
 const primitive = <T extends ModelField['type']>(type: T) => {
-  return (initialAttributes: SerializedField<T> = {}) => {
-    return getSyntaxProxy()({ ...initialAttributes, type }) as Chain<
-      SerializedField<T> & { type: T }
-    >;
+  return (initialAttributes: FieldInput<T> = {}) => {
+    return getSyntaxProxy()({ ...initialAttributes, type }) as Chain<FieldOutput<T>>;
   };
 };
 

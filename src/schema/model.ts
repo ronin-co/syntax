@@ -1,6 +1,6 @@
 import type { SyntaxItem } from '@/src/queries';
 import type {
-  PrimitiveField,
+  FieldOutput,
   blob,
   boolean,
   date,
@@ -48,13 +48,13 @@ export type Primitives =
   | NestedFieldsPrimitives;
 
 export type PrimitivesItem =
-  | SyntaxItem<PrimitiveField<'link'>>
-  | SyntaxItem<PrimitiveField<'string'>>
-  | SyntaxItem<PrimitiveField<'boolean'>>
-  | SyntaxItem<PrimitiveField<'number'>>
-  | SyntaxItem<PrimitiveField<'json'>>
-  | SyntaxItem<PrimitiveField<'date'>>
-  | SyntaxItem<PrimitiveField<'blob'>>
+  | SyntaxItem<FieldOutput<'link'>>
+  | SyntaxItem<FieldOutput<'string'>>
+  | SyntaxItem<FieldOutput<'boolean'>>
+  | SyntaxItem<FieldOutput<'number'>>
+  | SyntaxItem<FieldOutput<'json'>>
+  | SyntaxItem<FieldOutput<'date'>>
+  | SyntaxItem<FieldOutput<'blob'>>
   | NestedFieldsPrimitivesItem;
 
 export interface NestedFieldsPrimitives {
@@ -87,10 +87,6 @@ export interface Model<Fields>
    */
   triggers?: Array<ModelTrigger<Array<ModelField & { slug: keyof Fields }>>>;
 }
-
-export type SerializedField<Type> = Partial<
-  Omit<Extract<ModelField, { type: Type }>, 'slug' | 'type'>
->;
 
 // This type maps the fields of a model to their types.
 type FieldsToTypes<F> = F extends Record<string, Primitives>
