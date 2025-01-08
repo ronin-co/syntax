@@ -1,4 +1,3 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
 import type { link } from '@/src/schema';
 import type { NestedFields, Primitives } from '@/src/schema/model';
 import type {
@@ -9,8 +8,6 @@ import type {
   WithInstruction,
 } from '@ronin/compiler';
 import { getBatchProxy } from 'ronin/utils';
-
-const ASYNC_CONTEXT = new AsyncLocalStorage();
 
 /**
  * Serialize fields from `Record<string, Primitives>` to `Model<Fields>`.
@@ -102,7 +99,7 @@ export const serializeQueries = (query: () => Array<Query>) => {
     () => {
       return query();
     },
-    { asyncContext: ASYNC_CONTEXT },
+    {},
     (queries) => {
       return queries.map((query) => query.query);
     },
