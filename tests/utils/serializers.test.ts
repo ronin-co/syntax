@@ -59,7 +59,7 @@ describe('serializers', () => {
   });
 
   test('serializeTriggers', () => {
-    const add = getSyntaxProxy('add');
+    const add = getSyntaxProxy({ rootProperty: 'add' });
 
     const triggers = serializeTriggers([
       {
@@ -98,7 +98,7 @@ describe('serializers', () => {
   });
 
   test('serialize query', () => {
-    const add = getSyntaxProxy('add');
+    const add = getSyntaxProxy({ rootProperty: 'add' });
 
     const query = serializeQueries(() => [add.account.to({ name: 'Lorena' })]);
 

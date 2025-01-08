@@ -562,7 +562,7 @@ describe('models', () => {
   });
 
   test('create model with triggers', () => {
-    const add = getSyntaxProxy('add');
+    const add = getSyntaxProxy({ rootProperty: 'add' });
 
     const Account = model({
       slug: 'account',

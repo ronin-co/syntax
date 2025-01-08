@@ -45,21 +45,19 @@ let IN_BATCH_ASYNC: AsyncLocalStorage<boolean>;
 let IN_BATCH_SYNC = false;
 
 /**
- * A utility function that creates a Proxy object to handle dynamic property
- * access and function calls. It is used to create a syntax that allows for
- * dynamic query generation.
+ * A utility function that creates a proxy object to handle dynamic property access and
+ * function calls, which is used to compose the query and schema syntax.
  *
- * @param queryType - The type of the query. This will be used as the key in
- * the generated query object.
- * @param queryHandler - A function that handles the execution of the query.
+ * @param config - An object containing configuration for the composed structure.
  *
- * @returns A Proxy object that intercepts property access and function
- * calls to generate and execute queries.
+ * @returns A proxy object that intercepts property access and function calls.
  *
  * ### Usage
  * ```typescript
- * const proxy = getSyntaxProxy('get', async (query) => {
- *   // Execute the query and return the result
+ * const get = getSyntaxProxy({
+ *  rootProperty: 'get',
+ *  // Execute the query and return the result
+ *  callback: async (query) => {}
  * });
  *
  * const result = await get.account();
@@ -67,10 +65,15 @@ let IN_BATCH_SYNC = false;
  * const result = await get.account.with.email('mike@gmail.com');
  * ```
  */
-export const getSyntaxProxy = (
-  queryType?: string,
-  queryHandler?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any,
-) => {
+export const getSyntaxProxy = (config?: {
+  rootProperty?: string;
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}) => {
+  // The default value of a property within the composed structure.
+  const propertyValue =
+    typeof config?.propertyValue === 'undefined' ? {} : config.propertyValue;
+
   function createProxy(path: Array<string>, targetProps?: QueryItem) {
     const proxyTargetFunction = () => undefined;
 
@@ -136,7 +139,7 @@ export const getSyntaxProxy = (
         // same query, the existing query will be available as `target.structure`, and
         // we should extend it. If none is available, we should create a new query.
         const structure = target.structure || {};
-        const targetValue = typeof value === 'undefined' ? true : value;
+        const targetValue = typeof value === 'undefined' ? propertyValue : value;
         const pathJoined = path.length > 0 ? path.join('.') : '.';
 
         if (pathJoined === '.') {
@@ -144,7 +147,7 @@ export const getSyntaxProxy = (
         } else {
           setProperty(
             structure,
-            queryType ? `${queryType}.${pathJoined}` : pathJoined,
+            config?.rootProperty ? `${config.rootProperty}.${pathJoined}` : pathJoined,
             targetValue,
           );
         }
@@ -152,7 +155,7 @@ export const getSyntaxProxy = (
         // If the function call is happening inside a batch, return a new proxy, to
         // allow for continuing to chain `get` accessors and function calls after
         // existing function calls in the same query.
-        if (IN_BATCH_ASYNC?.getStore() || IN_BATCH_SYNC || !queryHandler) {
+        if (IN_BATCH_ASYNC?.getStore() || IN_BATCH_SYNC || !config?.callback) {
           // To ensure that `get` accessor calls are mounted to the same level as
           // the function after which they are called, we need to remove the last
           // path segment.
@@ -166,7 +169,7 @@ export const getSyntaxProxy = (
           return createProxy(newPath, details);
         }
 
-        return queryHandler(structure, options);
+        return config.callback(structure, options);
       },
 
       get(target: any, nextProp: string, receiver: any): any {
