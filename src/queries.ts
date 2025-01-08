@@ -140,17 +140,11 @@ export const getSyntaxProxy = (config?: {
         // we should extend it. If none is available, we should create a new query.
         const structure = target.structure || {};
         const targetValue = typeof value === 'undefined' ? propertyValue : value;
-        const pathJoined = path.length > 0 ? path.join('.') : '.';
 
-        if (pathJoined === '.') {
-          Object.assign(structure, targetValue);
-        } else {
-          setProperty(
-            structure,
-            config?.rootProperty ? `${config.rootProperty}.${pathJoined}` : pathJoined,
-            targetValue,
-          );
-        }
+        const pathParts = config?.rootProperty ? [config.rootProperty, ...path] : path;
+        const pathJoined = pathParts.length > 0 ? pathParts.join('.') : '.';
+
+        setProperty(structure, pathJoined, targetValue);
 
         // If the function call is happening inside a batch, return a new proxy, to
         // allow for continuing to chain `get` accessors and function calls after

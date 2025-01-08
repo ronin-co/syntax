@@ -320,4 +320,24 @@ describe('syntax proxy', () => {
       },
     ]);
   });
+
+  test('using a function call at the root', async () => {
+    const getQueryHandler = { callback: () => undefined };
+    const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
+
+    const getProxy = getSyntaxProxy({
+      rootProperty: 'get',
+      callback: getQueryHandlerSpy,
+    });
+
+    getProxy({ account: null });
+
+    const finalQuery = {
+      get: {
+        account: null,
+      },
+    };
+
+    expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+  });
 });
