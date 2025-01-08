@@ -66,8 +66,13 @@ const setPropertyViaPathSegments = (
 };
 
 export const setProperty = <T extends object, K>(obj: T, path: string, value: K): T => {
-  const segments = getPathSegments(path);
-  setPropertyViaPathSegments(obj, segments, value);
+  if (path === '.') {
+    Object.assign(obj, value);
+  } else {
+    const segments = getPathSegments(path);
+    setPropertyViaPathSegments(obj, segments, value);
+  }
+
   return obj;
 };
 

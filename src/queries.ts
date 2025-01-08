@@ -144,11 +144,7 @@ export const getSyntaxProxy = (config?: {
         const pathParts = config?.rootProperty ? [config.rootProperty, ...path] : path;
         const pathJoined = pathParts.length > 0 ? pathParts.join('.') : '.';
 
-        if (pathJoined === '.') {
-          Object.assign(structure, targetValue);
-        } else {
-          setProperty(structure, pathJoined, targetValue);
-        }
+        setProperty(structure, pathJoined, targetValue);
 
         // If the function call is happening inside a batch, return a new proxy, to
         // allow for continuing to chain `get` accessors and function calls after
