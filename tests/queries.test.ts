@@ -154,9 +154,7 @@ describe('syntax proxy', () => {
           { randomOption: true },
         ),
       ],
-      {
-        asyncContext: new AsyncLocalStorage(),
-      },
+      {},
       (queries) => queryList.push(...queries),
     );
 
@@ -194,9 +192,7 @@ describe('syntax proxy', () => {
           .with({ team: 'blue' })
           .orderedBy.ascending(['joinedAt']),
       ],
-      {
-        asyncContext: new AsyncLocalStorage(),
-      },
+      {},
       (queries) => queryList.push(...queries),
     );
 
@@ -256,9 +252,7 @@ describe('syntax proxy', () => {
         alterProxy.model('users').drop.field('handle'),
         dropProxy.model('users'),
       ],
-      {
-        asyncContext: new AsyncLocalStorage(),
-      },
+      {},
       (queries) => queryList.push(...queries),
     );
 
