@@ -2,11 +2,6 @@ import { describe, expect, test } from 'bun:test';
 import { getSyntaxProxy } from '@/src/queries';
 import { blob, boolean, date, json, link, model, number, string } from '@/src/schema';
 
-const default_FIELD_PROPERTIES = {
-  required: false,
-  unique: false,
-};
-
 describe('models', () => {
   test('create empty model', () => {
     const Account = model({
@@ -167,7 +162,6 @@ describe('models', () => {
 
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'name',
           type: 'string',
           required: true,
@@ -195,13 +189,11 @@ describe('models', () => {
 
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'name',
           type: 'string',
           required: true,
         },
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'avatar',
           type: 'blob',
         },
@@ -228,13 +220,11 @@ describe('models', () => {
 
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'name',
           type: 'string',
           required: true,
         },
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'bio',
           type: 'json',
         },
@@ -261,13 +251,11 @@ describe('models', () => {
 
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'name',
           type: 'string',
           required: true,
         },
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'birthday',
           type: 'date',
         },
@@ -293,7 +281,6 @@ describe('models', () => {
 
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'name',
           name: 'CusToM NaMe',
           type: 'string',
@@ -321,7 +308,6 @@ describe('models', () => {
 
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'createdAt',
           type: 'string',
           required: true,
@@ -353,28 +339,23 @@ describe('models', () => {
 
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'name',
           type: 'string',
           required: true,
         },
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'email',
           type: 'string',
         },
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'emailVerified',
           type: 'boolean',
         },
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'password',
           type: 'string',
         },
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'follower',
           type: 'number',
         },
@@ -401,7 +382,6 @@ describe('models', () => {
 
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'name',
           type: 'string',
           unique: true,
@@ -443,7 +423,6 @@ describe('models', () => {
       pluralSlug: 'accounts',
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'name',
           type: 'string',
           required: true,
@@ -460,7 +439,6 @@ describe('models', () => {
 
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'author',
           type: 'link',
           target: 'account',
@@ -498,7 +476,6 @@ describe('models', () => {
       name: 'Account',
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'name',
           type: 'string',
           required: true,
@@ -592,7 +569,6 @@ describe('models', () => {
       name: 'Account',
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'name',
           type: 'string',
           required: true,
@@ -639,13 +615,11 @@ describe('models', () => {
       pluralSlug: 'accounts',
       fields: [
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'address.country',
           type: 'string',
           required: true,
         },
         {
-          ...default_FIELD_PROPERTIES,
           slug: 'address.city',
           type: 'string',
         },

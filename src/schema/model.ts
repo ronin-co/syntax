@@ -1,4 +1,14 @@
-import type { blob, boolean, date, json, link, number, string } from '@/src/schema';
+import type { SyntaxItem } from '@/src/queries';
+import type {
+  PrimitiveField,
+  blob,
+  boolean,
+  date,
+  json,
+  link,
+  number,
+  string,
+} from '@/src/schema';
 import { throwForbiddenModelDefinition } from '@/src/utils/errors';
 import {
   serializeFields,
@@ -35,10 +45,38 @@ export type Primitives =
   | ReturnType<typeof json>
   | ReturnType<typeof date>
   | ReturnType<typeof blob>
-  | NestedFields;
+  | NestedFieldsPrimitives;
 
-export interface NestedFields {
+export type PrimitivesItem =
+  | SyntaxItem<PrimitiveField<'link'>>
+  | SyntaxItem<PrimitiveField<'string'>>
+  | SyntaxItem<PrimitiveField<'boolean'>>
+  | SyntaxItem<PrimitiveField<'number'>>
+  | SyntaxItem<PrimitiveField<'json'>>
+  | SyntaxItem<PrimitiveField<'date'>>
+  | SyntaxItem<PrimitiveField<'blob'>>
+  | NestedFieldsPrimitivesItem;
+
+export type PrimitivesRaw =
+  | PrimitiveField<'link'>
+  | PrimitiveField<'string'>
+  | PrimitiveField<'boolean'>
+  | PrimitiveField<'number'>
+  | PrimitiveField<'json'>
+  | PrimitiveField<'date'>
+  | PrimitiveField<'blob'>
+  | NestedFieldsPrimitivesRaw;
+
+export interface NestedFieldsPrimitives {
   [key: string]: Primitives;
+}
+
+export interface NestedFieldsPrimitivesItem {
+  [key: string]: PrimitivesItem;
+}
+
+export interface NestedFieldsPrimitivesRaw {
+  [key: string]: PrimitivesRaw;
 }
 
 export interface Model<Fields>
@@ -69,9 +107,9 @@ export type SerializedField<Type> = Partial<
 >;
 
 // This type maps the fields of a model to their types.
-type FieldsToTypes<F> = F extends Record<string, Primitives>
+type FieldsToTypes<F> = F extends Record<string, PrimitivesRaw>
   ? {
-      [K in keyof F]: F[K] extends Record<string, Primitives>
+      [K in keyof F]: F[K] extends Record<string, PrimitivesRaw>
         ? FieldsToTypes<F[K]>
         : F[K]['type'] extends 'string'
           ? string

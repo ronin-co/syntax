@@ -2,8 +2,8 @@ import { AsyncLocalStorage } from 'node:async_hooks';
 
 import { describe, expect, spyOn, test } from 'bun:test';
 
-import { type QueryItem, getBatchProxy, getSyntaxProxy } from '@/src/queries';
-import { QUERY_SYMBOLS } from '@ronin/compiler';
+import { type SyntaxItem, getBatchProxy, getSyntaxProxy } from '@/src/queries';
+import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
   test('using sub query', async () => {
@@ -143,7 +143,7 @@ describe('syntax proxy', () => {
 
   test('using options for query in batch', async () => {
     const get = getSyntaxProxy({ rootProperty: 'get' });
-    const queryList: Array<QueryItem> = [];
+    const queryList: Array<SyntaxItem<Query>> = [];
 
     getBatchProxy(
       () => [
@@ -179,7 +179,7 @@ describe('syntax proxy', () => {
   test('using function chaining in batch', async () => {
     const getProxy = getSyntaxProxy({ rootProperty: 'get', callback: () => undefined });
 
-    const queryList: Array<QueryItem> = [];
+    const queryList: Array<SyntaxItem<Query>> = [];
 
     getBatchProxy(
       () => [
@@ -233,7 +233,7 @@ describe('syntax proxy', () => {
     const alterProxy = getSyntaxProxy({ rootProperty: 'alter', callback });
     const dropProxy = getSyntaxProxy({ rootProperty: 'drop', callback });
 
-    const queryList: Array<QueryItem> = [];
+    const queryList: Array<SyntaxItem<Query>> = [];
 
     getBatchProxy(
       () => [

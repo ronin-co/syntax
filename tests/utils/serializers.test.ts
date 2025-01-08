@@ -16,14 +16,9 @@ describe('serializers', () => {
 
     expect(fields).toEqual([
       {
-        actions: undefined,
-        defaultValue: undefined,
-        required: false,
         slug: 'account',
-        name: undefined,
         target: 'account',
         type: 'link',
-        unique: false,
       },
     ]);
 

@@ -18,8 +18,8 @@ export type PromiseTuple<
  * Utility type that represents a particular query and any options that should
  * be used when executing it.
  */
-export interface QueryItem {
-  structure: Query;
+export interface SyntaxItem<Structure = unknown> {
+  structure: Structure;
   options?: Record<string, unknown>;
 }
 
@@ -74,7 +74,7 @@ export const getSyntaxProxy = (config?: {
   const propertyValue =
     typeof config?.propertyValue === 'undefined' ? {} : config.propertyValue;
 
-  function createProxy(path: Array<string>, targetProps?: QueryItem) {
+  function createProxy(path: Array<string>, targetProps?: SyntaxItem) {
     const proxyTargetFunction = () => undefined;
 
     // This is workaround to avoid "uncalled functions" in the test
@@ -160,7 +160,7 @@ export const getSyntaxProxy = (config?: {
           // the function after which they are called, we need to remove the last
           // path segment.
           const newPath = path.slice(0, -1);
-          const details: QueryItem = { structure };
+          const details: SyntaxItem = { structure };
 
           // Only add options if any are available, to avoid adding a property that
           // holds an `undefined` value.
@@ -219,11 +219,11 @@ export const getBatchProxy = <
   // biome-ignore lint/style/useDefaultParameterLast:
   options: QueryOptions = {},
   queriesHandler: (
-    queries: Array<QueryItem>,
+    queries: Array<SyntaxItem<Query>>,
     options?: QueryOptions,
   ) => Promise<any> | any,
 ): Promise<PromiseTuple<T>> | T => {
-  let queries: Array<QueryItem> = [];
+  let queries: Array<SyntaxItem<Query>> = [];
 
   if (options.asyncContext) {
     IN_BATCH_ASYNC = options.asyncContext;

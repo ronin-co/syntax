@@ -1,8 +1,20 @@
 import { expect, test } from 'bun:test';
-import { blob, boolean, date, json, link, number, string } from '@/src/schema';
+import type { SyntaxItem } from '@/src/queries';
+import {
+  type PrimitiveField,
+  blob,
+  boolean,
+  date,
+  json,
+  link,
+  number,
+  string,
+} from '@/src/schema';
 
 test('create string field', () => {
-  const field = string({ displayAs: 'secret' });
+  const field = string({ displayAs: 'secret' }) as unknown as SyntaxItem<
+    PrimitiveField<'string'>
+  >;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -14,7 +26,9 @@ test('create string field', () => {
 });
 
 test('create string field with attributes', () => {
-  const field = string({ required: true, name: 'Surname' });
+  const field = string({ required: true, name: 'Surname' }) as unknown as SyntaxItem<
+    PrimitiveField<'string'>
+  >;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -26,7 +40,7 @@ test('create string field with attributes', () => {
 });
 
 test('create number field', () => {
-  const field = number();
+  const field = number() as unknown as SyntaxItem<PrimitiveField<'number'>>;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -37,7 +51,9 @@ test('create number field', () => {
 });
 
 test('create number field with attributes', () => {
-  const field = number({ required: true, name: 'Follower' });
+  const field = number({ required: true, name: 'Follower' }) as unknown as SyntaxItem<
+    PrimitiveField<'number'>
+  >;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -49,7 +65,7 @@ test('create number field with attributes', () => {
 });
 
 test('create boolean field', () => {
-  const field = boolean();
+  const field = boolean() as unknown as SyntaxItem<PrimitiveField<'boolean'>>;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -60,7 +76,9 @@ test('create boolean field', () => {
 });
 
 test('create boolean field with attributes', () => {
-  const field = boolean({ required: true, name: 'Registered' });
+  const field = boolean({ required: true, name: 'Registered' }) as unknown as SyntaxItem<
+    PrimitiveField<'boolean'>
+  >;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -72,7 +90,7 @@ test('create boolean field with attributes', () => {
 });
 
 test('create date field', () => {
-  const field = date();
+  const field = date() as unknown as SyntaxItem<PrimitiveField<'date'>>;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -83,7 +101,9 @@ test('create date field', () => {
 });
 
 test('create date field with attributes', () => {
-  const field = date({ required: true, name: 'Registered' });
+  const field = date({ required: true, name: 'Registered' }) as unknown as SyntaxItem<
+    PrimitiveField<'date'>
+  >;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -95,7 +115,7 @@ test('create date field with attributes', () => {
 });
 
 test('create blob field', () => {
-  const field = blob();
+  const field = blob() as unknown as SyntaxItem<PrimitiveField<'blob'>>;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -106,7 +126,9 @@ test('create blob field', () => {
 });
 
 test('create blob field with attributes', () => {
-  const field = blob({ required: true, name: 'Registered' });
+  const field = blob({ required: true, name: 'Registered' }) as unknown as SyntaxItem<
+    PrimitiveField<'blob'>
+  >;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -118,7 +140,7 @@ test('create blob field with attributes', () => {
 });
 
 test('create json field', () => {
-  const field = json();
+  const field = json() as unknown as SyntaxItem<PrimitiveField<'json'>>;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -130,7 +152,9 @@ test('create json field', () => {
 });
 
 test('create json field with attributes', () => {
-  const field = json({ required: true, name: 'Registered' });
+  const field = json({ required: true, name: 'Registered' }) as unknown as SyntaxItem<
+    PrimitiveField<'json'>
+  >;
 
   expect(field.structure).toBeTypeOf('object');
 
@@ -145,7 +169,8 @@ test('create json field with attributes', () => {
 test('create link field', () => {
   const field = link({
     target: 'account',
-  });
+  }) as unknown as SyntaxItem<PrimitiveField<'link'>>;
+
   expect(field.structure).toBeTypeOf('object');
 
   expect(field.structure).toEqual({
@@ -161,7 +186,7 @@ test('create link field with attributes', () => {
     target: 'account',
     required: true,
     name: 'Profile',
-  });
+  }) as unknown as SyntaxItem<PrimitiveField<'link'>>;
   expect(field.structure).toBeTypeOf('object');
 
   expect(field.structure).toEqual({

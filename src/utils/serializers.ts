@@ -1,6 +1,5 @@
 import { getBatchProxy } from '@/src/queries';
-import type { link } from '@/src/schema';
-import type { NestedFields, Primitives } from '@/src/schema/model';
+import type { PrimitivesItem } from '@/src/schema/model';
 import type {
   GetInstructions,
   ModelField,
@@ -16,14 +15,14 @@ import type {
  *
  * @returns The serialized fields.
  */
-export const serializeFields = (fields?: Record<string, Primitives>) => {
+export const serializeFields = (fields?: Record<string, PrimitivesItem>) => {
   return Object.entries(fields ?? {}).flatMap(
     ([key, initialValue]): Array<ModelField> | ModelField => {
       let value = initialValue?.structure;
 
       if (typeof value === 'undefined') {
         value = initialValue;
-        const result: Record<string, Primitives> = {};
+        const result: Record<string, PrimitivesItem> = {};
 
         for (const k of Object.keys(value)) {
           result[`${key}.${k}`] = value[k];
@@ -32,21 +31,9 @@ export const serializeFields = (fields?: Record<string, Primitives>) => {
         return serializeFields(result);
       }
 
-      const { type, unique, defaultValue, required, name } = value as unknown as Exclude<
-        Primitives,
-        NestedFields
-      >;
-      const { actions, target } = value as unknown as ReturnType<typeof link>;
-
       return {
         slug: key,
-        name,
-        unique: unique ?? false,
-        required: required ?? false,
-        defaultValue,
-        type,
-        target,
-        actions,
+        ...value,
       };
     },
   );

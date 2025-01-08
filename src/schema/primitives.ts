@@ -27,6 +27,11 @@ type Chain<Attrs, Used extends keyof Attrs = never> = {
   (...args: Parameters<AttributeSignature<Attrs[K]>>) => Chain<Attrs, Used | K>;
 };
 
+export type PrimitiveField<T extends ModelField['type']> = Omit<
+  Extract<ModelField, { type: T }>,
+  'slug'
+>;
+
 /**
  * Creates a primitive field definition returning an object that includes the field type
  * and attributes.
@@ -37,9 +42,7 @@ type Chain<Attrs, Used extends keyof Attrs = never> = {
  */
 const primitive = <T extends ModelField['type']>(type: T) => {
   return (initialAttributes: SerializedField<T> = {}) => {
-    return getSyntaxProxy()({ ...initialAttributes, type }) as Chain<
-      Omit<Extract<ModelField, { type: T }>, 'slug'>
-    >;
+    return getSyntaxProxy()({ ...initialAttributes, type }) as Chain<SerializedField<T>>;
   };
 };
 
