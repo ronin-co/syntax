@@ -2,6 +2,31 @@ import { getSyntaxProxy } from '@/src/queries';
 import type { SerializedField } from '@/src/schema/model';
 import type { ModelField } from '@ronin/compiler';
 
+/** A utility type that maps an attribute's type to a function signature. */
+type AttributeSignature<T> = T extends boolean
+  ? () => any
+  : T extends boolean
+    ? never
+    : (value: string) => any;
+
+/**
+ * Represents a chain of field attributes in the form of a function chain.
+ *
+ * - `Attrs`: The interface describing your attributes (e.g., { required: boolean; }).
+ * - `Used`: A union of the keys already used in the chain.
+ *
+ * For each attribute key `K` not in `Used`, create a method using the signature derived
+ * from that attribute's type. Calling it returns a new `Chain` marking `K` as used.
+ */
+type Chain<Attrs, Used extends keyof Attrs = never> = {
+  [K in Exclude<
+    keyof Attrs,
+    Used
+  >]: // Convert the attribute type into a function signature and produce the next chain
+  // stage with `K` now included in `Used`.
+  (...args: Parameters<AttributeSignature<Attrs[K]>>) => Chain<Attrs, Used | K>;
+};
+
 /**
  * Creates a primitive field definition returning an object that includes the field type
  * and attributes.
@@ -12,8 +37,9 @@ import type { ModelField } from '@ronin/compiler';
  */
 const primitive = <T extends ModelField['type']>(type: T) => {
   return (initialAttributes: SerializedField<T> = {}) => {
-    return getSyntaxProxy()({ ...initialAttributes, type });
-    // return { type, ...attributes } as Omit<Extract<ModelField, { type: T }>, 'slug'>;
+    return getSyntaxProxy()({ ...initialAttributes, type }) as Chain<
+      Omit<Extract<ModelField, { type: T }>, 'slug'>
+    >;
   };
 };
 
