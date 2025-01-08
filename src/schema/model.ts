@@ -194,7 +194,7 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     pluralName,
     identifiers,
     idPrefix,
-    fields: serializeFields(fields),
+    fields: serializeFields(fields as RecordWithoutForbiddenKeys<PrimitivesItem>),
     presets: serializePresets(presets),
     triggers: serializeTriggers(triggers),
     indexes,

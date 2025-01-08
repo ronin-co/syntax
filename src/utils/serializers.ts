@@ -21,8 +21,8 @@ export const serializeFields = (fields?: Record<string, PrimitivesItem>) => {
       let value = initialValue?.structure;
 
       if (typeof value === 'undefined') {
-        value = initialValue;
-        const result: Record<string, PrimitivesItem> = {};
+        value = initialValue as Record<string, PrimitivesItem>;
+        const result: typeof value = {};
 
         for (const k of Object.keys(value)) {
           result[`${key}.${k}`] = value[k];
