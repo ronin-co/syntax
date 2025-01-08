@@ -9,8 +9,6 @@ import type {
   WithInstruction,
 } from '@ronin/compiler';
 
-const ASYNC_CONTEXT = new (await import('node:async_hooks')).AsyncLocalStorage();
-
 /**
  * Serialize fields from `Record<string, Primitives>` to `Model<Fields>`.
  *
@@ -104,7 +102,7 @@ export const serializeQueries = (query: () => Array<Query>) => {
     () => {
       return query();
     },
-    { asyncContext: ASYNC_CONTEXT },
+    {},
     (queries) => {
       return queries.map((query) => query.structure);
     },
