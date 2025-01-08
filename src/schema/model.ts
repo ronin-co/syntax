@@ -1,6 +1,5 @@
-import type { SyntaxItem } from '@/src/queries';
 import type {
-  FieldOutput,
+  SyntaxField,
   blob,
   boolean,
   date,
@@ -48,13 +47,13 @@ export type Primitives =
   | NestedFieldsPrimitives;
 
 export type PrimitivesItem =
-  | SyntaxItem<FieldOutput<'link'>>
-  | SyntaxItem<FieldOutput<'string'>>
-  | SyntaxItem<FieldOutput<'boolean'>>
-  | SyntaxItem<FieldOutput<'number'>>
-  | SyntaxItem<FieldOutput<'json'>>
-  | SyntaxItem<FieldOutput<'date'>>
-  | SyntaxItem<FieldOutput<'blob'>>
+  | SyntaxField<'link'>
+  | SyntaxField<'string'>
+  | SyntaxField<'boolean'>
+  | SyntaxField<'number'>
+  | SyntaxField<'json'>
+  | SyntaxField<'date'>
+  | SyntaxField<'blob'>
   | NestedFieldsPrimitivesItem;
 
 export interface NestedFieldsPrimitives {

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'bun:test';
-import { type SyntaxItem, getProperty, getSyntaxProxy, setProperty } from '@/src/queries';
-import { type FieldOutput, link } from '@/src/schema';
+import { getProperty, getSyntaxProxy, setProperty } from '@/src/queries';
+import { type SyntaxField, link } from '@/src/schema';
 import {
   serializeFields,
   serializePresets,
@@ -11,7 +11,7 @@ import {
 describe('serializers', () => {
   test('serializeFields', () => {
     const fields = serializeFields({
-      account: link({ target: 'account' }) as unknown as SyntaxItem<FieldOutput<'link'>>,
+      account: link({ target: 'account' }) as unknown as SyntaxField<'link'>,
     });
 
     expect(fields).toEqual([

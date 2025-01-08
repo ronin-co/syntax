@@ -1,4 +1,4 @@
-import { getSyntaxProxy } from '@/src/queries';
+import { type SyntaxItem, getSyntaxProxy } from '@/src/queries';
 import type { ModelField } from '@ronin/compiler';
 
 /** A utility type that maps an attribute's type to a function signature. */
@@ -30,10 +30,12 @@ type FieldInput<Type> = Partial<
   Omit<Extract<ModelField, { type: Type }>, 'slug' | 'type'>
 >;
 
-export type FieldOutput<T extends ModelField['type']> = Omit<
-  Extract<ModelField, { type: T }>,
+type FieldOutput<Type extends ModelField['type']> = Omit<
+  Extract<ModelField, { type: Type }>,
   'slug'
 >;
+
+export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutput<Type>>;
 
 /**
  * Creates a primitive field definition returning an object that includes the field type
