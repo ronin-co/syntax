@@ -20,7 +20,7 @@ export const serializeFields = (fields?: Record<string, PrimitivesItem>) => {
 
   return Object.entries(fields).flatMap(
     ([key, initialValue]): Array<ModelField> | ModelField => {
-      let value = initialValue.structure;
+      let value = initialValue?.structure;
 
       if (typeof value === 'undefined') {
         value = initialValue as Record<string, PrimitivesItem>;
