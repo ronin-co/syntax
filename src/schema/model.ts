@@ -8,7 +8,6 @@ import type {
   number,
   string,
 } from '@/src/schema';
-import { throwForbiddenModelDefinition } from '@/src/utils/errors';
 import {
   serializeFields,
   serializePresets,
@@ -165,8 +164,6 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     presets,
     triggers,
   } = model;
-
-  throwForbiddenModelDefinition(model);
 
   return {
     slug,
