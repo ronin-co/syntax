@@ -127,11 +127,9 @@ describe('syntax proxy', () => {
   test('using async context', async () => {
     const get = getSyntaxProxy({ rootProperty: 'get' });
 
-    const details = getBatchProxy(() => [get.account()], {
-      callback: (queries) => (queries.length === 1 ? { result: true } : null),
-    });
+    const queries = getBatchProxy(() => [get.account()]);
 
-    expect(details).toMatchObject({
+    expect(queries.length === 1 ? { result: true } : null).toMatchObject({
       result: true,
     });
   });

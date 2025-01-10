@@ -1,9 +1,10 @@
-import { getBatchProxy } from '@/src/queries';
+import { type SyntaxItem, getBatchProxy } from '@/src/queries';
 import type { PrimitivesItem } from '@/src/schema/model';
 import type {
   GetInstructions,
   ModelField,
   ModelTrigger,
+  Query,
   WithInstruction,
 } from '@ronin/compiler';
 
@@ -51,6 +52,7 @@ export const serializePresets = (
   presets?: Record<string, WithInstruction | GetInstructions>,
 ) => {
   if (!presets) return undefined;
+
   return Object.entries(presets).map(([key, value]) => {
     return {
       slug: key,
@@ -70,8 +72,12 @@ export const serializePresets = (
 export const serializeTriggers = (triggers?: Array<ModelTrigger<Array<ModelField>>>) => {
   if (!triggers) return undefined;
 
-  return triggers.map((trigger) => ({
-    ...trigger,
-    effects: getBatchProxy(trigger.effects).map(({ structure }) => structure),
-  }));
+  return triggers.map((trigger) => {
+    const effectQueries = trigger.effects as unknown as () => Array<SyntaxItem<Query>>;
+
+    return {
+      ...trigger,
+      effects: getBatchProxy(effectQueries).map(({ structure }) => structure),
+    };
+  });
 };

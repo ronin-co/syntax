@@ -174,36 +174,23 @@ export const getSyntaxProxy = (config?: {
 };
 
 /**
- * Executes a batch of operations and handles their results. It is used to
- * execute multiple queries at once and return their results at once.
+ * Obtains a list of queries from a function by wrapping the queries into a context.
  *
- * @param operations - A function that returns an array of Promises. Each
- * Promise should resolve with a Query object.
- * @param config - An object containing configuration for the composed structures.
+ * @param operations - A function that contains multiple query functions.
  *
- * @returns A Promise that resolves with a tuple of the results of the queries.
+ * @returns A list of queries and their respective options.
  *
  * ### Usage
  * ```typescript
- * const results = await getBatchProxy(() => [
+ * const queries = getBatchProxy(() => [
  *   get.accounts(),
  *   get.account.with.email('mike@gmail.com')
- * ], {
- *   // Execute the queries and return the results
- *   callback: async (queries) => {}
- * });
+ * ]);
  * ```
  */
-export const getBatchProxy = <
-  T extends
-    | [Promise<any> | any, ...Array<Promise<any> | any>]
-    | Array<Promise<any> | any>,
->(
-  operations: () => T,
-  config?: {
-    callback?: (queries: Array<SyntaxItem<Query>>) => Promise<any> | any;
-  },
-): Promise<PromiseTuple<T>> | T => {
+export const getBatchProxy = (
+  operations: () => Array<SyntaxItem<Query>>,
+): Array<SyntaxItem<Query>> => {
   let queries: Array<SyntaxItem<Query>> = [];
 
   IN_BATCH = true;
@@ -215,12 +202,7 @@ export const getBatchProxy = <
   // therefore return the respective `Proxy` instances, which wouldn't be logged as plain
   // objects, thereby making development more difficult. To avoid this, we are creating a
   // plain object containing the same properties as the `Proxy` instances.
-  const cleanQueries = queries.map((details) => ({ ...details }));
-
-  // If no handler is available, return queries directly.
-  if (!config?.callback) return cleanQueries as PromiseTuple<T> | T;
-
-  return config.callback(cleanQueries) as PromiseTuple<T> | T;
+  return queries.map((details) => ({ ...details }));
 };
 
 type NestedObject = {
