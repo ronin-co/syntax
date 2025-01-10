@@ -71,11 +71,6 @@ export interface Model<Fields>
   fields?: Fields;
 
   /**
-   * Predefined query instructions that can be reused across multiple different queries.
-   */
-  presets?: Record<string, GetInstructions | WithInstruction>;
-
-  /**
    * Database indexes to optimize query performance.
    */
   indexes?: Array<ModelIndex<Array<ModelField & { slug: keyof Fields }>>>;
@@ -84,6 +79,11 @@ export interface Model<Fields>
    * Queries that run automatically in response to other queries.
    */
   triggers?: Array<ModelTrigger<Array<ModelField & { slug: keyof Fields }>>>;
+
+  /**
+   * Predefined query instructions that can be reused across multiple different queries.
+   */
+  presets?: Record<string, GetInstructions | WithInstruction>;
 }
 
 // This type maps the fields of a model to their types.
@@ -160,16 +160,16 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     ) as unknown as typeof newModel.fields;
   }
 
-  if (newModel.presets) {
-    newModel.presets = serializePresets(
-      newModel.presets,
-    ) as unknown as typeof newModel.presets;
-  }
-
   if (newModel.triggers) {
     newModel.triggers = serializeTriggers(
       newModel.triggers,
     ) as unknown as typeof newModel.triggers;
+  }
+
+  if (newModel.presets) {
+    newModel.presets = serializePresets(
+      newModel.presets,
+    ) as unknown as typeof newModel.presets;
   }
 
   return newModel as unknown as Expand<FieldsToTypes<Fields>> & Expand<RoninFields>;

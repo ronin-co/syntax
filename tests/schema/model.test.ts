@@ -589,6 +589,41 @@ describe('models', () => {
     });
   });
 
+  test('create model with presets', () => {
+    const Account = model({
+      slug: 'account',
+      presets: {
+        onlyName: {
+          with: {
+            space: {
+              being: 'spa_m9h8oha94helaji',
+            },
+          },
+          selecting: ['name'],
+        },
+      },
+    });
+
+    expect(Account).toEqual({
+      // @ts-expect-error: The Account object has 'slug'.
+      slug: 'account',
+      // @ts-expect-error: The Account object has 'presets'.
+      presets: [
+        {
+          slug: 'onlyName',
+          instructions: {
+            with: {
+              space: {
+                being: 'spa_m9h8oha94helaji',
+              },
+            },
+            selecting: ['name'],
+          },
+        },
+      ],
+    });
+  });
+
   test('create model with nested fields', () => {
     const Account = model({
       slug: 'account',
