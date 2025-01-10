@@ -87,7 +87,7 @@ export const serializeTriggers = (triggers?: Array<ModelTrigger<Array<ModelField
  * @returns The serialized query.
  */
 export const serializeQueries = (query: () => Array<Query>) => {
-  const queryObject = getBatchProxy(
+  const queryList = getBatchProxy(
     () => {
       return query();
     },
@@ -96,5 +96,5 @@ export const serializeQueries = (query: () => Array<Query>) => {
       return queries.map((query) => query.structure);
     },
   );
-  return queryObject;
+  return queryList.map(({ structure }) => structure);
 };

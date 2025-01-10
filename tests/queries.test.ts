@@ -1,10 +1,8 @@
-import { AsyncLocalStorage } from 'node:async_hooks';
-
 import { describe, expect, spyOn, test } from 'bun:test';
 
-import { type SyntaxItem, getBatchProxy, getSyntaxProxy } from '@/src/queries';
+import { getBatchProxy, getSyntaxProxy } from '@/src/queries';
 import { string } from '@/src/schema';
-import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
+import { QUERY_SYMBOLS } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
   test('using sub query', async () => {
@@ -129,13 +127,9 @@ describe('syntax proxy', () => {
   test('using async context', async () => {
     const get = getSyntaxProxy({ rootProperty: 'get' });
 
-    const details = getBatchProxy(
-      () => [get.account()],
-      {
-        asyncContext: new AsyncLocalStorage(),
-      },
-      (queries) => (queries.length === 1 ? { result: true } : null),
-    );
+    const details = getBatchProxy(() => [get.account()], {
+      callback: (queries) => (queries.length === 1 ? { result: true } : null),
+    });
 
     expect(details).toMatchObject({
       result: true,
@@ -144,20 +138,15 @@ describe('syntax proxy', () => {
 
   test('using options for query in batch', async () => {
     const get = getSyntaxProxy({ rootProperty: 'get' });
-    const queryList: Array<SyntaxItem<Query>> = [];
 
-    getBatchProxy(
-      () => [
-        get.account(
-          {
-            with: { handle: 'juri' },
-          },
-          { randomOption: true },
-        ),
-      ],
-      {},
-      (queries) => queryList.push(...queries),
-    );
+    const queryList = getBatchProxy(() => [
+      get.account(
+        {
+          with: { handle: 'juri' },
+        },
+        { randomOption: true },
+      ),
+    ]);
 
     expect(queryList).toEqual([
       {
@@ -180,22 +169,16 @@ describe('syntax proxy', () => {
   test('using function chaining in batch', async () => {
     const getProxy = getSyntaxProxy({ rootProperty: 'get', callback: () => undefined });
 
-    const queryList: Array<SyntaxItem<Query>> = [];
-
-    getBatchProxy(
-      () => [
-        // Test queries where the second function is called right after the first one.
-        getProxy.members
-          .with({ team: 'red' })
-          .selecting(['name']),
-        // Test queries where the second function is not called right after the first one.
-        getProxy.members
-          .with({ team: 'blue' })
-          .orderedBy.ascending(['joinedAt']),
-      ],
-      {},
-      (queries) => queryList.push(...queries),
-    );
+    const queryList = getBatchProxy(() => [
+      // Test queries where the second function is called right after the first one.
+      getProxy.members
+        .with({ team: 'red' })
+        .selecting(['name']),
+      // Test queries where the second function is not called right after the first one.
+      getProxy.members
+        .with({ team: 'blue' })
+        .orderedBy.ascending(['joinedAt']),
+    ]);
 
     expect(queryList).toEqual([
       {
@@ -234,28 +217,22 @@ describe('syntax proxy', () => {
     const alterProxy = getSyntaxProxy({ rootProperty: 'alter', callback });
     const dropProxy = getSyntaxProxy({ rootProperty: 'drop', callback });
 
-    const queryList: Array<SyntaxItem<Query>> = [];
-
-    getBatchProxy(
-      () => [
-        createProxy.model({
-          slug: 'account',
-        }),
-        alterProxy.model('account').to({
-          slug: 'users',
-        }),
-        alterProxy.model('users').create.field({
-          slug: 'handle',
-        }),
-        alterProxy.model('users').alter.field('handle').to({
-          name: 'User Handle',
-        }),
-        alterProxy.model('users').drop.field('handle'),
-        dropProxy.model('users'),
-      ],
-      {},
-      (queries) => queryList.push(...queries),
-    );
+    const queryList = getBatchProxy(() => [
+      createProxy.model({
+        slug: 'account',
+      }),
+      alterProxy.model('account').to({
+        slug: 'users',
+      }),
+      alterProxy.model('users').create.field({
+        slug: 'handle',
+      }),
+      alterProxy.model('users').alter.field('handle').to({
+        name: 'User Handle',
+      }),
+      alterProxy.model('users').drop.field('handle'),
+      dropProxy.model('users'),
+    ]);
 
     expect(queryList).toEqual([
       {

@@ -1,4 +1,3 @@
-import type { AsyncLocalStorage } from 'node:async_hooks';
 import { model } from '@/src/schema';
 import { setProperty } from '@/src/utils';
 import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
@@ -25,25 +24,10 @@ export interface SyntaxItem<Structure = unknown> {
 }
 
 /**
- * A list of options that may be passed for every individual query. The type is meant to
- * represent a generic list of options without specific properties. The specific
- * properties are defined by the client that re-exports the syntax package.
- */
-type QueryOptions = Record<string, unknown> & {
-  asyncContext?: AsyncLocalStorage<any>;
-};
-
-/**
- * Used to track whether queries run in batches if `AsyncLocalStorage` is
- * available for use.
- */
-let IN_BATCH_ASYNC: AsyncLocalStorage<boolean>;
-
-/**
  * Used to track whether queries run in batches if `AsyncLocalStorage` is not
  * available for use.
  */
-let IN_BATCH_SYNC = false;
+let IN_BATCH = false;
 
 /**
  * A utility function that creates a proxy object to handle dynamic property access and
@@ -56,9 +40,9 @@ let IN_BATCH_SYNC = false;
  * ### Usage
  * ```typescript
  * const get = getSyntaxProxy({
- *  rootProperty: 'get',
- *  // Execute the query and return the result
- *  callback: async (query) => {}
+ *   rootProperty: 'get',
+ *   // Execute the query and return the result
+ *   callback: async (query) => {}
  * });
  *
  * const result = await get.account();
@@ -99,11 +83,11 @@ export const getSyntaxProxy = (config?: {
         // all queries within it think they are running inside a batch transaction,
         // in order to retrieve their serialized values.
         if (typeof value === 'function') {
-          // Since `value()` is synchronous, `IN_BATCH_SYNC` should not affect any
+          // Since `value()` is synchronous, `IN_BATCH` should not affect any
           // other queries somewhere else in the app, even if those are run inside
           // an asynchronous function, so we don't need to use `IN_BATCH_ASYNC`,
           // which avoids the need to pass it as an option to the client.
-          IN_BATCH_SYNC = true;
+          IN_BATCH = true;
 
           // A proxy object providing a property for every field of the model. It allows
           // for referencing fields inside of an expression.
@@ -133,7 +117,7 @@ export const getSyntaxProxy = (config?: {
             value = wrapExpressions(value);
           }
 
-          IN_BATCH_SYNC = false;
+          IN_BATCH = false;
         }
 
         // If the function call is happening after an existing function call in the
@@ -155,7 +139,7 @@ export const getSyntaxProxy = (config?: {
         // If the function call is happening inside a batch, return a new proxy, to
         // allow for continuing to chain `get` accessors and function calls after
         // existing function calls in the same query.
-        if (IN_BATCH_ASYNC?.getStore() || IN_BATCH_SYNC || !config?.callback) {
+        if (IN_BATCH || !config?.callback) {
           // To ensure that `get` accessor calls are mounted to the same level as
           // the function after which they are called, we need to remove the last
           // path segment.
@@ -195,44 +179,36 @@ export const getSyntaxProxy = (config?: {
  *
  * @param operations - A function that returns an array of Promises. Each
  * Promise should resolve with a Query object.
- * @param queriesHandler - A function that handles the execution of the queries.
- * This function is expected to receive an array of Query objects and return a
- * Promise that resolves with the results of the queries.
+ * @param config - An object containing configuration for the composed structures.
  *
  * @returns A Promise that resolves with a tuple of the results of the queries.
  *
  * ### Usage
  * ```typescript
- * const results = await batch(() => [
+ * const results = await getBatchProxy(() => [
  *   get.accounts(),
  *   get.account.with.email('mike@gmail.com')
- * ], async (queries) => {
- *   // Execute the queries and return their results
+ * ], {
+ *   // Execute the queries and return the results
+ *   callback: async (queries) => {}
  * });
  * ```
  */
 export const getBatchProxy = <
-  // biome-ignore lint/style/useConsistentArrayType: <explanation>
-  T extends [Promise<any> | any, ...Array<Promise<any> | any>] | (Promise<any> | any)[],
+  T extends
+    | [Promise<any> | any, ...Array<Promise<any> | any>]
+    | Array<Promise<any> | any>,
 >(
   operations: () => T,
-  // biome-ignore lint/style/useDefaultParameterLast:
-  options: QueryOptions = {},
-  queriesHandler: (
-    queries: Array<SyntaxItem<Query>>,
-    options?: QueryOptions,
-  ) => Promise<any> | any,
+  config?: {
+    callback?: (queries: Array<SyntaxItem<Query>>) => Promise<any> | any;
+  },
 ): Promise<PromiseTuple<T>> | T => {
   let queries: Array<SyntaxItem<Query>> = [];
 
-  if (options.asyncContext) {
-    IN_BATCH_ASYNC = options.asyncContext;
-    queries = IN_BATCH_ASYNC.run(true, () => operations());
-  } else {
-    IN_BATCH_SYNC = true;
-    queries = operations();
-    IN_BATCH_SYNC = false;
-  }
+  IN_BATCH = true;
+  queries = operations();
+  IN_BATCH = false;
 
   // Within a batch, every query item is a JavaScript `Proxy`, in order to allow for
   // function chaining within every query. Returning the query items directly would
@@ -241,7 +217,10 @@ export const getBatchProxy = <
   // plain object containing the same properties as the `Proxy` instances.
   const cleanQueries = queries.map((details) => ({ ...details }));
 
-  return queriesHandler(cleanQueries) as PromiseTuple<T> | T;
+  // If no handler is available, return queries directly.
+  if (!config?.callback) return cleanQueries as PromiseTuple<T> | T;
+
+  return config.callback(cleanQueries) as PromiseTuple<T> | T;
 };
 
 type NestedObject = {
