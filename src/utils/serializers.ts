@@ -15,8 +15,8 @@ import type {
  *
  * @returns The serialized fields.
  */
-export const serializeFields = (fields?: Record<string, PrimitivesItem>) => {
-  if (!fields || Array.isArray(fields)) return fields;
+export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
+  if (Array.isArray(fields)) return fields;
 
   return Object.entries(fields).flatMap(
     ([key, initialValue]): Array<ModelField> | ModelField => {
@@ -49,10 +49,8 @@ export const serializeFields = (fields?: Record<string, PrimitivesItem>) => {
  * @returns The serialized fields.
  */
 export const serializePresets = (
-  presets?: Record<string, WithInstruction | GetInstructions>,
+  presets: Record<string, WithInstruction | GetInstructions>,
 ) => {
-  if (!presets) return undefined;
-
   return Object.entries(presets).map(([key, value]) => {
     return {
       slug: key,
@@ -69,9 +67,7 @@ export const serializePresets = (
  *
  * @returns The serialized triggers array, or undefined if no triggers were provided.
  */
-export const serializeTriggers = (triggers?: Array<ModelTrigger<Array<ModelField>>>) => {
-  if (!triggers) return undefined;
-
+export const serializeTriggers = (triggers: Array<ModelTrigger<Array<ModelField>>>) => {
   return triggers.map((trigger) => {
     const effectQueries = trigger.effects as unknown as () => Array<SyntaxItem<Query>>;
 
