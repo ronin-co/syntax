@@ -1,4 +1,4 @@
-import { getBatchProxy } from '@/src/queries';
+import { type SyntaxItem, getBatchProxy } from '@/src/queries';
 import type { PrimitivesItem } from '@/src/schema/model';
 import type {
   GetInstructions,
@@ -52,6 +52,7 @@ export const serializePresets = (
   presets?: Record<string, WithInstruction | GetInstructions>,
 ) => {
   if (!presets) return undefined;
+
   return Object.entries(presets).map(([key, value]) => {
     return {
       slug: key,
@@ -72,29 +73,11 @@ export const serializeTriggers = (triggers?: Array<ModelTrigger<Array<ModelField
   if (!triggers) return undefined;
 
   return triggers.map((trigger) => {
+    const effectQueries = trigger.effects as unknown as () => Array<SyntaxItem<Query>>;
+
     return {
       ...trigger,
-      effects: serializeQueries(trigger.effects as unknown as () => Array<Query>),
+      effects: getBatchProxy(effectQueries).map(({ structure }) => structure),
     };
   });
-};
-
-/**
- * Serialize a RONIN query to query objects.
- *
- * @param queries - The query to serialize.
- *
- * @returns The serialized query.
- */
-export const serializeQueries = (query: () => Array<Query>) => {
-  const queryObject = getBatchProxy(
-    () => {
-      return query();
-    },
-    {},
-    (queries) => {
-      return queries.map((query) => query.structure);
-    },
-  );
-  return queryObject;
 };

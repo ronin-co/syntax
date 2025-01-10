@@ -4,7 +4,6 @@ import { type SyntaxField, link } from '@/src/schema';
 import {
   serializeFields,
   serializePresets,
-  serializeQueries,
   serializeTriggers,
 } from '@/src/utils/serializers';
 
@@ -90,14 +89,6 @@ describe('serializers', () => {
     const triggers = serializeTriggers();
     // @ts-expect-error: Triggers can be undefined.
     expect(triggers).toStrictEqual(undefined);
-  });
-
-  test('serialize query', () => {
-    const add = getSyntaxProxy({ rootProperty: 'add' });
-
-    const query = serializeQueries(() => [add.account.to({ name: 'Lorena' })]);
-
-    expect(query).toEqual([{ add: { account: { to: { name: 'Lorena' } } } }]);
   });
 });
 
