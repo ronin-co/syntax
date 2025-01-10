@@ -4,7 +4,6 @@ import type {
   GetInstructions,
   ModelField,
   ModelTrigger,
-  Query,
   WithInstruction,
 } from '@ronin/compiler';
 
@@ -71,24 +70,8 @@ export const serializePresets = (
 export const serializeTriggers = (triggers?: Array<ModelTrigger<Array<ModelField>>>) => {
   if (!triggers) return undefined;
 
-  return triggers.map((trigger) => {
-    return {
-      ...trigger,
-      effects: serializeQueries(trigger.effects as unknown as () => Array<Query>),
-    };
-  });
-};
-
-/**
- * Serialize a RONIN query to query objects.
- *
- * @param queries - The query to serialize.
- *
- * @returns The serialized query.
- */
-export const serializeQueries = (query: () => Array<Query>) => {
-  const queryList = getBatchProxy(() => {
-    return query();
-  });
-  return queryList.map(({ structure }) => structure);
+  return triggers.map((trigger) => ({
+    ...trigger,
+    effects: getBatchProxy(trigger.effects).map(({ structure }) => structure),
+  }));
 };
