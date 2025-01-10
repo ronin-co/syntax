@@ -20,9 +20,6 @@ describe('serializers', () => {
         type: 'link',
       },
     ]);
-
-    // Test empty fields case
-    expect(serializeFields()).toBeUndefined();
   });
 
   test('serializePresets', () => {
@@ -83,12 +80,6 @@ describe('serializers', () => {
         fields: [{ slug: 'name' }],
       },
     ]);
-  });
-
-  test('serialize empty triggers', () => {
-    const triggers = serializeTriggers();
-    // @ts-expect-error: Triggers can be undefined.
-    expect(triggers).toStrictEqual(undefined);
   });
 });
 

@@ -152,29 +152,25 @@ type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
 export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
   model: Model<Fields>,
 ): Expand<FieldsToTypes<Fields>> & Expand<RoninFields> => {
-  const {
-    slug,
-    pluralSlug,
-    name,
-    pluralName,
-    identifiers,
-    idPrefix,
-    fields,
-    indexes,
-    presets,
-    triggers,
-  } = model;
+  const newModel = { ...model };
 
-  return {
-    slug,
-    pluralSlug,
-    name,
-    pluralName,
-    identifiers,
-    idPrefix,
-    fields: serializeFields(fields as RecordWithoutForbiddenKeys<PrimitivesItem>),
-    presets: serializePresets(presets),
-    triggers: serializeTriggers(triggers),
-    indexes,
-  } as unknown as Expand<FieldsToTypes<Fields>> & Expand<RoninFields>;
+  if (newModel.fields) {
+    newModel.fields = serializeFields(
+      newModel.fields as RecordWithoutForbiddenKeys<PrimitivesItem>,
+    ) as unknown as typeof newModel.fields;
+  }
+
+  if (newModel.presets) {
+    newModel.presets = serializePresets(
+      newModel.presets,
+    ) as unknown as typeof newModel.presets;
+  }
+
+  if (newModel.triggers) {
+    newModel.triggers = serializeTriggers(
+      newModel.triggers,
+    ) as unknown as typeof newModel.triggers;
+  }
+
+  return newModel as unknown as Expand<FieldsToTypes<Fields>> & Expand<RoninFields>;
 };
