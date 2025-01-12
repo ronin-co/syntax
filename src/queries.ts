@@ -83,6 +83,10 @@ export const getSyntaxProxy = (config?: {
         // all queries within it think they are running inside a batch transaction,
         // in order to retrieve their serialized values.
         if (typeof value === 'function') {
+          // Temporarily store the original value of `IN_BATCH`, so that we can resume it
+          // after the nested function has been called.
+          const ORIGINAL_IN_BATCH = IN_BATCH;
+
           // Since `value()` is synchronous, `IN_BATCH` should not affect any
           // other queries somewhere else in the app, even if those are run inside
           // an asynchronous function, so we don't need to use `IN_BATCH_ASYNC`,
@@ -117,7 +121,8 @@ export const getSyntaxProxy = (config?: {
             value = wrapExpressions(value);
           }
 
-          IN_BATCH = false;
+          // Restore the original value of `IN_BATCH`.
+          IN_BATCH = ORIGINAL_IN_BATCH;
         }
 
         // If the function call is happening after an existing function call in the
