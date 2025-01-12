@@ -211,17 +211,16 @@ describe('syntax proxy', () => {
   test('using nested function as argument in batch', async () => {
     // It's important to define the `callback` here, in order to guarantee that the
     // queries are executed standalone if no batch context is detected.
-    const addProxy = getSyntaxProxy({ rootProperty: 'add', callback: () => undefined });
-    const getProxy = getSyntaxProxy({ rootProperty: 'get', callback: () => undefined });
-    const alterProxy = getSyntaxProxy({
-      rootProperty: 'alter',
-      callback: () => undefined,
-    });
+    const callback = () => undefined;
+
+    const addProxy = getSyntaxProxy({ rootProperty: 'add', callback });
+    const getProxy = getSyntaxProxy({ rootProperty: 'get', callback });
+    const alterProxy = getSyntaxProxy({ rootProperty: 'alter', callback });
 
     const queryList = getBatchProxy(() => [
       addProxy.newUsers.to(() => getProxy.oldUsers()),
       // Assert whether function chaining is still possible after a nested function call,
-      // since the former is able to manipulate the batch context.
+      // since the latter is able to manipulate the batch context.
       alterProxy
         .model('newUsers')
         .to({ slug: 'accounts' }),
