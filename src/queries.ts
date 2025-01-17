@@ -115,9 +115,13 @@ export const getSyntaxProxy = (config?: {
             value = instructions;
           }
 
-          if (isExpression(value)) {
+          // If the provided value contains an expression string, wrap it into a query
+          // symbol that allows the compiler to easily detect and process it. Similarily,
+          // if the provided value is an object that contains an expression string in one
+          // of its properties, wrap each of them as well.
+          if (containsExpressionString(value)) {
             value = wrapExpression(value as string);
-          } else if (typeof value === 'object' && !(QUERY_SYMBOLS.EXPRESSION in value)) {
+          } else if (typeof value === 'object' && Object.values(value).some(containsExpressionString)) {
             value = wrapExpressions(value);
           }
 
@@ -221,7 +225,7 @@ type NestedObject = {
  *
  * @returns A boolean indicating whether or not the provided value is an expression.
  */
-const isExpression = (value: unknown): boolean => {
+const containsExpressionString = (value: unknown): boolean => {
   return typeof value === 'string' && value.includes(RONIN_EXPRESSION_SEPARATOR);
 };
 
@@ -258,7 +262,7 @@ const wrapExpression = (
 const wrapExpressions = (obj: NestedObject): NestedObject =>
   Object.fromEntries(
     Object.entries(obj).map(([key, value]) => {
-      if (isExpression(value)) return [key, wrapExpression(value as string)];
+      if (containsExpressionString(value)) return [key, wrapExpression(value as string)];
 
       return [
         key,
