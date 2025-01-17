@@ -1,4 +1,6 @@
 import type {
+  Chain,
+  FieldOutput,
   SyntaxField,
   blob,
   boolean,
@@ -43,6 +45,16 @@ export type Primitives =
   | ReturnType<typeof json>
   | ReturnType<typeof date>
   | ReturnType<typeof blob>
+  | Chain<
+      FieldOutput<'string' | 'number' | 'boolean' | 'link' | 'json' | 'date' | 'blob'>,
+      | 'name'
+      | 'displayAs'
+      | 'unique'
+      | 'required'
+      | 'defaultValue'
+      | 'computedAs'
+      | 'check'
+    >
   | NestedFieldsPrimitives;
 
 export type PrimitivesItem =

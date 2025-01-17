@@ -2,12 +2,11 @@ import { type SyntaxItem, getSyntaxProxy } from '@/src/queries';
 import type { ModelField } from '@ronin/compiler';
 
 /** A utility type that maps an attribute's type to a function signature. */
-type AttributeSignature<T> = T extends boolean
+type AttributeSignature<T, Attribute> = T extends boolean
   ? () => any
-  : T extends boolean
-    ? never
-    : (value: string) => any;
-
+  : Attribute extends keyof Omit<ModelField, 'type' | 'slug'>
+    ? (value: ModelField[Attribute]) => any
+    : never;
 /**
  * Represents a chain of field attributes in the form of a function chain.
  *
@@ -17,10 +16,10 @@ type AttributeSignature<T> = T extends boolean
  * For each attribute key `K` not in `Used`, create a method using the signature derived
  * from that attribute's type. Calling it returns a new `Chain` marking `K` as used.
  */
-type Chain<Attrs, Used extends keyof Attrs = never> = {
+export type Chain<Attrs, Used extends keyof Attrs = never> = {
   // 1) Chainable methods for all keys that are not in `Used` or `type`
   [K in Exclude<keyof Attrs, Used | 'type'>]: (
-    ...args: Parameters<AttributeSignature<Attrs[K]>>
+    ...args: Parameters<AttributeSignature<Attrs[K], K>>
   ) => Chain<Attrs, Used | K>;
   // 2) If `type` is defined in `Attrs`, add it as a read-only property
   // biome-ignore lint/complexity/noBannedTypes: This is a valid use case.
@@ -30,7 +29,7 @@ type FieldInput<Type> = Partial<
   Omit<Extract<ModelField, { type: Type }>, 'slug' | 'type'>
 >;
 
-type FieldOutput<Type extends ModelField['type']> = Omit<
+export type FieldOutput<Type extends ModelField['type']> = Omit<
   Extract<ModelField, { type: Type }>,
   'slug'
 >;

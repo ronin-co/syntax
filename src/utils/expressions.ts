@@ -23,6 +23,9 @@ type StringOperator = '||';
 /** Valid arithmetic operators for numbers */
 type NumberOperator = '+' | '-' | '*' | '/' | '%';
 
+/** Valid comparison operators for numbers and strings */
+type ComparisonOperator = '=' | '!=' | '>' | '<' | '>=' | '<=';
+
 /**
  * Creates a binary operation expression with type safety for operands.
  *
@@ -34,27 +37,50 @@ type NumberOperator = '+' | '-' | '*' | '/' | '%';
  */
 export const op = <T extends string | number | Record<string, string | number>>(
   left: T,
-  operator: T extends string ? StringOperator : NumberOperator,
+  operator: T extends string
+    ? StringOperator | ComparisonOperator
+    : NumberOperator | ComparisonOperator,
   right: T,
 ) => {
-  const leftValue =
-    typeof left === 'object' && QUERY_SYMBOLS.EXPRESSION in left
-      ? left[QUERY_SYMBOLS.EXPRESSION]
-      : left;
-  const rightValue =
-    typeof right === 'object' && QUERY_SYMBOLS.EXPRESSION in right
-      ? right[QUERY_SYMBOLS.EXPRESSION]
-      : right;
-  const wrappedLeft =
+  let leftValue = left;
+  if (typeof left === 'object') {
+    if (QUERY_SYMBOLS.FIELD in left) {
+      leftValue = left[QUERY_SYMBOLS.FIELD] as T;
+    } else if (QUERY_SYMBOLS.EXPRESSION in left) {
+      leftValue = left[QUERY_SYMBOLS.EXPRESSION] as T;
+    }
+  }
+
+  let rightValue = right;
+  if (typeof right === 'object') {
+    if (QUERY_SYMBOLS.FIELD in right) {
+      rightValue = right[QUERY_SYMBOLS.FIELD] as T;
+    } else if (QUERY_SYMBOLS.EXPRESSION in right) {
+      rightValue = right[QUERY_SYMBOLS.EXPRESSION] as T;
+    }
+  }
+
+  let wrappedLeft = leftValue;
+  if (
     typeof leftValue === 'string' &&
-    !(typeof left === 'object' && QUERY_SYMBOLS.EXPRESSION in left)
-      ? `'${leftValue}'`
-      : leftValue;
-  const wrappedRight =
+    !(
+      typeof left === 'object' &&
+      (QUERY_SYMBOLS.EXPRESSION in left || QUERY_SYMBOLS.FIELD in left)
+    )
+  ) {
+    wrappedLeft = `'${leftValue}'` as T;
+  }
+
+  let wrappedRight = rightValue;
+  if (
     typeof rightValue === 'string' &&
-    !(typeof right === 'object' && QUERY_SYMBOLS.EXPRESSION in right)
-      ? `'${rightValue}'`
-      : rightValue;
+    !(
+      typeof right === 'object' &&
+      (QUERY_SYMBOLS.EXPRESSION in right || QUERY_SYMBOLS.FIELD in right)
+    )
+  ) {
+    wrappedRight = `'${rightValue}'` as T;
+  }
 
   return expression(`${wrappedLeft} ${operator} ${wrappedRight}`) as unknown as T;
 };

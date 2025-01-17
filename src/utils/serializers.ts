@@ -1,11 +1,12 @@
 import { type SyntaxItem, getBatchProxy } from '@/src/queries';
 import type { PrimitivesItem } from '@/src/schema/model';
-import type {
-  GetInstructions,
-  ModelField,
-  ModelTrigger,
-  Query,
-  WithInstruction,
+import {
+  type GetInstructions,
+  type ModelField,
+  type ModelTrigger,
+  QUERY_SYMBOLS,
+  type Query,
+  type WithInstruction,
 } from '@ronin/compiler';
 
 /**
@@ -21,7 +22,6 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
   return Object.entries(fields).flatMap(
     ([key, initialValue]): Array<ModelField> | ModelField => {
       let value = initialValue?.structure;
-
       if (typeof value === 'undefined') {
         value = initialValue as Record<string, PrimitivesItem>;
         const result: typeof value = {};
@@ -29,8 +29,28 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
         for (const k of Object.keys(value)) {
           result[`${key}.${k}`] = value[k];
         }
-
         return serializeFields(result) || [];
+      }
+
+      if (typeof value.defaultValue === 'function') {
+        value.defaultValue = value.defaultValue();
+      }
+
+      if (typeof value.computedAs === 'function') {
+        value.computedAs = value.computedAs();
+      }
+
+      if (typeof value.check === 'function') {
+        // Pass columns into check function
+        const fieldKeys = Object.keys(fields).reduce<Record<string, unknown>>(
+          (acc, item) => {
+            acc[item] = { [QUERY_SYMBOLS.FIELD]: item };
+            return acc;
+          },
+          {},
+        );
+
+        value.check = value.check(fieldKeys);
       }
 
       return {
