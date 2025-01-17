@@ -1,9 +1,11 @@
 import { model } from '@/src/schema';
 import { setProperty } from '@/src/utils';
-import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
-
-/** Used to separate the components of an expression from each other. */
-const RONIN_EXPRESSION_SEPARATOR = '//.//';
+import {
+  RONIN_EXPRESSION_SEPARATOR,
+  wrapExpression,
+  wrapExpressions,
+} from '@/src/utils/expressions';
+import { QUERY_SYMBOLS, type Query, getQuerySymbol } from '@ronin/compiler';
 
 /**
  * Utility type to convert a tuple of promises into a tuple of their resolved types.
@@ -113,16 +115,17 @@ export const getSyntaxProxy = (config?: {
             value = { [QUERY_SYMBOLS.QUERY]: instructions.structure };
           } else {
             value = instructions;
-          }
 
-          // If the provided value contains an expression string, wrap it into a query
-          // symbol that allows the compiler to easily detect and process it. Similarily,
-          // if the provided value is an object that contains an expression string in one
-          // of its properties, wrap each of them as well.
-          if (containsExpressionString(value)) {
-            value = wrapExpression(value as string);
-          } else if (typeof value === 'object' && Object.values(value).some(containsExpressionString)) {
-            value = wrapExpressions(value);
+            const symbol = getQuerySymbol(value);
+
+            // If the value isn't already a query symbol, wrap it in one.
+            if (!(symbol?.type === 'expression')) {
+              if (typeof value === 'string') {
+                value = wrapExpression(value);
+              } else if (typeof value === 'object') {
+                value = wrapExpressions(value);
+              }
+            }
           }
 
           // Restore the original value of `IN_BATCH`.
@@ -213,64 +216,5 @@ export const getBatchProxy = (
   // plain object containing the same properties as the `Proxy` instances.
   return queries.map((details) => ({ ...details }));
 };
-
-type NestedObject = {
-  [key: string]: unknown | NestedObject;
-};
-
-/**
- * Checks whether a given value is a query expression.
- *
- * @param value - The value to check.
- *
- * @returns A boolean indicating whether or not the provided value is an expression.
- */
-const containsExpressionString = (value: unknown): boolean => {
-  return typeof value === 'string' && value.includes(RONIN_EXPRESSION_SEPARATOR);
-};
-
-/**
- * Wraps an expression string into a query symbol that allows the compiler to easily
- * detect and process it.
- *
- * @param value - The expression to wrap.
- *
- * @returns The provided expression wrapped in a query symbol.
- */
-const wrapExpression = (
-  value: string,
-): Record<typeof QUERY_SYMBOLS.EXPRESSION, string> => {
-  const components = value
-    .split(RONIN_EXPRESSION_SEPARATOR)
-    .filter((part) => part.length > 0)
-    .map((part) => {
-      return part.startsWith(QUERY_SYMBOLS.FIELD) ? part : `'${part}'`;
-    })
-    .join(' || ');
-
-  return { [QUERY_SYMBOLS.EXPRESSION]: components };
-};
-
-/**
- * Recursively checks an object for query expressions and, if they are found, wraps them
- * in a query symbol that allows the compiler to easily detect and process them.
- *
- * @param obj - The object containing potential expressions.
- *
- * @returns The updated object.
- */
-const wrapExpressions = (obj: NestedObject): NestedObject =>
-  Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => {
-      if (containsExpressionString(value)) return [key, wrapExpression(value as string)];
-
-      return [
-        key,
-        value && typeof value === 'object'
-          ? wrapExpressions(value as NestedObject)
-          : value,
-      ];
-    }),
-  );
 
 export { getProperty, setProperty } from '@/src/utils';

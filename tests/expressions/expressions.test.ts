@@ -48,7 +48,7 @@ describe('expressions', () => {
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
     expect(Test.fields[0].check).toEqual({
-      __RONIN_EXPRESSION: "test5 = 'test'",
+      __RONIN_EXPRESSION: "__RONIN_FIELD_test5 = 'test'",
     });
   });
   test('operator string expression', () => {

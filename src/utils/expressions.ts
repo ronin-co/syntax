@@ -1,8 +1,75 @@
-import { QUERY_SYMBOLS } from '@ronin/compiler';
+import { QUERY_SYMBOLS, getQuerySymbol } from '@ronin/compiler';
 
-const expression = (expression: string | number) => {
+export const createExpression = (
+  expression: string,
+): Record<typeof QUERY_SYMBOLS.EXPRESSION, string> => {
   return { [QUERY_SYMBOLS.EXPRESSION]: expression };
 };
+
+/** Used to separate the components of an expression from each other. */
+export const RONIN_EXPRESSION_SEPARATOR = '//.//';
+
+type NestedObject = {
+  [key: string]: unknown | NestedObject;
+};
+
+/**
+ * Checks whether a given value is a query expression.
+ *
+ * @param value - The value to check.
+ *
+ * @returns A boolean indicating whether or not the provided value is an expression.
+ */
+const containsExpressionString = (value: unknown): boolean => {
+  return typeof value === 'string' && value.includes(RONIN_EXPRESSION_SEPARATOR);
+};
+
+/**
+ * Wraps an expression string into a query symbol that allows the compiler to easily
+ * detect and process it.
+ *
+ * @param value - The expression to wrap.
+ *
+ * @returns The provided expression wrapped in a query symbol.
+ */
+export const wrapExpression = (
+  value: string,
+): Record<typeof QUERY_SYMBOLS.EXPRESSION, string> => {
+  const symbol = getQuerySymbol(value);
+  const existingExpression = symbol?.type === 'expression' ? symbol : null;
+
+  const components = (existingExpression ? existingExpression.value : value)
+    .split(RONIN_EXPRESSION_SEPARATOR)
+    .filter((part) => part.length > 0)
+    .map((part) => {
+      return part.startsWith(QUERY_SYMBOLS.FIELD) ? part : `'${part}'`;
+    })
+    .join(' || ');
+
+  return createExpression(components);
+};
+
+/**
+ * Recursively checks an object for query expressions and, if they are found, wraps them
+ * in a query symbol that allows the compiler to easily detect and process them.
+ *
+ * @param obj - The object containing potential expressions.
+ *
+ * @returns The updated object.
+ */
+export const wrapExpressions = (obj: NestedObject): NestedObject =>
+  Object.fromEntries(
+    Object.entries(obj).map(([key, value]) => {
+      if (containsExpressionString(value)) return [key, wrapExpression(value as string)];
+
+      return [
+        key,
+        value && typeof value === 'object'
+          ? wrapExpressions(value as NestedObject)
+          : value,
+      ];
+    }),
+  );
 
 /**
  * Wraps a raw SQL expression as-is.
@@ -14,7 +81,7 @@ const expression = (expression: string | number) => {
  */
 export const sql = (expressions: string) => {
   // TODO: Check expressions use '' rather than ""
-  return expression(expressions);
+  return createExpression(expressions);
 };
 
 /** Valid operators for string concatenation */
@@ -68,7 +135,11 @@ export const op = <T extends string | number | Record<string, string | number>>(
       (QUERY_SYMBOLS.EXPRESSION in left || QUERY_SYMBOLS.FIELD in left)
     )
   ) {
-    wrappedLeft = `'${leftValue}'` as T;
+    if (leftValue.startsWith(RONIN_EXPRESSION_SEPARATOR)) {
+      wrappedLeft = leftValue.replaceAll(RONIN_EXPRESSION_SEPARATOR, '') as T;
+    } else {
+      wrappedLeft = `'${leftValue}'` as T;
+    }
   }
 
   let wrappedRight = rightValue;
@@ -79,10 +150,14 @@ export const op = <T extends string | number | Record<string, string | number>>(
       (QUERY_SYMBOLS.EXPRESSION in right || QUERY_SYMBOLS.FIELD in right)
     )
   ) {
-    wrappedRight = `'${rightValue}'` as T;
+    if (rightValue.startsWith(RONIN_EXPRESSION_SEPARATOR)) {
+      wrappedRight = rightValue.replaceAll(RONIN_EXPRESSION_SEPARATOR, '') as T;
+    } else {
+      wrappedRight = `'${rightValue}'` as T;
+    }
   }
 
-  return expression(`${wrappedLeft} ${operator} ${wrappedRight}`) as unknown as T;
+  return createExpression(`${wrappedLeft} ${operator} ${wrappedRight}`) as unknown as T;
 };
 
 /**
@@ -91,7 +166,7 @@ export const op = <T extends string | number | Record<string, string | number>>(
  * @returns SQL expression that evaluates to a random number
  */
 export const random = (): number => {
-  return expression('random()') as unknown as number;
+  return createExpression('random()') as unknown as number;
 };
 
 /**
@@ -106,7 +181,7 @@ export const abs = (value: number | Record<string, string | number>): number => 
     typeof value === 'object' && QUERY_SYMBOLS.EXPRESSION in value
       ? value[QUERY_SYMBOLS.EXPRESSION]
       : value;
-  return expression(`abs(${valueExpression})`) as unknown as number;
+  return createExpression(`abs(${valueExpression})`) as unknown as number;
 };
 
 /**
@@ -118,7 +193,7 @@ export const abs = (value: number | Record<string, string | number>): number => 
  * @returns SQL expression that evaluates to the formatted timestamp
  */
 export const strftime = (format: string, timestamp: string | 'now'): string => {
-  return expression(`strftime('${format}', '${timestamp}')`) as unknown as string;
+  return createExpression(`strftime('${format}', '${timestamp}')`) as unknown as string;
 };
 
 /**
@@ -130,7 +205,7 @@ export const strftime = (format: string, timestamp: string | 'now'): string => {
  * @returns SQL expression that evaluates to the patched JSON document
  */
 export const json_patch = (patch: string, input: string): string => {
-  return expression(`json_patch('${patch}', '${input}')`) as unknown as string;
+  return createExpression(`json_patch('${patch}', '${input}')`) as unknown as string;
 };
 
 /**
@@ -144,7 +219,9 @@ export const json_patch = (patch: string, input: string): string => {
  * @returns SQL expression that evaluates to the modified JSON document
  */
 export const json_set = (json: string, path: string, value: string): string => {
-  return expression(`json_set('${json}', '${path}', '${value}')`) as unknown as string;
+  return createExpression(
+    `json_set('${json}', '${path}', '${value}')`,
+  ) as unknown as string;
 };
 
 /**
@@ -158,7 +235,7 @@ export const json_set = (json: string, path: string, value: string): string => {
  * @returns SQL expression that evaluates to the modified JSON document
  */
 export const json_replace = (json: string, path: string, value: string): string => {
-  return expression(
+  return createExpression(
     `json_replace('${json}', '${path}', '${value}')`,
   ) as unknown as string;
 };
@@ -174,5 +251,7 @@ export const json_replace = (json: string, path: string, value: string): string 
  * @returns SQL expression that evaluates to the modified JSON document
  */
 export const json_insert = (json: string, path: string, value: string): string => {
-  return expression(`json_insert('${json}', '${path}', '${value}')`) as unknown as string;
+  return createExpression(
+    `json_insert('${json}', '${path}', '${value}')`,
+  ) as unknown as string;
 };
