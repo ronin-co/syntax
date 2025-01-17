@@ -117,7 +117,7 @@ export const getSyntaxProxy = (config?: {
 
           if (isExpression(value)) {
             value = wrapExpression(value as string);
-          } else if (typeof value === 'object') {
+          } else if (typeof value === 'object' && !(QUERY_SYMBOLS.EXPRESSION in value)) {
             value = wrapExpressions(value);
           }
 
