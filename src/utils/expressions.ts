@@ -1,6 +1,6 @@
 import { QUERY_SYMBOLS, getQuerySymbol } from '@ronin/compiler';
 
-export const createExpression = (
+export const expression = (
   expression: string,
 ): Record<typeof QUERY_SYMBOLS.EXPRESSION, string> => {
   return { [QUERY_SYMBOLS.EXPRESSION]: expression };
@@ -46,7 +46,7 @@ export const wrapExpression = (
     })
     .join(' || ');
 
-  return createExpression(components);
+  return expression(components);
 };
 
 /**
@@ -81,7 +81,7 @@ export const wrapExpressions = (obj: NestedObject): NestedObject =>
  */
 export const sql = (expressions: string) => {
   // TODO: Check expressions use '' rather than ""
-  return createExpression(expressions);
+  return expression(expressions);
 };
 
 /** Valid operators for string concatenation */
@@ -157,7 +157,7 @@ export const op = <T extends string | number | Record<string, string | number>>(
     }
   }
 
-  return createExpression(`${wrappedLeft} ${operator} ${wrappedRight}`) as unknown as T;
+  return expression(`${wrappedLeft} ${operator} ${wrappedRight}`) as unknown as T;
 };
 
 /**
@@ -166,7 +166,7 @@ export const op = <T extends string | number | Record<string, string | number>>(
  * @returns SQL expression that evaluates to a random number
  */
 export const random = (): number => {
-  return createExpression('random()') as unknown as number;
+  return expression('random()') as unknown as number;
 };
 
 /**
@@ -181,7 +181,7 @@ export const abs = (value: number | Record<string, string | number>): number => 
     typeof value === 'object' && QUERY_SYMBOLS.EXPRESSION in value
       ? value[QUERY_SYMBOLS.EXPRESSION]
       : value;
-  return createExpression(`abs(${valueExpression})`) as unknown as number;
+  return expression(`abs(${valueExpression})`) as unknown as number;
 };
 
 /**
@@ -193,7 +193,7 @@ export const abs = (value: number | Record<string, string | number>): number => 
  * @returns SQL expression that evaluates to the formatted timestamp
  */
 export const strftime = (format: string, timestamp: string | 'now'): string => {
-  return createExpression(`strftime('${format}', '${timestamp}')`) as unknown as string;
+  return expression(`strftime('${format}', '${timestamp}')`) as unknown as string;
 };
 
 /**
@@ -205,7 +205,7 @@ export const strftime = (format: string, timestamp: string | 'now'): string => {
  * @returns SQL expression that evaluates to the patched JSON document
  */
 export const json_patch = (patch: string, input: string): string => {
-  return createExpression(`json_patch('${patch}', '${input}')`) as unknown as string;
+  return expression(`json_patch('${patch}', '${input}')`) as unknown as string;
 };
 
 /**
@@ -219,9 +219,7 @@ export const json_patch = (patch: string, input: string): string => {
  * @returns SQL expression that evaluates to the modified JSON document
  */
 export const json_set = (json: string, path: string, value: string): string => {
-  return createExpression(
-    `json_set('${json}', '${path}', '${value}')`,
-  ) as unknown as string;
+  return expression(`json_set('${json}', '${path}', '${value}')`) as unknown as string;
 };
 
 /**
@@ -235,7 +233,7 @@ export const json_set = (json: string, path: string, value: string): string => {
  * @returns SQL expression that evaluates to the modified JSON document
  */
 export const json_replace = (json: string, path: string, value: string): string => {
-  return createExpression(
+  return expression(
     `json_replace('${json}', '${path}', '${value}')`,
   ) as unknown as string;
 };
@@ -251,7 +249,5 @@ export const json_replace = (json: string, path: string, value: string): string 
  * @returns SQL expression that evaluates to the modified JSON document
  */
 export const json_insert = (json: string, path: string, value: string): string => {
-  return createExpression(
-    `json_insert('${json}', '${path}', '${value}')`,
-  ) as unknown as string;
+  return expression(`json_insert('${json}', '${path}', '${value}')`) as unknown as string;
 };
