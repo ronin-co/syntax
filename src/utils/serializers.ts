@@ -32,24 +32,24 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
         return serializeFields(result) || [];
       }
 
+      // Pass columns into check function
+      const fieldKeys = Object.keys(fields).reduce<Record<string, unknown>>(
+        (acc, item) => {
+          acc[item] = { [QUERY_SYMBOLS.FIELD]: item };
+          return acc;
+        },
+        {},
+      );
+
       if (typeof value.defaultValue === 'function') {
         value.defaultValue = value.defaultValue();
       }
 
-      if (typeof value.computedAs === 'function') {
-        value.computedAs = value.computedAs();
+      if (typeof value.computedAs?.value === 'function') {
+        value.computedAs.value = value.computedAs.value(fieldKeys);
       }
 
       if (typeof value.check === 'function') {
-        // Pass columns into check function
-        const fieldKeys = Object.keys(fields).reduce<Record<string, unknown>>(
-          (acc, item) => {
-            acc[item] = { [QUERY_SYMBOLS.FIELD]: item };
-            return acc;
-          },
-          {},
-        );
-
         value.check = value.check(fieldKeys);
       }
 

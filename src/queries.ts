@@ -1,10 +1,6 @@
 import { model } from '@/src/schema';
 import { setProperty } from '@/src/utils';
-import {
-  RONIN_EXPRESSION_SEPARATOR,
-  wrapExpression,
-  wrapExpressions,
-} from '@/src/utils/expressions';
+import { RONIN_EXPRESSION_SEPARATOR, wrapExpressions } from '@/src/utils/expressions';
 import { QUERY_SYMBOLS, type Query, getQuerySymbol } from '@ronin/compiler';
 
 /**
@@ -119,12 +115,8 @@ export const getSyntaxProxy = (config?: {
             const symbol = getQuerySymbol(value);
 
             // If the value isn't already a query symbol, wrap it in one.
-            if (!(symbol?.type === 'expression')) {
-              if (typeof value === 'string') {
-                value = wrapExpression(value);
-              } else if (typeof value === 'object') {
-                value = wrapExpressions(value);
-              }
+            if (!(symbol?.type === 'expression') && typeof value === 'object') {
+              value = wrapExpressions(value);
             }
           }
 

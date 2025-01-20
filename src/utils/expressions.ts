@@ -40,8 +40,8 @@ export const wrapExpression = (
 
   const components = (existingExpression ? existingExpression.value : value)
     .split(RONIN_EXPRESSION_SEPARATOR)
-    .filter((part) => part.length > 0)
-    .map((part) => {
+    .filter((part: string) => part.length > 0)
+    .map((part: string) => {
       return part.startsWith(QUERY_SYMBOLS.FIELD) ? part : `'${part}'`;
     })
     .join(' || ');
@@ -112,7 +112,7 @@ export const op = <T extends string | number | Record<string, string | number>>(
   let leftValue = left;
   if (typeof left === 'object') {
     if (QUERY_SYMBOLS.FIELD in left) {
-      leftValue = left[QUERY_SYMBOLS.FIELD] as T;
+      leftValue = `__RONIN_FIELD_${left[QUERY_SYMBOLS.FIELD]}` as T;
     } else if (QUERY_SYMBOLS.EXPRESSION in left) {
       leftValue = left[QUERY_SYMBOLS.EXPRESSION] as T;
     }
@@ -121,7 +121,7 @@ export const op = <T extends string | number | Record<string, string | number>>(
   let rightValue = right;
   if (typeof right === 'object') {
     if (QUERY_SYMBOLS.FIELD in right) {
-      rightValue = right[QUERY_SYMBOLS.FIELD] as T;
+      rightValue = `__RONIN_FIELD_${right[QUERY_SYMBOLS.FIELD]}` as T;
     } else if (QUERY_SYMBOLS.EXPRESSION in right) {
       rightValue = right[QUERY_SYMBOLS.EXPRESSION] as T;
     }
@@ -157,7 +157,7 @@ export const op = <T extends string | number | Record<string, string | number>>(
     }
   }
 
-  return expression(`${wrappedLeft} ${operator} ${wrappedRight}`) as unknown as T;
+  return expression(`(${wrappedLeft} ${operator} ${wrappedRight})`) as unknown as T;
 };
 
 /**
