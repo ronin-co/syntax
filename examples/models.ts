@@ -36,6 +36,7 @@ export const Profile = model({
   slug: 'profile',
 
   fields: {
+    test: string(),
     account: link({
       target: 'account',
       actions: {

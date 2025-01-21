@@ -64,6 +64,7 @@ describe('syntax proxy', () => {
     };
 
     expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(setQueryHandlerSpy).toHaveBeenCalledTimes(1);
   });
 
   // Since `name` is a native property of functions and queries contain function calls,
