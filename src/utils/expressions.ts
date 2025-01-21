@@ -103,11 +103,9 @@ type ComparisonOperator = '=' | '!=' | '>' | '<' | '>=' | '<=';
  * @returns The formatted binary operation expression
  */
 export const op = <T extends string | number | Record<string, string | number>>(
-  left: T,
-  operator: T extends string
-    ? StringOperator | ComparisonOperator
-    : NumberOperator | ComparisonOperator,
-  right: T,
+  left: T | string | number | boolean,
+  operator: NumberOperator | ComparisonOperator | StringOperator,
+  right: T | string | number | boolean,
 ) => {
   let leftValue = left;
   if (typeof left === 'object') {

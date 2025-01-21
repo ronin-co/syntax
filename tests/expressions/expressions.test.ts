@@ -57,7 +57,14 @@ describe('expressions', () => {
 
         computedAs: string().computedAs({
           kind: 'VIRTUAL',
-          value: (fields) => op(fields.numberAdd2, '+', fields.numberSubtract),
+          value: (fields) => op(fields.numberAdd2, '||', fields.numberSubtract),
+        }),
+
+        computedAs2: number({
+          computedAs: {
+            kind: 'VIRTUAL',
+            value: (fields) => op(fields.numberAdd2, '+', fields.numberSubtract),
+          },
         }),
       },
     });
