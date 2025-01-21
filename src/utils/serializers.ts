@@ -1,4 +1,5 @@
 import { type SyntaxItem, getBatchProxy } from '@/src/queries';
+import type { ModelFieldExpression } from '@/src/schema';
 import type { PrimitivesItem } from '@/src/schema/model';
 import {
   type GetInstructions,
@@ -20,7 +21,7 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
   if (Array.isArray(fields)) return fields;
 
   return Object.entries(fields).flatMap(
-    ([key, initialValue]): Array<ModelField> | ModelField => {
+    ([key, initialValue]): Array<ModelFieldExpression> | ModelFieldExpression => {
       let value = initialValue?.structure;
       if (typeof value === 'undefined') {
         value = initialValue as Record<string, PrimitivesItem>;

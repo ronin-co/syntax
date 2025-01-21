@@ -1,11 +1,23 @@
 import { type SyntaxItem, getSyntaxProxy } from '@/src/queries';
 import type { ModelField } from '@ronin/compiler';
 
+export type ModelFieldExpression = Omit<
+  ModelField,
+  'check' | 'computedAs' | 'defaultValue'
+> & {
+  check?: (fields: Record<string, string>) => string;
+  computedAs?: {
+    kind: 'VIRTUAL' | 'STORED';
+    value: (fields: Record<string, string>) => string;
+  };
+  defaultValue?: (fields: Record<string, string>) => string;
+};
+
 /** A utility type that maps an attribute's type to a function signature. */
 type AttributeSignature<T, Attribute> = T extends boolean
   ? () => any
-  : Attribute extends keyof Omit<ModelField, 'type' | 'slug'>
-    ? (value: ModelField[Attribute]) => any
+  : Attribute extends keyof Omit<ModelFieldExpression, 'type' | 'slug'>
+    ? (value: ModelFieldExpression[Attribute]) => any
     : never;
 /**
  * Represents a chain of field attributes in the form of a function chain.
@@ -26,15 +38,17 @@ export type Chain<Attrs, Used extends keyof Attrs = never> = {
 } & ('type' extends keyof Attrs ? { readonly type: Attrs['type'] } : {});
 
 type FieldInput<Type> = Partial<
-  Omit<Extract<ModelField, { type: Type }>, 'slug' | 'type'>
+  Omit<Extract<ModelFieldExpression, { type: Type }>, 'slug' | 'type'>
 >;
 
-export type FieldOutput<Type extends ModelField['type']> = Omit<
-  Extract<ModelField, { type: Type }>,
+export type FieldOutput<Type extends ModelFieldExpression['type']> = Omit<
+  Extract<ModelFieldExpression, { type: Type }>,
   'slug'
 >;
 
-export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutput<Type>>;
+export type SyntaxField<Type extends ModelFieldExpression['type']> = SyntaxItem<
+  FieldOutput<Type>
+>;
 
 /**
  * Creates a primitive field definition returning an object that includes the field type
@@ -44,7 +58,7 @@ export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutpu
  *
  * @returns A field of the provided type with the specified attributes.
  */
-const primitive = <T extends ModelField['type']>(type: T) => {
+const primitive = <T extends ModelFieldExpression['type']>(type: T) => {
   return (initialAttributes: FieldInput<T> = {}) => {
     return getSyntaxProxy({ propertyValue: true })({
       ...initialAttributes,
