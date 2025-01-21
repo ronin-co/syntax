@@ -41,16 +41,24 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
         {},
       );
 
-      if (typeof value.defaultValue === 'function') {
+      if ('defaultValue' in value && typeof value.defaultValue === 'function') {
         value.defaultValue = value.defaultValue();
       }
 
-      if (typeof value.computedAs?.value === 'function') {
-        value.computedAs.value = value.computedAs.value(fieldKeys);
+      if (
+        'computedAs' in value &&
+        value.computedAs &&
+        'value' in value.computedAs &&
+        typeof value.computedAs.value === 'function'
+      ) {
+        value.computedAs.value = value.computedAs.value(
+          fieldKeys as Record<string, string>,
+        );
       }
-
-      if (typeof value.check === 'function') {
-        value.check = value.check(fieldKeys);
+      if ('check' in value && typeof value.check === 'function') {
+        value.check = value.check(
+          fieldKeys as Record<string, string>,
+        ) as unknown as PrimitivesItem;
       }
 
       return {
