@@ -1,6 +1,23 @@
+import type { DeepCallable } from '@/src/queries/types';
 import { model } from '@/src/schema';
+import type { Model } from '@/src/schema/model';
 import { setProperty } from '@/src/utils';
-import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
+import {
+  type AddQuery,
+  type AlterQuery,
+  type CountQuery,
+  type DropQuery,
+  type GetQuery,
+  type ModelField,
+  type ModelIndex,
+  type ModelPreset,
+  type ModelTrigger,
+  type CreateQuery as OriginalCreateQuery,
+  QUERY_SYMBOLS,
+  type Query,
+  type RemoveQuery,
+  type SetQuery,
+} from '@ronin/compiler';
 
 /** Used to separate the components of an expression from each other. */
 const RONIN_EXPRESSION_SEPARATOR = '//.//';
@@ -23,11 +40,73 @@ export interface SyntaxItem<Structure = unknown> {
   options?: Record<string, unknown>;
 }
 
+interface CreateQuery extends Omit<OriginalCreateQuery, 'model' | 'to'> {
+  model: string | Model;
+  to?: Model;
+}
+
 /**
  * Used to track whether queries run in batches if `AsyncLocalStorage` is not
  * available for use.
  */
 let IN_BATCH = false;
+
+export function getSyntaxProxy(config?: {
+  rootProperty?: never;
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}): any;
+
+export function getSyntaxProxy(config?: {
+  rootProperty?: 'get';
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}): DeepCallable<GetQuery>;
+
+export function getSyntaxProxy(config?: {
+  rootProperty?: 'set';
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}): DeepCallable<SetQuery>;
+
+export function getSyntaxProxy(config?: {
+  rootProperty?: 'add';
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}): DeepCallable<AddQuery>;
+
+export function getSyntaxProxy(config?: {
+  rootProperty?: 'remove';
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}): DeepCallable<RemoveQuery>;
+
+export function getSyntaxProxy(config?: {
+  rootProperty?: 'count';
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}): DeepCallable<CountQuery, number>;
+
+export function getSyntaxProxy(config?: {
+  rootProperty?: 'create';
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}): DeepCallable<CreateQuery, Model>;
+
+export function getSyntaxProxy(config?: {
+  rootProperty?: 'alter';
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}): DeepCallable<
+  AlterQuery,
+  Model | ModelField | ModelIndex | ModelTrigger | ModelPreset
+>;
+
+export function getSyntaxProxy(config?: {
+  rootProperty?: 'drop';
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}): DeepCallable<DropQuery, Model>;
 
 /**
  * A utility function that creates a proxy object to handle dynamic property access and
@@ -50,11 +129,19 @@ let IN_BATCH = false;
  * const result = await get.account.with.email('mike@gmail.com');
  * ```
  */
-export const getSyntaxProxy = (config?: {
+export function getSyntaxProxy(config?: {
   rootProperty?: string;
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
   propertyValue?: unknown;
-}) => {
+}):
+  | DeepCallable<GetQuery>
+  | DeepCallable<SetQuery>
+  | DeepCallable<AddQuery>
+  | DeepCallable<RemoveQuery>
+  | DeepCallable<CountQuery, number>
+  | DeepCallable<CreateQuery, Model>
+  | DeepCallable<AlterQuery, Model | ModelField | ModelIndex | ModelTrigger | ModelPreset>
+  | DeepCallable<DropQuery, Model> {
   // The default value of a property within the composed structure.
   const propertyValue =
     typeof config?.propertyValue === 'undefined' ? {} : config.propertyValue;
@@ -176,7 +263,7 @@ export const getSyntaxProxy = (config?: {
   }
 
   return createProxy([]);
-};
+}
 
 /**
  * Obtains a list of queries from a function by wrapping the queries into a context.
@@ -194,9 +281,9 @@ export const getSyntaxProxy = (config?: {
  * ```
  */
 export const getBatchProxy = (
-  operations: () => Array<SyntaxItem<Query>>,
+  operations: () => Array<SyntaxItem<Query> | Promise<any>>,
 ): Array<SyntaxItem<Query>> => {
-  let queries: Array<SyntaxItem<Query>> = [];
+  let queries: Array<SyntaxItem<Query> | Promise<any>> = [];
 
   IN_BATCH = true;
   queries = operations();
@@ -207,7 +294,7 @@ export const getBatchProxy = (
   // therefore return the respective `Proxy` instances, which wouldn't be logged as plain
   // objects, thereby making development more difficult. To avoid this, we are creating a
   // plain object containing the same properties as the `Proxy` instances.
-  return queries.map((details) => ({ ...details }));
+  return queries.map((details) => ({ ...details })) as Array<SyntaxItem<Query>>;
 };
 
 type NestedObject = {
@@ -270,3 +357,4 @@ const wrapExpressions = (obj: NestedObject): NestedObject =>
   );
 
 export { getProperty, setProperty } from '@/src/utils';
+export type { ResultRecord, DeepCallable } from '@/src/queries/types';

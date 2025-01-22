@@ -1,2 +1,2 @@
-export { model } from '@/src/schema/model';
+export { model, type Model } from '@/src/schema/model';
 export * from '@/src/schema/primitives';
