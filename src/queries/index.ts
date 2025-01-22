@@ -281,9 +281,9 @@ export function getSyntaxProxy(config?: {
  * ```
  */
 export const getBatchProxy = (
-  operations: () => Array<SyntaxItem<Query>>,
+  operations: () => Array<SyntaxItem<Query> | Promise<any>>,
 ): Array<SyntaxItem<Query>> => {
-  let queries: Array<SyntaxItem<Query>> = [];
+  let queries: Array<SyntaxItem<Query> | Promise<any>> = [];
 
   IN_BATCH = true;
   queries = operations();
@@ -294,7 +294,7 @@ export const getBatchProxy = (
   // therefore return the respective `Proxy` instances, which wouldn't be logged as plain
   // objects, thereby making development more difficult. To avoid this, we are creating a
   // plain object containing the same properties as the `Proxy` instances.
-  return queries.map((details) => ({ ...details }));
+  return queries.map((details) => ({ ...details })) as Array<SyntaxItem<Query>>;
 };
 
 type NestedObject = {
