@@ -1,18 +1,18 @@
 import type { DeepCallable } from '@/src/queries/types';
 import { model } from '@/src/schema';
+import type { Model } from '@/src/schema/model';
 import { setProperty } from '@/src/utils';
 import {
   type AddQuery,
   type AlterQuery,
   type CountQuery,
-  type CreateQuery,
   type DropQuery,
   type GetQuery,
-  type Model,
   type ModelField,
   type ModelIndex,
   type ModelPreset,
   type ModelTrigger,
+  type CreateQuery as OriginalCreateQuery,
   QUERY_SYMBOLS,
   type Query,
   type RemoveQuery,
@@ -38,6 +38,11 @@ export type PromiseTuple<
 export interface SyntaxItem<Structure = unknown> {
   structure: Structure;
   options?: Record<string, unknown>;
+}
+
+interface CreateQuery extends Omit<OriginalCreateQuery, 'model'|'to'> {
+  model: string | Model;
+  to?: Model;
 }
 
 /**

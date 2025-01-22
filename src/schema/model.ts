@@ -63,7 +63,7 @@ export interface NestedFieldsPrimitivesItem {
   [key: string]: PrimitivesItem;
 }
 
-export interface Model<Fields>
+export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
   extends Omit<RawModel, 'fields' | 'indexes' | 'triggers' | 'presets'> {
   /**
    * The fields that make up this model.
