@@ -375,7 +375,7 @@ describe('syntax proxy', () => {
       slug: 'account',
 
       fields: {
-        handle: string().required(),
+        handle: string().required() as any,
       },
     });
 

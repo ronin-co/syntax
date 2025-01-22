@@ -40,7 +40,7 @@ export interface SyntaxItem<Structure = unknown> {
   options?: Record<string, unknown>;
 }
 
-interface CreateQuery extends Omit<OriginalCreateQuery, 'model'|'to'> {
+interface CreateQuery extends Omit<OriginalCreateQuery, 'model' | 'to'> {
   model: string | Model;
   to?: Model;
 }
