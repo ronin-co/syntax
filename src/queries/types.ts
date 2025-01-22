@@ -59,7 +59,8 @@ export type DeepCallable<Query, Result = ResultRecord> = [NonNullable<Query>] ex
  * `DeepCallable<Query, FinalResult>`.
  */
 type ObjectCall<Query, DefaultResult, Arg> = (<FinalResult = DefaultResult>(
-  arg?: Arg,
+  arg?: ((f: Record<string, unknown>) => Arg) | Arg,
+  options?: Record<string, unknown>,
 ) => Promise<FinalResult> & DeepCallable<Query, FinalResult>) &
   ReducedFunction;
 
