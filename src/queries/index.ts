@@ -47,6 +47,12 @@ export interface SyntaxItem<Structure = unknown> {
 let IN_BATCH = false;
 
 export function getSyntaxProxy(config?: {
+  rootProperty?: never;
+  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
+  propertyValue?: unknown;
+}): any;
+
+export function getSyntaxProxy(config?: {
   rootProperty?: 'get';
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
   propertyValue?: unknown;
