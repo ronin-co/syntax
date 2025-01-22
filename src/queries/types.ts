@@ -72,7 +72,7 @@ export interface ReducedFunction {
   /**
    * @deprecated
    */
-  name: never;
+  name: any;
   /**
    * @deprecated
    */
