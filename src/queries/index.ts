@@ -357,4 +357,4 @@ const wrapExpressions = (obj: NestedObject): NestedObject =>
   );
 
 export { getProperty, setProperty } from '@/src/utils';
-export type { ResultRecord } from '@/src/queries/types';
+export type { ResultRecord, DeepCallable } from '@/src/queries/types';
