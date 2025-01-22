@@ -171,10 +171,12 @@ describe('syntax proxy', () => {
       // Test queries where the second function is called right after the first one.
       getProxy.members
         .with({ team: 'red' })
+        // @ts-expect-error This will be improved shortly.
         .selecting(['name']),
       // Test queries where the second function is not called right after the first one.
       getProxy.members
         .with({ team: 'blue' })
+        // @ts-expect-error This will be improved shortly.
         .orderedBy.ascending(['joinedAt']),
     ]);
 
@@ -223,6 +225,7 @@ describe('syntax proxy', () => {
       // since the latter is able to manipulate the batch context.
       alterProxy
         .model('newUsers')
+        // @ts-expect-error This will be improved shortly
         .to({ slug: 'accounts' }),
     ]);
 
@@ -264,16 +267,29 @@ describe('syntax proxy', () => {
       createProxy.model({
         slug: 'account',
       }),
-      alterProxy.model('account').to({
-        slug: 'users',
-      }),
-      alterProxy.model('users').create.field({
-        slug: 'handle',
-      }),
-      alterProxy.model('users').alter.field('handle').to({
-        name: 'User Handle',
-      }),
-      alterProxy.model('users').drop.field('handle'),
+      alterProxy
+        .model('account')
+        // @ts-expect-error This will be improved shortly.
+        .to({
+          slug: 'users',
+        }),
+      alterProxy
+        .model('users')
+        // @ts-expect-error This will be improved shortly.
+        .create.field({
+          slug: 'handle',
+        }),
+      alterProxy
+        .model('users')
+        // @ts-expect-error This will be improved shortly.
+        .alter.field('handle')
+        .to({
+          name: 'User Handle',
+        }),
+      alterProxy
+        .model('users')
+        // @ts-expect-error This will be improved shortly
+        .drop.field('handle'),
       dropProxy.model('users'),
     ]);
 
