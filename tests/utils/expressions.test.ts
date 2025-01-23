@@ -32,6 +32,7 @@ describe('expressions', () => {
     const Test = model({
       slug: 'test',
       fields: {
+        test: string().required(),
         stringConcat: string().defaultValue(() => op('Hello', '||', 'World')),
         numberAdd: number().defaultValue(() => op(1, '+', 2)),
         numberSubtract: number().defaultValue(() => op(5, '-', 3)),

@@ -5,7 +5,7 @@ import type { ModelField } from '@ronin/compiler';
 type AttributeSignature<T, Attribute> = T extends boolean
   ? () => any
   : Attribute extends keyof Omit<ModelFieldExpressions<T>, 'type' | 'slug'>
-    ? (expression: ModelFieldExpressions<T>[Attribute]) => T
+    ? ModelFieldExpressions<T>[Attribute]
     : never;
 
 /**
@@ -20,29 +20,25 @@ type AttributeSignature<T, Attribute> = T extends boolean
 export type Chain<Attrs, Used extends keyof Attrs = never> = {
   // 1) Chainable methods for all keys that are not in `Used` or `type`
   [K in Exclude<keyof Attrs, Used | 'type'>]: (
-    ...args: Parameters<AttributeSignature<Attrs[K], K>>
+    ...args: Array<AttributeSignature<TypeToTSType<Attrs['type']>, K>>
   ) => Chain<Attrs, Used | K>;
   // 2) If `type` is defined in `Attrs`, add it as a read-only property
   // biome-ignore lint/complexity/noBannedTypes: This is a valid use case.
 } & ('type' extends keyof Attrs ? { readonly type: Attrs['type'] } : {});
 
+type TypeToTSType<Type> = Type extends 'string'
+  ? string
+  : Type extends 'number'
+    ? number
+    : Type extends 'boolean'
+      ? boolean
+      : Type extends 'blob'
+        ? Blob
+        : never;
+
 type FieldInput<Type> = Partial<
   Omit<
-    Extract<
-      ModelField &
-        ModelFieldExpressions<
-          Type extends 'string'
-            ? string
-            : Type extends 'number'
-              ? number
-              : Type extends 'boolean'
-                ? boolean
-                : Type extends 'blob'
-                  ? Blob
-                  : never
-        >,
-      { type: Type }
-    >,
+    Extract<ModelField & ModelFieldExpressions<TypeToTSType<Type>>, { type: Type }>,
     'slug' | 'type'
   >
 >;
