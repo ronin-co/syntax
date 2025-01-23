@@ -1,11 +1,12 @@
 import { type SyntaxItem, getBatchProxy } from '@/src/queries';
 import type { PrimitivesItem } from '@/src/schema/model';
-import type {
-  GetInstructions,
-  ModelField,
-  ModelTrigger,
-  Query,
-  WithInstruction,
+import {
+  type GetInstructions,
+  type ModelField,
+  type ModelTrigger,
+  QUERY_SYMBOLS,
+  type Query,
+  type WithInstruction,
 } from '@ronin/compiler';
 
 /**
@@ -31,6 +32,33 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
         }
 
         return serializeFields(result) || [];
+      }
+
+      // Pass columns into check function
+      const fieldKeys = Object.keys(fields).reduce<Record<string, unknown>>(
+        (acc, item) => {
+          acc[item] = { [QUERY_SYMBOLS.FIELD]: item };
+          return acc;
+        },
+        {},
+      );
+
+      if ('defaultValue' in value && typeof value.defaultValue === 'function') {
+        value.defaultValue = value.defaultValue();
+      }
+
+      if (
+        'computedAs' in value &&
+        value.computedAs &&
+        'value' in value.computedAs &&
+        typeof value.computedAs.value === 'function'
+      ) {
+        value.computedAs.value = value.computedAs.value();
+      }
+      if ('check' in value && typeof value.check === 'function') {
+        value.check = value.check(
+          fieldKeys as Record<string, string>,
+        ) as unknown as PrimitivesItem;
       }
 
       return {

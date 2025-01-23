@@ -2,11 +2,11 @@ import { type SyntaxItem, getSyntaxProxy } from '@/src/queries';
 import type { ModelField } from '@ronin/compiler';
 
 /** A utility type that maps an attribute's type to a function signature. */
-type AttributeSignature<T> = T extends boolean
+type AttributeSignature<T, Attribute> = T extends boolean
   ? () => any
-  : T extends boolean
-    ? never
-    : (value: string) => any;
+  : Attribute extends keyof Omit<ModelFieldExpressions<T>, 'type' | 'slug'>
+    ? (expression: ModelFieldExpressions<T>[Attribute]) => T
+    : never;
 
 /**
  * Represents a chain of field attributes in the form of a function chain.
@@ -20,20 +20,46 @@ type AttributeSignature<T> = T extends boolean
 type Chain<Attrs, Used extends keyof Attrs = never> = {
   // 1) Chainable methods for all keys that are not in `Used` or `type`
   [K in Exclude<keyof Attrs, Used | 'type'>]: (
-    ...args: Parameters<AttributeSignature<Attrs[K]>>
+    ...args: Parameters<AttributeSignature<Attrs[K], K>>
   ) => Chain<Attrs, Used | K>;
   // 2) If `type` is defined in `Attrs`, add it as a read-only property
   // biome-ignore lint/complexity/noBannedTypes: This is a valid use case.
 } & ('type' extends keyof Attrs ? { readonly type: Attrs['type'] } : {});
 
 type FieldInput<Type> = Partial<
-  Omit<Extract<ModelField, { type: Type }>, 'slug' | 'type'>
+  Omit<
+    Extract<
+      ModelField &
+        ModelFieldExpressions<
+          Type extends 'string'
+            ? string
+            : Type extends 'number'
+              ? number
+              : Type extends 'boolean'
+                ? boolean
+                : Type extends 'blob'
+                  ? Blob
+                  : never
+        >,
+      { type: Type }
+    >,
+    'slug' | 'type'
+  >
 >;
 
 type FieldOutput<Type extends ModelField['type']> = Omit<
   Extract<ModelField, { type: Type }>,
   'slug'
 >;
+
+export type ModelFieldExpressions<Type> = {
+  check?: (fields: Record<string, string>) => Type;
+  computedAs?: (fields: Record<string, string>) => {
+    value: () => unknown;
+    kind: 'VIRTUAL' | 'STORED';
+  };
+  defaultValue?: () => Type | Type;
+};
 
 export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutput<Type>>;
 
