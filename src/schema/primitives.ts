@@ -17,7 +17,7 @@ type AttributeSignature<T, Attribute> = T extends boolean
  * For each attribute key `K` not in `Used`, create a method using the signature derived
  * from that attribute's type. Calling it returns a new `Chain` marking `K` as used.
  */
-type Chain<Attrs, Used extends keyof Attrs = never> = {
+export type Chain<Attrs, Used extends keyof Attrs = never> = {
   // 1) Chainable methods for all keys that are not in `Used` or `type`
   [K in Exclude<keyof Attrs, Used | 'type'>]: (
     ...args: Parameters<AttributeSignature<Attrs[K], K>>
@@ -47,15 +47,15 @@ type FieldInput<Type> = Partial<
   >
 >;
 
-type FieldOutput<Type extends ModelField['type']> = Omit<
+export type FieldOutput<Type extends ModelField['type']> = Omit<
   Extract<ModelField, { type: Type }>,
   'slug'
 >;
 
 export type ModelFieldExpressions<Type> = {
-  check?: (fields: Record<string, string>) => Type;
-  computedAs?: (fields: Record<string, string>) => {
-    value: () => unknown;
+  check?: (fields: Record<string, Type>) => Type;
+  computedAs?: (fields: Record<string, Type>) => {
+    value: () => Type;
     kind: 'VIRTUAL' | 'STORED';
   };
   defaultValue?: () => Type | Type;
