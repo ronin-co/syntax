@@ -66,6 +66,35 @@ describe('syntax proxy', () => {
     expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
+  test('using field with date', async () => {
+    const setQueryHandler = { callback: () => undefined };
+    const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
+
+    const setProxy = getSyntaxProxy({
+      rootProperty: 'set',
+      callback: setQueryHandlerSpy,
+    });
+
+    const date = new Date();
+
+    setProxy.member({
+      with: { id: '1234' },
+      // The date must be passed directly here, without conversion.
+      to: { activeAt: date },
+    });
+
+    const finalQuery = {
+      set: {
+        member: {
+          with: { id: '1234' },
+          to: { activeAt: date.toISOString() },
+        },
+      },
+    };
+
+    expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+  });
+
   // Since `name` is a native property of functions and queries contain function calls,
   // we have to explicitly assert whether it can be used as a field slug.
   test('using field with slug `name`', async () => {
