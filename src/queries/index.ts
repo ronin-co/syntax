@@ -2,6 +2,7 @@ import type { DeepCallable } from '@/src/queries/types';
 import { model } from '@/src/schema';
 import type { Model } from '@/src/schema/model';
 import { setProperty } from '@/src/utils';
+import { serializeSyntaxStructure } from '@/src/utils/serializers';
 import {
   type AddQuery,
   type AlterQuery,
@@ -219,11 +220,7 @@ export function getSyntaxProxy(config?: {
           // Restore the original value of `IN_BATCH`.
           IN_BATCH = ORIGINAL_IN_BATCH;
         } else if (typeof value !== 'undefined') {
-          // Serialize the value to ensure that the final structure can be sent over the
-          // network and/or passed to the query compiler.
-          //
-          // For example, `Date` objects will be converted into ISO strings.
-          value = JSON.parse(JSON.stringify(value));
+          value = serializeSyntaxStructure(value);
         }
 
         // If the function call is happening after an existing function call in the

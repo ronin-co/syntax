@@ -77,3 +77,45 @@ export const serializeTriggers = (triggers: Array<ModelTrigger<Array<ModelField>
     };
   });
 };
+
+/**
+ * Determines whether the provided value is storable as a binary object, or not.
+ *
+ * @param value - The value to check.
+ *
+ * @returns A boolean indicating whether the provided value is storable, or not.
+ */
+const isStorableObject = (value: unknown): boolean =>
+  (typeof File !== 'undefined' && value instanceof File) ||
+  (typeof ReadableStream !== 'undefined' && value instanceof ReadableStream) ||
+  (typeof Blob !== 'undefined' && value instanceof Blob) ||
+  (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) ||
+  (typeof Buffer !== 'undefined' && Buffer.isBuffer(value));
+
+/**
+ * Serializes syntax structures to ensure that the final structure can be sent over the
+ * network and/or passed to the query compiler. For example, `Date` objects will be
+ * converted into ISO strings.
+ *
+ * @param structure - The structure to serialize.
+ *
+ * @returns The serialized structure.
+ */
+export const serializeSyntaxStructure = (structure: unknown) => {
+  const string = JSON.stringify(structure, (_key: string, value: unknown) => {
+    return isStorableObject(value) ? { __storableObject: true, value } : value;
+  });
+
+  return JSON.parse(string, (_key: string, value: unknown) => {
+    if (
+      typeof value === 'object' &&
+      value !== null &&
+      '__storableObject' in value &&
+      'value' in value
+    ) {
+      return value.value;
+    }
+
+    return value;
+  });
+};
