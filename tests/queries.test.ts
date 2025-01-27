@@ -5,7 +5,7 @@ import { string } from '@/src/schema';
 import { QUERY_SYMBOLS } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
-  test('using sub query', async () => {
+  test('using sub query', () => {
     const getQueryHandler = { callback: () => undefined };
     const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
     const addQueryHandler = { callback: () => undefined };
@@ -38,7 +38,7 @@ describe('syntax proxy', () => {
     expect(addQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
-  test('using field with expression', async () => {
+  test('using field with expression', () => {
     const setQueryHandler = { callback: () => undefined };
     const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
 
@@ -66,7 +66,7 @@ describe('syntax proxy', () => {
     expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
-  test('using field with date', async () => {
+  test('using field with date', () => {
     const setQueryHandler = { callback: () => undefined };
     const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
 
@@ -95,9 +95,37 @@ describe('syntax proxy', () => {
     expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
+  test('using field with file', () => {
+    const setQueryHandler = { callback: () => undefined };
+    const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
+
+    const setProxy = getSyntaxProxy({
+      rootProperty: 'set',
+      callback: setQueryHandlerSpy,
+    });
+
+    const file = new File(['test'], 'test.txt');
+
+    setProxy.account({
+      with: { id: '1234' },
+      to: { avatar: file },
+    });
+
+    const finalQuery = {
+      set: {
+        account: {
+          with: { id: '1234' },
+          to: { avatar: file },
+        },
+      },
+    };
+
+    expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+  });
+
   // Since `name` is a native property of functions and queries contain function calls,
   // we have to explicitly assert whether it can be used as a field slug.
-  test('using field with slug `name`', async () => {
+  test('using field with slug `name`', () => {
     const getQueryHandler = { callback: () => undefined };
     const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
 
@@ -121,7 +149,7 @@ describe('syntax proxy', () => {
     expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
-  test('using multiple fields with expressions', async () => {
+  test('using multiple fields with expressions', () => {
     const setQueryHandler = { callback: () => undefined };
     const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
 
@@ -153,7 +181,7 @@ describe('syntax proxy', () => {
     expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
-  test('using async context', async () => {
+  test('using async context', () => {
     const get = getSyntaxProxy({ rootProperty: 'get' });
 
     const queries = getBatchProxy(() => [get.account()]);
@@ -163,7 +191,7 @@ describe('syntax proxy', () => {
     });
   });
 
-  test('using options for query in batch', async () => {
+  test('using options for query in batch', () => {
     const get = getSyntaxProxy({ rootProperty: 'get' });
 
     const queryList = getBatchProxy(() => [
@@ -193,7 +221,7 @@ describe('syntax proxy', () => {
     ]);
   });
 
-  test('using function chaining in batch', async () => {
+  test('using function chaining in batch', () => {
     const getProxy = getSyntaxProxy({ rootProperty: 'get', callback: () => undefined });
 
     const queryList = getBatchProxy(() => [
@@ -239,7 +267,7 @@ describe('syntax proxy', () => {
     ]);
   });
 
-  test('using nested function as argument in batch', async () => {
+  test('using nested function as argument in batch', () => {
     // It's important to define the `callback` here, in order to guarantee that the
     // queries are executed standalone if no batch context is detected.
     const callback = () => undefined;
@@ -285,7 +313,7 @@ describe('syntax proxy', () => {
     ]);
   });
 
-  test('using schema query types', async () => {
+  test('using schema query types', () => {
     const callback = () => undefined;
 
     const createProxy = getSyntaxProxy({ rootProperty: 'create', callback });
@@ -387,7 +415,7 @@ describe('syntax proxy', () => {
     ]);
   });
 
-  test('using a function call at the root', async () => {
+  test('using a function call at the root', () => {
     const getQueryHandler = { callback: () => undefined };
     const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
 
@@ -407,7 +435,7 @@ describe('syntax proxy', () => {
     expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
-  test('creating a model via query using primitive helpers', async () => {
+  test('creating a model via query using primitive helpers', () => {
     const getQueryHandler = { callback: () => undefined };
     const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
 
