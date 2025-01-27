@@ -161,6 +161,14 @@ export function getSyntaxProxy(config?: {
     // @ts-expect-error Deleting this property is required for fields called `name`.
     delete proxyTargetFunction.name;
 
+    // Ensure that the target can be serialized by `JSON.stringify()`.
+    Object.defineProperty(proxyTargetFunction, 'toJSON', {
+      value() {
+        return { ...this };
+      },
+      enumerable: false, // The property hould not appear during enumeration.
+    });
+
     return new Proxy(proxyTargetFunction, {
       apply(target: any, _thisArg: any, args: Array<any>) {
         let value = args[0];
@@ -210,6 +218,12 @@ export function getSyntaxProxy(config?: {
 
           // Restore the original value of `IN_BATCH`.
           IN_BATCH = ORIGINAL_IN_BATCH;
+        } else if (typeof value !== 'undefined') {
+          // Serialize the value to ensure that the final structure can be sent over the
+          // network and/or passed to the query compiler.
+          //
+          // For example, `Date` objects will be converted into ISO strings.
+          value = JSON.parse(JSON.stringify(value));
         }
 
         // If the function call is happening after an existing function call in the
