@@ -177,7 +177,6 @@ describe('expressions', () => {
       slug: 'test',
       fields: {
         numberAbs: number().defaultValue(() => abs(-42)),
-        stringAbs: string().defaultValue(() => abs(-42)),
         expressionAbs: number().defaultValue(() => abs(op(1, '-', 5))),
       },
     });

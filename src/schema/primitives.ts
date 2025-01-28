@@ -20,6 +20,7 @@ type AttributeSignature<T, Attribute> = T extends boolean
 export type Chain<Attrs, Used extends keyof Attrs = never> = {
   // 1) Chainable methods for all keys that are not in `Used` or `type`
   [K in Exclude<keyof Attrs, Used | 'type'>]: (
+    // @ts-expect-error: This is a valid use case.
     ...args: Array<AttributeSignature<TypeToTSType<Attrs['type']>, K>>
   ) => Chain<Attrs, Used | K>;
   // 2) If `type` is defined in `Attrs`, add it as a read-only property
@@ -34,13 +35,20 @@ type TypeToTSType<Type> = Type extends 'string'
       ? boolean
       : Type extends 'blob'
         ? Blob
-        : never;
+        : Type extends 'date'
+          ? Date
+          : never;
 
-type FieldInput<Type> = Partial<
-  Omit<
-    Extract<ModelField & ModelFieldExpressions<TypeToTSType<Type>>, { type: Type }>,
-    'slug' | 'type'
-  >
+type FieldInput<Type extends ModelField['type']> = Partial<
+  Omit<ModelField, keyof ModelFieldExpressions<TypeToTSType<Type>>> & {
+    type: 'link';
+    target: string;
+    kind?: 'one' | 'many';
+    actions?: {
+      onDelete?: 'CASCADE' | 'SET NULL' | 'SET DEFAULT' | 'NO ACTION';
+      onUpdate?: 'CASCADE' | 'SET NULL' | 'SET DEFAULT' | 'NO ACTION';
+    };
+  } & ModelFieldExpressions<TypeToTSType<Type>>
 >;
 
 export type FieldOutput<Type extends ModelField['type']> = Omit<

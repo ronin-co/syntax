@@ -79,7 +79,7 @@ export const wrapExpressions = (obj: NestedObject): NestedObject =>
  *
  * @returns The wrapped SQL expression
  */
-export const sql = (expressions: string) => {
+export const sql = (expressions: string): any => {
   // TODO: Check expressions use '' rather than ""
   return expression(expressions);
 };
@@ -192,8 +192,8 @@ export const abs = (value: number | Record<string, string | number>): number => 
  *
  * @returns SQL expression that evaluates to the formatted timestamp
  */
-export const strftime = (format: string, timestamp: string | 'now'): string => {
-  return expression(`strftime('${format}', '${timestamp}')`) as unknown as string;
+export const strftime = (format: string, timestamp: string | 'now'): Date => {
+  return expression(`strftime('${format}', '${timestamp}')`) as unknown as Date;
 };
 
 /**
