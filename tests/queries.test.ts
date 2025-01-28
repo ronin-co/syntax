@@ -132,6 +132,29 @@ describe('syntax proxy', () => {
     expect(setQuery).toMatchObject(finalQuery);
   });
 
+  test('using `undefined` instruction`', () => {
+    let getQuery: Query | undefined;
+
+    const getProxy = getSyntaxProxy({
+      rootProperty: 'get',
+      callback: (value) => {
+        getQuery = value;
+      },
+    });
+
+    getProxy.accounts({
+      after: undefined,
+    });
+
+    const finalQuery = {
+      get: {
+        accounts: {},
+      },
+    };
+
+    expect(getQuery).toMatchObject(finalQuery);
+  });
+
   // Since `name` is a native property of functions and queries contain function calls,
   // we have to explicitly assert whether it can be used as a field slug.
   test('using field with slug `name`', () => {
