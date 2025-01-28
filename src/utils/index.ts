@@ -134,7 +134,7 @@ const isPlainObject = (value: unknown): boolean => {
  * every property in the object.
  *
  * @param obj - The object to mutate.
- * @param callback - The function to apply to each value in the object.
+ * @param callback - The function to call for every value in the object.
  *
  * @returns The mutated object.
  */
@@ -152,7 +152,7 @@ export const mutateStructure = (
         // Recursively mutate nested objects.
         mutateStructure(obj[key] as NestedObject, callback);
       } else {
-        // Apply the mutation function to the value.
+        // Call the mutation function for the value.
         obj[key] = callback(obj[key]);
       }
     }
