@@ -2,7 +2,7 @@ import { describe, expect, spyOn, test } from 'bun:test';
 
 import { getBatchProxy, getSyntaxProxy } from '@/src/queries';
 import { string } from '@/src/schema';
-import { QUERY_SYMBOLS } from '@ronin/compiler';
+import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
   test('using sub query', () => {
@@ -67,12 +67,13 @@ describe('syntax proxy', () => {
   });
 
   test('using field with date', () => {
-    const setQueryHandler = { callback: () => undefined };
-    const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
+    let setQuery: Query | undefined;
 
     const setProxy = getSyntaxProxy({
       rootProperty: 'set',
-      callback: setQueryHandlerSpy,
+      callback: (value) => {
+        setQuery = value;
+      },
     });
 
     const date = new Date();
@@ -92,16 +93,19 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    // It's important to assert the object directly here, because `toHaveBeenCalledWith`
+    // does not work correctly with `Date` objects.
+    expect(setQuery).toMatchObject(finalQuery);
   });
 
   test('using field with file', () => {
-    const setQueryHandler = { callback: () => undefined };
-    const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
+    let setQuery: Query | undefined;
 
     const setProxy = getSyntaxProxy({
       rootProperty: 'set',
-      callback: setQueryHandlerSpy,
+      callback: (value) => {
+        setQuery = value;
+      },
       replacer: (value: unknown) => {
         return value instanceof File ? value : JSON.parse(JSON.stringify(value));
       },
@@ -123,7 +127,9 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    // It's important to assert the object directly here, because `toHaveBeenCalledWith`
+    // does not work correctly with `File` objects.
+    expect(setQuery).toMatchObject(finalQuery);
   });
 
   // Since `name` is a native property of functions and queries contain function calls,

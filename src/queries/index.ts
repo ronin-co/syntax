@@ -235,7 +235,7 @@ export function getSyntaxProxy(config?: {
           // For example, `Date` objects will be converted into ISO strings.
           value = mutateStructure(
             value,
-            options?.replacer || ((value) => JSON.parse(JSON.stringify(value))),
+            config?.replacer || ((value) => JSON.parse(JSON.stringify(value))),
           );
         }
 
