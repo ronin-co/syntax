@@ -28,6 +28,10 @@ const getPathSegments = (path: string): Array<string> => {
   return segments;
 };
 
+type NestedObject = {
+  [key: string]: unknown | NestedObject;
+};
+
 /**
  * Set the property at the given path to the given value.
  *
@@ -112,4 +116,46 @@ export const getProperty = (obj: object, path: string): unknown => {
   }
 
   return current;
+};
+
+/**
+ * Determines whether an object is a plain object or not.
+ *
+ * @param value - The object to check.
+ *
+ * @returns A boolean indicating whether the object is plain, or not.
+ */
+const isPlainObject = (value: unknown): boolean => {
+  return Object.prototype.toString.call(value) === '[object Object]';
+};
+
+/**
+ * Recursively iterates through an object and calls a mutation function for the value of
+ * every property in the object.
+ *
+ * @param obj - The object to mutate.
+ * @param callback - The function to call for every value in the object.
+ *
+ * @returns The mutated object.
+ */
+export const mutateStructure = (
+  obj: NestedObject,
+  callback: (value: unknown) => unknown,
+) => {
+  // If it's not a plain object, return as-is (e.g., Date, Blob, etc.)
+  if (!isPlainObject(obj)) return obj;
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      if (isPlainObject(obj[key])) {
+        // Recursively mutate nested objects.
+        mutateStructure(obj[key] as NestedObject, callback);
+      } else {
+        // Call the mutation function for the value.
+        obj[key] = callback(obj[key]);
+      }
+    }
+  }
+
+  return obj; // Return the mutated object.
 };
