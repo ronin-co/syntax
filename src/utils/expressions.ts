@@ -112,7 +112,7 @@ export const op = <
   let leftValue = left;
   if (typeof left === 'object') {
     if (QUERY_SYMBOLS.FIELD in left) {
-      leftValue = `__RONIN_FIELD_${left[QUERY_SYMBOLS.FIELD]}` as T;
+      leftValue = `${QUERY_SYMBOLS.FIELD}${left[QUERY_SYMBOLS.FIELD]}` as T;
     } else if (QUERY_SYMBOLS.EXPRESSION in left) {
       leftValue = left[QUERY_SYMBOLS.EXPRESSION] as T;
     }
@@ -121,7 +121,7 @@ export const op = <
   let rightValue = right;
   if (typeof right === 'object') {
     if (QUERY_SYMBOLS.FIELD in right) {
-      rightValue = `__RONIN_FIELD_${right[QUERY_SYMBOLS.FIELD]}` as T;
+      rightValue = `${QUERY_SYMBOLS.FIELD}${right[QUERY_SYMBOLS.FIELD]}` as T;
     } else if (QUERY_SYMBOLS.EXPRESSION in right) {
       rightValue = right[QUERY_SYMBOLS.EXPRESSION] as T;
     }

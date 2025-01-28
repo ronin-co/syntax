@@ -10,6 +10,7 @@ import {
   random,
   sql,
   strftime,
+  wrapExpression,
   wrapExpressions,
 } from '@/src/utils/expressions';
 
@@ -28,11 +29,218 @@ describe('expressions', () => {
     });
   });
 
+  describe('operator expressions', () => {
+    test('string concatenation operator', () => {
+      const Test = model({
+        slug: 'test',
+        fields: {
+          stringConcat: string().defaultValue(() => op('Hello', '||', 'World')),
+        },
+      });
+      // @ts-expect-error This exists
+      expect(Test.fields[0].defaultValue).toEqual({
+        __RONIN_EXPRESSION: "('Hello' || 'World')",
+      });
+    });
+
+    describe('arithmetic operators', () => {
+      test('addition', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            add: number().defaultValue(() => op(1, '+', 2)),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].defaultValue).toEqual({
+          __RONIN_EXPRESSION: '(1 + 2)',
+        });
+      });
+
+      test('subtraction', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            subtract: number().defaultValue(() => op(5, '-', 3)),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].defaultValue).toEqual({
+          __RONIN_EXPRESSION: '(5 - 3)',
+        });
+      });
+
+      test('multiplication', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            multiply: number().defaultValue(() => op(4, '*', 2)),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].defaultValue).toEqual({
+          __RONIN_EXPRESSION: '(4 * 2)',
+        });
+      });
+
+      test('division', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            divide: number().defaultValue(() => op(10, '/', 2)),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].defaultValue).toEqual({
+          __RONIN_EXPRESSION: '(10 / 2)',
+        });
+      });
+
+      test('modulo', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            modulo: number().defaultValue(() => op(7, '%', 3)),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].defaultValue).toEqual({
+          __RONIN_EXPRESSION: '(7 % 3)',
+        });
+      });
+    });
+
+    describe('comparison operators', () => {
+      test('equals', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            equals: string().check((fields) => op(fields.equals, '=', 'test')),
+            equalsRight: string().check((fields) => op('test', '=', fields.equalsRight)),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].check).toEqual({
+          __RONIN_EXPRESSION: "(__RONIN_FIELD_equals = 'test')",
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[1].check).toEqual({
+          __RONIN_EXPRESSION: "('test' = __RONIN_FIELD_equalsRight)",
+        });
+      });
+
+      test('not equals', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            notEquals: string().check((fields) => op(fields.notEquals, '!=', 'test')),
+            notEqualsRight: string().check((fields) =>
+              op('test', '!=', op(fields.notEqualsRight, '!=', 'test')),
+            ),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].check).toEqual({
+          __RONIN_EXPRESSION: "(__RONIN_FIELD_notEquals != 'test')",
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[1].check).toEqual({
+          __RONIN_EXPRESSION: "('test' != (__RONIN_FIELD_notEqualsRight != 'test'))",
+        });
+      });
+
+      test('greater than', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            greaterThan: number().check((fields) => op(fields.greaterThan, '>', 5)),
+            greaterThanRight: number().check((fields) =>
+              op(5, '>', fields.greaterThanRight),
+            ),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].check).toEqual({
+          __RONIN_EXPRESSION: '(__RONIN_FIELD_greaterThan > 5)',
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[1].check).toEqual({
+          __RONIN_EXPRESSION: '(5 > __RONIN_FIELD_greaterThanRight)',
+        });
+      });
+
+      test('less than', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            lessThan: number().check((fields) =>
+              op(op(fields.lessThan, '<', 5), '<', op(fields.lessThan, '<', 5)),
+            ),
+            lessThanRight: number().check((fields) =>
+              op(op(5, '<', fields.lessThanRight), '<', op(5, '<', fields.lessThanRight)),
+            ),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].check).toEqual({
+          __RONIN_EXPRESSION:
+            '((__RONIN_FIELD_lessThan < 5) < (__RONIN_FIELD_lessThan < 5))',
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[1].check).toEqual({
+          __RONIN_EXPRESSION:
+            '((5 < __RONIN_FIELD_lessThanRight) < (5 < __RONIN_FIELD_lessThanRight))',
+        });
+      });
+
+      test('greater than or equal', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            greaterThanEqual: number().check((fields) =>
+              op(fields.greaterThanEqual, '>=', 5),
+            ),
+            greaterThanEqualRight: number().check((fields) =>
+              op(5, '>=', fields.greaterThanEqualRight),
+            ),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].check).toEqual({
+          __RONIN_EXPRESSION: '(__RONIN_FIELD_greaterThanEqual >= 5)',
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[1].check).toEqual({
+          __RONIN_EXPRESSION: '(5 >= __RONIN_FIELD_greaterThanEqualRight)',
+        });
+      });
+
+      test('less than or equal', () => {
+        const Test = model({
+          slug: 'test',
+          fields: {
+            lessThanEqual: number().check((fields) => op(fields.lessThanEqual, '<=', 5)),
+            lessThanEqualRight: number().check((fields) =>
+              op(5, '<=', fields.lessThanEqualRight),
+            ),
+          },
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[0].check).toEqual({
+          __RONIN_EXPRESSION: '(__RONIN_FIELD_lessThanEqual <= 5)',
+        });
+        // @ts-expect-error This exists
+        expect(Test.fields[1].check).toEqual({
+          __RONIN_EXPRESSION: '(5 <= __RONIN_FIELD_lessThanEqualRight)',
+        });
+      });
+    });
+  });
+
   test('operator expressions', () => {
     const Test = model({
       slug: 'test',
       fields: {
-        test: string().required(),
         stringConcat: string().defaultValue(() => op('Hello', '||', 'World')),
         numberAdd: number().defaultValue(() => op(1, '+', 2)),
         numberSubtract: number().defaultValue(() => op(5, '-', 3)),
@@ -53,7 +261,7 @@ describe('expressions', () => {
         stringCompare2: string({
           check: (fields) => op(fields.stringConcat2, '=', 'HelloWorld'),
         }),
-        numberCompare2: number({ check: (fields) => op(fields.numberAdd2, '>=', 3) }),
+        numberCompare2: number({ check: (fields) => op(3, '>=', fields.numberAdd2) }),
         rightSideField: string().check((fields) => op('Hello', '=', fields.stringConcat)),
 
         computedAs: string().computedAs((fields) => ({
@@ -141,7 +349,7 @@ describe('expressions', () => {
 
     // @ts-expect-error This exists
     expect(Test.fields[15].check).toEqual({
-      __RONIN_EXPRESSION: '(__RONIN_FIELD_numberAdd2 >= 3)',
+      __RONIN_EXPRESSION: '(3 >= __RONIN_FIELD_numberAdd2)',
     });
 
     // @ts-expect-error This exists
@@ -180,17 +388,15 @@ describe('expressions', () => {
         expressionAbs: number().defaultValue(() => abs(op(1, '-', 5))),
       },
     });
+
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
     expect(Test.fields[0].defaultValue).toEqual({
       __RONIN_EXPRESSION: 'abs(-42)',
     });
+
     // @ts-expect-error This exists
     expect(Test.fields[1].defaultValue).toEqual({
-      __RONIN_EXPRESSION: 'abs(-42)',
-    });
-    // @ts-expect-error This exists
-    expect(Test.fields[2].defaultValue).toEqual({
       __RONIN_EXPRESSION: 'abs((1 - 5))',
     });
   });
@@ -326,6 +532,27 @@ describe('expressions', () => {
         nullValue: null,
         undefinedValue: undefined,
       },
+    });
+
+    // Test wrapExpression directly
+    expect(wrapExpression('hello//.//world')).toEqual({
+      __RONIN_EXPRESSION: "'hello' || 'world'",
+    });
+  });
+
+  test('nested expressions', () => {
+    const Test = model({
+      slug: 'test',
+      fields: {
+        test: string().defaultValue(() =>
+          op(op('Hello', '||', 'World'), '||', op('Hello', '||', 'World')),
+        ),
+      },
+    });
+    expect(Test).toBeTypeOf('object');
+    // @ts-expect-error This exists
+    expect(Test.fields[0].defaultValue).toEqual({
+      __RONIN_EXPRESSION: "(('Hello' || 'World') || ('Hello' || 'World'))",
     });
   });
 });
