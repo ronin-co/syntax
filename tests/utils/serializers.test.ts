@@ -58,7 +58,7 @@ describe('serializers', () => {
         when: 'AFTER',
         fields: [{ slug: 'name' }],
         // @ts-expect-error: The queries need to be adjusted in the TS client.
-        effects: () => [add.account.to({ name: 'Lorena' })],
+        effects: () => [add.account.with({ name: 'Lorena' })],
       },
     ]);
 
@@ -70,7 +70,7 @@ describe('serializers', () => {
           {
             add: {
               account: {
-                to: {
+                with: {
                   name: 'Lorena',
                 },
               },

@@ -1,6 +1,6 @@
 {
   "name": "@ronin/syntax",
-  "version": "0.2.6",
+  "version": "0.2.12",
   "type": "module",
   "description": "Allows for defining RONIN queries and schemas in code.",
   "publishConfig": {
@@ -41,9 +41,9 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
-    "@ronin/compiler": "0.14.9",
-    "@types/bun": "1.1.18",
-    "tsup": "8.3.5",
+    "@ronin/compiler": "0.14.14",
+    "@types/bun": "1.2.1",
+    "tsup": "8.3.6",
     "typescript": "5.7.3"
   }
 }
