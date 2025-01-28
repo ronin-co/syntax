@@ -146,8 +146,7 @@ export const mutateStructure = (
   if (!isPlainObject(obj)) return obj;
 
   for (const key in obj) {
-    // biome-ignore lint/suspicious/noPrototypeBuiltins: We're iterating over the object.
-    if (obj.hasOwnProperty(key)) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
       if (isPlainObject(obj[key])) {
         // Recursively mutate nested objects.
         mutateStructure(obj[key] as NestedObject, callback);
