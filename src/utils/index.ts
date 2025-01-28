@@ -28,6 +28,10 @@ const getPathSegments = (path: string): Array<string> => {
   return segments;
 };
 
+type NestedObject = {
+  [key: string]: unknown | NestedObject;
+};
+
 /**
  * Set the property at the given path to the given value.
  *
@@ -112,4 +116,37 @@ export const getProperty = (obj: object, path: string): unknown => {
   }
 
   return current;
+};
+
+/**
+ * Recursively iterates through an object and calls a mutation function for the value of
+ * every property in the object.
+ *
+ * @param obj - The object to mutate.
+ * @param callback - The function to apply to each value in the object.
+ *
+ * @returns The mutated object.
+ */
+export const mutateStructure = (
+  obj: NestedObject,
+  callback: (value: unknown) => unknown,
+) => {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj; // Base case: non-object or null, return as-is.
+  }
+
+  for (const key in obj) {
+    // biome-ignore lint/suspicious/noPrototypeBuiltins: We're iterating over the object.
+    if (obj.hasOwnProperty(key)) {
+      if (typeof obj[key] === 'object' && obj[key] !== null) {
+        // Recursively mutate nested objects.
+        mutateStructure(obj[key] as NestedObject, callback);
+      } else {
+        // Apply the mutation function to the value.
+        obj[key] = callback(obj[key]);
+      }
+    }
+  }
+
+  return obj; // Return the mutated object.
 };
