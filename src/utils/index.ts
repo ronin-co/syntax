@@ -147,12 +147,14 @@ export const mutateStructure = (
 
   for (const key in obj) {
     if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      if (isPlainObject(obj[key])) {
-        // Recursively mutate nested objects.
-        mutateStructure(obj[key] as NestedObject, callback);
-      } else {
-        // Call the mutation function for the value.
-        obj[key] = callback(obj[key]);
+      const value = obj[key];
+
+      if (isPlainObject(value)) {
+        // Recursively mutate nested plain objects
+        obj[key] = mutateStructure(value as NestedObject, callback);
+      } else if (typeof value !== 'function') {
+        // Apply mutation to non-function values
+        obj[key] = callback(value);
       }
     }
   }
