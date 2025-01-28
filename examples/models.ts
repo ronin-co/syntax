@@ -27,7 +27,7 @@ export const Account = model({
       action: 'INSERT',
       fields: [{ slug: 'name' }],
       // @ts-expect-error: The queries need to be adjusted in the TS client.
-      effects: () => [add.member.to({ name: 'admin', email: 'admin@ronin.io' })],
+      effects: () => [add.member.with({ name: 'admin', email: 'admin@ronin.io' })],
     },
   ],
 });

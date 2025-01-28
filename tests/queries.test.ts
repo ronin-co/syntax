@@ -20,12 +20,12 @@ describe('syntax proxy', () => {
       callback: addQueryHandlerSpy,
     });
 
-    addProxy.accounts.to(() => getProxy.oldAccounts());
+    addProxy.accounts.with(() => getProxy.oldAccounts());
 
     const finalQuery = {
       add: {
         accounts: {
-          to: {
+          with: {
             __RONIN_QUERY: {
               get: { oldAccounts: {} },
             },
@@ -309,7 +309,7 @@ describe('syntax proxy', () => {
     const alterProxy = getSyntaxProxy({ rootProperty: 'alter', callback });
 
     const queryList = getBatchProxy(() => [
-      addProxy.newUsers.to(() => getProxy.oldUsers()),
+      addProxy.newUsers.with(() => getProxy.oldUsers()),
       // Assert whether function chaining is still possible after a nested function call,
       // since the latter is able to manipulate the batch context.
       alterProxy
@@ -323,7 +323,7 @@ describe('syntax proxy', () => {
         structure: {
           add: {
             newUsers: {
-              to: {
+              with: {
                 __RONIN_QUERY: {
                   get: { oldUsers: {} },
                 },
