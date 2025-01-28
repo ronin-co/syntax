@@ -25,7 +25,7 @@ describe('syntax proxy', () => {
     const finalQuery = {
       add: {
         accounts: {
-          to: {
+          with: {
             __RONIN_QUERY: {
               get: { oldAccounts: {} },
             },
@@ -323,7 +323,7 @@ describe('syntax proxy', () => {
         structure: {
           add: {
             newUsers: {
-              to: {
+              with: {
                 __RONIN_QUERY: {
                   get: { oldUsers: {} },
                 },

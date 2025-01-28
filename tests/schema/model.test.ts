@@ -576,7 +576,7 @@ describe('models', () => {
             {
               add: {
                 account: {
-                  to: {
+                  with: {
                     name: 'Lorena',
                   },
                 },
