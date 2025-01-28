@@ -54,56 +54,56 @@ let IN_BATCH = false;
 export function getSyntaxProxy(config?: {
   rootProperty?: never;
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: Parameters<typeof mutateStructure>[1];
+  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
   propertyValue?: unknown;
 }): any;
 
 export function getSyntaxProxy(config?: {
   rootProperty?: 'get';
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: Parameters<typeof mutateStructure>[1];
+  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
   propertyValue?: unknown;
 }): DeepCallable<GetQuery>;
 
 export function getSyntaxProxy(config?: {
   rootProperty?: 'set';
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: Parameters<typeof mutateStructure>[1];
+  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
   propertyValue?: unknown;
 }): DeepCallable<SetQuery>;
 
 export function getSyntaxProxy(config?: {
   rootProperty?: 'add';
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: Parameters<typeof mutateStructure>[1];
+  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
   propertyValue?: unknown;
 }): DeepCallable<AddQuery>;
 
 export function getSyntaxProxy(config?: {
   rootProperty?: 'remove';
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: Parameters<typeof mutateStructure>[1];
+  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
   propertyValue?: unknown;
 }): DeepCallable<RemoveQuery>;
 
 export function getSyntaxProxy(config?: {
   rootProperty?: 'count';
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: Parameters<typeof mutateStructure>[1];
+  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
   propertyValue?: unknown;
 }): DeepCallable<CountQuery, number>;
 
 export function getSyntaxProxy(config?: {
   rootProperty?: 'create';
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: Parameters<typeof mutateStructure>[1];
+  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
   propertyValue?: unknown;
 }): DeepCallable<CreateQuery, Model>;
 
 export function getSyntaxProxy(config?: {
   rootProperty?: 'alter';
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: Parameters<typeof mutateStructure>[1];
+  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
   propertyValue?: unknown;
 }): DeepCallable<
   AlterQuery,
@@ -113,7 +113,7 @@ export function getSyntaxProxy(config?: {
 export function getSyntaxProxy(config?: {
   rootProperty?: 'drop';
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: Parameters<typeof mutateStructure>[1];
+  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
   propertyValue?: unknown;
 }): DeepCallable<DropQuery, Model>;
 
