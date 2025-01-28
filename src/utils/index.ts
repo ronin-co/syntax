@@ -119,20 +119,6 @@ export const getProperty = (obj: object, path: string): unknown => {
 };
 
 /**
- * Determines whether the provided value is storable as a binary object, or not.
- *
- * @param value - The value to check.
- *
- * @returns A boolean indicating whether the provided value is storable, or not.
- */
-const isStorableObject = (value: unknown): boolean =>
-  (typeof File !== 'undefined' && value instanceof File) ||
-  (typeof ReadableStream !== 'undefined' && value instanceof ReadableStream) ||
-  (typeof Blob !== 'undefined' && value instanceof Blob) ||
-  (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) ||
-  (typeof Buffer !== 'undefined' && Buffer.isBuffer(value));
-
-/**
  * Determines whether an object is a plain object or not.
  *
  * @param value - The object to check.
@@ -154,7 +140,7 @@ const isPlainObject = (value: unknown): boolean => {
  */
 export const mutateStructure = (
   obj: NestedObject,
-  callback: (value: unknown, isStorable: boolean) => unknown,
+  callback: (value: unknown) => unknown,
 ) => {
   // If it's not a plain object, return as-is (e.g., Date, Blob, etc.)
   if (!isPlainObject(obj)) return obj;
@@ -167,7 +153,7 @@ export const mutateStructure = (
         mutateStructure(obj[key] as NestedObject, callback);
       } else {
         // Apply the mutation function to the value.
-        obj[key] = callback(obj[key], isStorableObject(obj[key]));
+        obj[key] = callback(obj[key]);
       }
     }
   }

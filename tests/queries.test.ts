@@ -99,9 +99,24 @@ describe('syntax proxy', () => {
     const setQueryHandler = { callback: () => undefined };
     const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
 
+    /**
+     * Determines whether the provided value is storable as a binary object, or not.
+     *
+     * @param value - The value to check.
+     *
+     * @returns A boolean indicating whether the provided value is storable, or not.
+     */
+    const isStorableObject = (value: unknown): boolean =>
+      (typeof File !== 'undefined' && value instanceof File) ||
+      (typeof ReadableStream !== 'undefined' && value instanceof ReadableStream) ||
+      (typeof Blob !== 'undefined' && value instanceof Blob) ||
+      (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) ||
+      (typeof Buffer !== 'undefined' && Buffer.isBuffer(value));
+
     const setProxy = getSyntaxProxy({
       rootProperty: 'set',
       callback: setQueryHandlerSpy,
+      replacer: isStorableObject,
     });
 
     const file = new File(['test'], 'test.txt');
