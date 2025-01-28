@@ -36,16 +36,14 @@ type TypeToTSType<Type> = Type extends 'string'
         ? Blob
         : never;
 
+type Overwrite<T, U> = Omit<T, keyof U> & U;
+
 type FieldInput<Type> = Partial<
-  Omit<
-    Extract<ModelField & ModelFieldExpressions<TypeToTSType<Type>>, { type: Type }>,
-    'slug' | 'type'
-  >
+  Overwrite<ModelField, ModelFieldExpressions<TypeToTSType<Type>>>
 >;
 
-export type FieldOutput<Type extends ModelField['type']> = Omit<
-  Extract<ModelField, { type: Type }>,
-  'slug'
+export type FieldOutput<Type extends ModelField['type']> = Partial<
+  Overwrite<ModelField, ModelFieldExpressions<TypeToTSType<Type>>>
 >;
 
 export type ModelFieldExpressions<Type> = {
