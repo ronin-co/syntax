@@ -119,6 +119,31 @@ export const getProperty = (obj: object, path: string): unknown => {
 };
 
 /**
+ * Determines whether the provided value is storable as a binary object, or not.
+ *
+ * @param value - The value to check.
+ *
+ * @returns A boolean indicating whether the provided value is storable, or not.
+ */
+const isStorableObject = (value: unknown): boolean =>
+  (typeof File !== 'undefined' && value instanceof File) ||
+  (typeof ReadableStream !== 'undefined' && value instanceof ReadableStream) ||
+  (typeof Blob !== 'undefined' && value instanceof Blob) ||
+  (typeof ArrayBuffer !== 'undefined' && value instanceof ArrayBuffer) ||
+  (typeof Buffer !== 'undefined' && Buffer.isBuffer(value));
+
+/**
+ * Determines whether an object is a plain object or not.
+ *
+ * @param value - The object to check.
+ *
+ * @returns A boolean indicating whether the object is plain, or not.
+ */
+const isPlainObject = (value: unknown): boolean => {
+  return Object.prototype.toString.call(value) === '[object Object]';
+};
+
+/**
  * Recursively iterates through an object and calls a mutation function for the value of
  * every property in the object.
  *
@@ -129,21 +154,20 @@ export const getProperty = (obj: object, path: string): unknown => {
  */
 export const mutateStructure = (
   obj: NestedObject,
-  callback: (value: unknown) => unknown,
+  callback: (value: unknown, isStorable: boolean) => unknown,
 ) => {
-  if (typeof obj !== 'object' || obj === null) {
-    return obj; // Base case: non-object or null, return as-is.
-  }
+  // If it's not a plain object, return as-is (e.g., Date, Blob, etc.)
+  if (!isPlainObject(obj)) return obj;
 
   for (const key in obj) {
     // biome-ignore lint/suspicious/noPrototypeBuiltins: We're iterating over the object.
     if (obj.hasOwnProperty(key)) {
-      if (typeof obj[key] === 'object' && obj[key] !== null) {
+      if (isPlainObject(obj[key])) {
         // Recursively mutate nested objects.
         mutateStructure(obj[key] as NestedObject, callback);
       } else {
         // Apply the mutation function to the value.
-        obj[key] = callback(obj[key]);
+        obj[key] = callback(obj[key], isStorableObject(obj[key]));
       }
     }
   }

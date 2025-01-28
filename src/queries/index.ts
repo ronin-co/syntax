@@ -1,8 +1,7 @@
 import type { DeepCallable } from '@/src/queries/types';
 import { model } from '@/src/schema';
 import type { Model } from '@/src/schema/model';
-import { setProperty } from '@/src/utils';
-import { serializeSyntaxStructure } from '@/src/utils/serializers';
+import { mutateStructure, setProperty } from '@/src/utils';
 import {
   type AddQuery,
   type AlterQuery,
@@ -220,7 +219,9 @@ export function getSyntaxProxy(config?: {
           // Restore the original value of `IN_BATCH`.
           IN_BATCH = ORIGINAL_IN_BATCH;
         } else if (typeof value !== 'undefined') {
-          value = serializeSyntaxStructure(value);
+          value = mutateStructure(value, (value, isStorable) => {
+            return isStorable ? value : JSON.parse(JSON.stringify(value));
+          });
         }
 
         // If the function call is happening after an existing function call in the
