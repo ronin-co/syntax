@@ -15,10 +15,10 @@ import {
 } from '@/src/utils/serializers';
 import type {
   GetInstructions,
-  Model as RawModel,
   ModelField,
   ModelIndex,
   ModelTrigger,
+  Model as RawModel,
   StoredObject,
   WithInstruction,
 } from '@ronin/compiler';
