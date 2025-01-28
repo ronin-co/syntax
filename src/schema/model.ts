@@ -21,6 +21,7 @@ import type {
   ModelIndex,
   ModelTrigger,
   Model as RawModel,
+  StoredObject,
   WithInstruction,
 } from '@ronin/compiler';
 
@@ -114,7 +115,7 @@ type FieldsToTypes<F> = F extends Record<string, Primitives>
                 : F[K]['type'] extends 'json'
                   ? object
                   : F[K]['type'] extends 'blob'
-                    ? Blob
+                    ? StoredObject
                     : F[K]['type'] extends 'date'
                       ? Date
                       : never;
