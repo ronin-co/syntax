@@ -64,6 +64,7 @@ const setPropertyViaPathSegments = (
       ) {
         current[key] = {};
       }
+
       current = current[key] as Record<string, object>;
     }
   }
