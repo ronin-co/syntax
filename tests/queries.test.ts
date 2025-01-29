@@ -199,6 +199,7 @@ describe('syntax proxy', () => {
     setProxy.accounts.to((f: Record<string, unknown>) => ({
       name: `${f.firstName} ${f.lastName}`,
       email: `${f.handle}@site.co`,
+      handle: 'newHandle',
     }));
 
     const finalQuery = {
@@ -211,6 +212,7 @@ describe('syntax proxy', () => {
             email: {
               [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}handle || '@site.co'`,
             },
+            handle: 'newHandle',
           },
         },
       },
