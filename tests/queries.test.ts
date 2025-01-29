@@ -6,10 +6,10 @@ import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
   test('using sub query', () => {
+    let query: Query | undefined;
+
     const getQueryHandler = { callback: () => undefined };
     const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
-    const addQueryHandler = { callback: () => undefined };
-    const addQueryHandlerSpy = spyOn(addQueryHandler, 'callback');
 
     const getProxy = getSyntaxProxy({
       rootProperty: 'get',
@@ -17,17 +17,23 @@ describe('syntax proxy', () => {
     });
     const addProxy = getSyntaxProxy({
       rootProperty: 'add',
-      callback: addQueryHandlerSpy,
+      callback: (value) => {
+        query = value;
+      },
     });
 
-    addProxy.accounts.with(() => getProxy.oldAccounts());
+    addProxy.accounts.with(() => getProxy.oldAccounts.selecting(['handle']));
 
     const finalQuery = {
       add: {
         accounts: {
           with: {
             __RONIN_QUERY: {
-              get: { oldAccounts: {} },
+              get: {
+                oldAccounts: {
+                  selecting: ['handle'],
+                },
+              },
             },
           },
         },
@@ -35,7 +41,7 @@ describe('syntax proxy', () => {
     };
 
     expect(getQueryHandlerSpy).not.toHaveBeenCalled();
-    expect(addQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(query).toMatchObject(finalQuery);
   });
 
   test('using field with expression', () => {
@@ -193,6 +199,7 @@ describe('syntax proxy', () => {
     setProxy.accounts.to((f: Record<string, unknown>) => ({
       name: `${f.firstName} ${f.lastName}`,
       email: `${f.handle}@site.co`,
+      handle: 'newHandle',
     }));
 
     const finalQuery = {
@@ -205,6 +212,7 @@ describe('syntax proxy', () => {
             email: {
               [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}handle || '@site.co'`,
             },
+            handle: 'newHandle',
           },
         },
       },

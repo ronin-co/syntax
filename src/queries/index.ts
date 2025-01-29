@@ -218,12 +218,12 @@ export function getSyntaxProxy(config?: {
             value = { [QUERY_SYMBOLS.QUERY]: instructions.structure };
           } else {
             value = instructions;
-          }
 
-          if (isExpression(value)) {
-            value = wrapExpression(value as string);
-          } else if (typeof value === 'object') {
-            value = wrapExpressions(value);
+            if (isExpression(value)) {
+              value = wrapExpression(value as string);
+            } else if (typeof value === 'object') {
+              value = wrapExpressions(value);
+            }
           }
 
           // Restore the original value of `IN_BATCH`.
