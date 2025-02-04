@@ -1,12 +1,11 @@
 import { type SyntaxItem, getBatchProxy } from '@/src/queries';
 import type { PrimitivesItem } from '@/src/schema/model';
-import {
-  type GetInstructions,
-  type ModelField,
-  type ModelTrigger,
-  QUERY_SYMBOLS,
-  type Query,
-  type WithInstruction,
+import type {
+  GetInstructions,
+  ModelField,
+  ModelTrigger,
+  Query,
+  WithInstruction,
 } from '@ronin/compiler';
 
 /**
@@ -34,15 +33,6 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
         return serializeFields(result) || [];
       }
 
-      if (
-        'computedAs' in value &&
-        value.computedAs &&
-        'value' in value.computedAs &&
-        typeof value.computedAs.value === 'function'
-      ) {
-        value.computedAs.value = (value.computedAs.value as () => PrimitivesItem)();
-      }
-     
       return {
         slug: key,
         ...value,

@@ -111,13 +111,13 @@ export const op = <
 ): T => {
   let leftValue = left;
   if (typeof left === 'object' && QUERY_SYMBOLS.EXPRESSION in left) {
-      leftValue = left[QUERY_SYMBOLS.EXPRESSION] as T;
-    }
+    leftValue = left[QUERY_SYMBOLS.EXPRESSION] as T;
+  }
 
   let rightValue = right;
   if (typeof right === 'object' && QUERY_SYMBOLS.EXPRESSION in right) {
-      rightValue = right[QUERY_SYMBOLS.EXPRESSION] as T;
-    }
+    rightValue = right[QUERY_SYMBOLS.EXPRESSION] as T;
+  }
 
   let wrappedLeft = leftValue;
   if (
