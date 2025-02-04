@@ -395,3 +395,4 @@ const wrapExpressions = (obj: NestedObject): NestedObject =>
 
 export { getProperty, setProperty } from '@/src/utils';
 export type { ResultRecord, DeepCallable } from '@/src/queries/types';
+export { getSyntaxProxySQL, getBatchProxySQL } from '@/src/queries/statements';
