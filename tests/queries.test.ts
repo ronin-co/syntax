@@ -188,7 +188,7 @@ describe('syntax proxy', () => {
     expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
-  test('using field with defaultValue expression', () => {
+  test('using field with `defaultValue` expression', () => {
     const createQueryHandler = { callback: () => undefined };
     const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
 
@@ -224,7 +224,7 @@ describe('syntax proxy', () => {
     expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
-  test('using field with check expression', () => {
+  test('using field with `check` expression', () => {
     const createQueryHandler = { callback: () => undefined };
     const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
 
@@ -260,7 +260,7 @@ describe('syntax proxy', () => {
     expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
-  test('using field with computedAs expression', () => {
+  test('using field with `computedAs` expression', () => {
     const createQueryHandler = { callback: () => undefined };
     const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
 
