@@ -37,7 +37,7 @@ type TypeToTSType<Type> = Type extends 'string'
         ? Blob
         : Type extends 'date'
           ? Date
-          : never;
+          : object;
 
 type FieldInput<Type extends ModelField['type']> = Partial<
   Omit<ModelField, keyof ModelFieldExpressions<TypeToTSType<Type>>> & {
