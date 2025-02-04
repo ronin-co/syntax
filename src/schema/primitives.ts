@@ -59,7 +59,7 @@ export type FieldOutput<Type extends ModelField['type']> = Omit<
 export type ModelFieldExpressions<Type> = {
   check?: (fields: Record<string, Type>) => Type;
   computedAs?: (fields: Record<string, Type>) => {
-    value: () => Type;
+    value: Type;
     kind: 'VIRTUAL' | 'STORED';
   };
   defaultValue?: () => Type | Type;

@@ -274,7 +274,7 @@ describe('syntax proxy', () => {
       fields: {
         name: string().computedAs((fields) => ({
           kind: 'VIRTUAL',
-          value: () => op(fields.name, '||', 'World'),
+          value: op(fields.name, '||', 'World'),
         })),
       },
     });

@@ -110,22 +110,14 @@ export const op = <
   right: T,
 ): T => {
   let leftValue = left;
-  if (typeof left === 'object') {
-    if (QUERY_SYMBOLS.FIELD in left) {
-      leftValue = `${QUERY_SYMBOLS.FIELD}${left[QUERY_SYMBOLS.FIELD]}` as T;
-    } else if (QUERY_SYMBOLS.EXPRESSION in left) {
+  if (typeof left === 'object' && QUERY_SYMBOLS.EXPRESSION in left) {
       leftValue = left[QUERY_SYMBOLS.EXPRESSION] as T;
     }
-  }
 
   let rightValue = right;
-  if (typeof right === 'object') {
-    if (QUERY_SYMBOLS.FIELD in right) {
-      rightValue = `${QUERY_SYMBOLS.FIELD}${right[QUERY_SYMBOLS.FIELD]}` as T;
-    } else if (QUERY_SYMBOLS.EXPRESSION in right) {
+  if (typeof right === 'object' && QUERY_SYMBOLS.EXPRESSION in right) {
       rightValue = right[QUERY_SYMBOLS.EXPRESSION] as T;
     }
-  }
 
   let wrappedLeft = leftValue;
   if (

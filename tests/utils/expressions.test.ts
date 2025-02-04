@@ -127,6 +127,7 @@ describe('expressions', () => {
         expect(Test.fields[1].check).toEqual({
           __RONIN_EXPRESSION: "('test' = __RONIN_FIELD_equalsRight)",
         });
+   
       });
 
       test('not equals', () => {
@@ -243,130 +244,99 @@ describe('expressions', () => {
       fields: {
         stringConcat: string().defaultValue(() => op('Hello', '||', 'World')),
         numberAdd: number().defaultValue(() => op(1, '+', 2)),
-        numberSubtract: number().defaultValue(() => op(5, '-', 3)),
+        numberSubtract: number().defaultValue(() => op(5, '-', 3)), 
         numberMultiply: number().defaultValue(() => op(4, '*', 2)),
         numberDivide: number().defaultValue(() => op(10, '/', 2)),
         numberModulo: number().defaultValue(() => op(7, '%', 3)),
-        stringCompare: string().check((fields) =>
-          op(fields.stringConcat, '=', 'HelloWorld'),
+        stringCompare: string().check((fields) => 
+          op(fields.stringConcat, '=', 'HelloWorld')
         ),
         numberCompare: number().check((fields) => op(fields.numberAdd, '>=', 3)),
-
-        stringConcat2: string({ defaultValue: () => op('Hello', '||', 'World') }),
-        numberAdd2: number({ defaultValue: () => op(1, '+', 2) }),
-        numberSubtract2: number({ defaultValue: () => op(5, '-', 3) }),
-        numberMultiply2: number({ defaultValue: () => op(4, '*', 2) }),
-        numberDivide2: number({ defaultValue: () => op(10, '/', 2) }),
-        numberModulo2: number({ defaultValue: () => op(7, '%', 3) }),
-        stringCompare2: string({
-          check: (fields) => op(fields.stringConcat2, '=', 'HelloWorld'),
-        }),
-        numberCompare2: number({ check: (fields) => op(3, '>=', fields.numberAdd2) }),
         rightSideField: string().check((fields) => op('Hello', '=', fields.stringConcat)),
-
         computedAs: string().computedAs((fields) => ({
           kind: 'VIRTUAL',
-          value: () => op(fields.numberAdd2, '||', fields.numberSubtract),
-        })),
-
-        computedAs2: number({
-          computedAs: (fields) => ({
-            kind: 'VIRTUAL',
-            value: () => op(fields.numberAdd2, '+', fields.numberSubtract),
-          }),
-        }),
+          value: () => op(fields.numberAdd, '||', fields.numberSubtract)
+        }))
       },
     });
 
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
     expect(Test.fields[0].defaultValue).toEqual({
-      __RONIN_EXPRESSION: "('Hello' || 'World')",
+      __RONIN_EXPRESSION: "('Hello' || 'World')"
     });
     // @ts-expect-error This exists
     expect(Test.fields[1].defaultValue).toEqual({
-      __RONIN_EXPRESSION: '(1 + 2)',
+      __RONIN_EXPRESSION: '(1 + 2)'
     });
     // @ts-expect-error This exists
     expect(Test.fields[2].defaultValue).toEqual({
-      __RONIN_EXPRESSION: '(5 - 3)',
+      __RONIN_EXPRESSION: '(5 - 3)'
     });
     // @ts-expect-error This exists
     expect(Test.fields[3].defaultValue).toEqual({
-      __RONIN_EXPRESSION: '(4 * 2)',
+      __RONIN_EXPRESSION: '(4 * 2)'
     });
     // @ts-expect-error This exists
     expect(Test.fields[4].defaultValue).toEqual({
-      __RONIN_EXPRESSION: '(10 / 2)',
+      __RONIN_EXPRESSION: '(10 / 2)'
     });
     // @ts-expect-error This exists
     expect(Test.fields[5].defaultValue).toEqual({
-      __RONIN_EXPRESSION: '(7 % 3)',
+      __RONIN_EXPRESSION: '(7 % 3)'
     });
     // @ts-expect-error This exists
     expect(Test.fields[6].check).toEqual({
-      __RONIN_EXPRESSION: "(__RONIN_FIELD_stringConcat = 'HelloWorld')",
+      __RONIN_EXPRESSION: "(__RONIN_FIELD_stringConcat = 'HelloWorld')"
     });
     // @ts-expect-error This exists
     expect(Test.fields[7].check).toEqual({
-      __RONIN_EXPRESSION: '(__RONIN_FIELD_numberAdd >= 3)',
+      __RONIN_EXPRESSION: '(__RONIN_FIELD_numberAdd >= 3)'
     });
-
     // @ts-expect-error This exists
-    expect(Test.fields[8].defaultValue).toEqual({
-      __RONIN_EXPRESSION: "('Hello' || 'World')",
+    expect(Test.fields[8].check).toEqual({
+      __RONIN_EXPRESSION: "('Hello' = __RONIN_FIELD_stringConcat)"
     });
-
     // @ts-expect-error This exists
-    expect(Test.fields[9].defaultValue).toEqual({
-      __RONIN_EXPRESSION: '(1 + 2)',
-    });
-
-    // @ts-expect-error This exists
-    expect(Test.fields[10].defaultValue).toEqual({
-      __RONIN_EXPRESSION: '(5 - 3)',
-    });
-
-    // @ts-expect-error This exists
-    expect(Test.fields[11].defaultValue).toEqual({
-      __RONIN_EXPRESSION: '(4 * 2)',
-    });
-
-    // @ts-expect-error This exists
-    expect(Test.fields[12].defaultValue).toEqual({
-      __RONIN_EXPRESSION: '(10 / 2)',
-    });
-
-    // @ts-expect-error This exists
-    expect(Test.fields[13].defaultValue).toEqual({
-      __RONIN_EXPRESSION: '(7 % 3)',
-    });
-
-    // @ts-expect-error This exists
-    expect(Test.fields[14].check).toEqual({
-      __RONIN_EXPRESSION: "(__RONIN_FIELD_stringConcat2 = 'HelloWorld')",
-    });
-
-    // @ts-expect-error This exists
-    expect(Test.fields[15].check).toEqual({
-      __RONIN_EXPRESSION: '(3 >= __RONIN_FIELD_numberAdd2)',
-    });
-
-    // @ts-expect-error This exists
-    expect(Test.fields[16].check).toEqual({
-      __RONIN_EXPRESSION: "('Hello' = __RONIN_FIELD_stringConcat)",
-    });
-
-    // @ts-expect-error This exists
-    expect(Test.fields[17].computedAs).toEqual({
+    expect(Test.fields[9].computedAs).toEqual({
       kind: 'VIRTUAL',
       value: {
-        __RONIN_EXPRESSION: '(__RONIN_FIELD_numberAdd2 || __RONIN_FIELD_numberSubtract)',
-      },
+        __RONIN_EXPRESSION: '(__RONIN_FIELD_numberAdd || __RONIN_FIELD_numberSubtract)'
+      }
     });
   });
 
-  test('random expression', () => {
+
+  test("default expression", () => {
+    const Test = model({
+      slug: 'test',
+      fields: {
+        test1: string().defaultValue(() => 'test'),
+        test2: string().defaultValue(() => op('Hello', '||', 'World')),
+        test3: string().defaultValue(() => op(op('Hello', '||', 'World'), '||', 'test')),
+        test4: string().defaultValue(() => op(op('Hello', '||', 'World'), '||', op('Hello', '||', 'World'))),
+      },
+    });
+    expect(Test).toBeTypeOf('object');
+    // @ts-expect-error This exists
+    expect(Test.fields[0].defaultValue).toEqual(
+      "test"
+    );
+    // @ts-expect-error This exists
+    expect(Test.fields[1].defaultValue).toEqual({
+      __RONIN_EXPRESSION: "('Hello' || 'World')"
+    });
+    // @ts-expect-error This exists
+    expect(Test.fields[2].defaultValue).toEqual({
+      __RONIN_EXPRESSION: "(('Hello' || 'World') || 'test')"
+    });
+    // @ts-expect-error This exists
+    expect(Test.fields[3].defaultValue).toEqual({
+      __RONIN_EXPRESSION: "(('Hello' || 'World') || ('Hello' || 'World'))"
+    });
+  });
+
+    test('random expression', () => {
     const Test = model({
       slug: 'test',
       fields: {

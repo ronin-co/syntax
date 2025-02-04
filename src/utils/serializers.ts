@@ -34,19 +34,6 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
         return serializeFields(result) || [];
       }
 
-      // Pass columns into check function
-      const fieldKeys = Object.keys(fields).reduce<Record<string, unknown>>(
-        (acc, item) => {
-          acc[item] = { [QUERY_SYMBOLS.FIELD]: item };
-          return acc;
-        },
-        {},
-      );
-
-      if ('defaultValue' in value && typeof value.defaultValue === 'function') {
-        value.defaultValue = value.defaultValue() as unknown as PrimitivesItem;
-      }
-
       if (
         'computedAs' in value &&
         value.computedAs &&
@@ -55,12 +42,7 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
       ) {
         value.computedAs.value = (value.computedAs.value as () => PrimitivesItem)();
       }
-      if ('check' in value && typeof value.check === 'function') {
-        value.check = (value.check as (fields: Record<string, never>) => PrimitivesItem)(
-          fieldKeys as Record<string, never>,
-        ) as unknown as PrimitivesItem;
-      }
-
+     
       return {
         slug: key,
         ...value,
