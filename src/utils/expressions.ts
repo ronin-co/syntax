@@ -1,5 +1,12 @@
 import { QUERY_SYMBOLS, getQuerySymbol } from '@ronin/compiler';
 
+/**
+ * Creates a query expression object that can be processed by the compiler.
+ * 
+ * @param expression - The expression string to wrap in a query symbol.
+ * 
+ * @returns An object containing the expression wrapped in a query symbol.
+ */
 export const expression = (
   expression: string,
 ): Record<typeof QUERY_SYMBOLS.EXPRESSION, string> => {
