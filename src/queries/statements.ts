@@ -51,7 +51,7 @@ export const getSyntaxProxySQL = (options: {
  * @returns A list of SQL statements.
  */
 export const getBatchProxySQL = (
-  operations: () => Array<Promise<any>>,
+  operations: () => Array<Statement> | Array<Promise<any>>,
 ): Array<Statement> => {
   let statements: Array<Statement> = [];
 
