@@ -118,7 +118,7 @@ type FieldsToTypes<F> = F extends Record<string, Primitives>
                     ? StoredObject
                     : F[K]['type'] extends 'date'
                       ? Date
-                      : never;
+                      : object;
     }
   : RoninFields;
 
@@ -164,7 +164,7 @@ type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
  */
 export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
   model: Model<Fields>,
-): Expand<FieldsToTypes<Fields>> & Expand<RoninFields> => {
+): Expand<RoninFields & FieldsToTypes<Fields>> => {
   const newModel = { ...model };
 
   if (newModel.fields) {
@@ -185,5 +185,5 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     ) as unknown as typeof newModel.presets;
   }
 
-  return newModel as unknown as Expand<FieldsToTypes<Fields>> & Expand<RoninFields>;
+  return newModel as unknown as Expand<RoninFields & FieldsToTypes<Fields>>;
 };
