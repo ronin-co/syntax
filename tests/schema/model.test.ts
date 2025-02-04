@@ -607,7 +607,6 @@ describe('models', () => {
     expect(Account).toEqual({
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'account',
-      // @ts-expect-error: The Account object has 'presets'.
       presets: [
         {
           slug: 'onlyName',
