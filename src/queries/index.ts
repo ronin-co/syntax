@@ -46,8 +46,7 @@ interface CreateQuery extends Omit<OriginalCreateQuery, 'model' | 'to'> {
 }
 
 /**
- * Used to track whether queries run in batches if `AsyncLocalStorage` is not
- * available for use.
+ * Used to track whether RONIN queries are run in batches.
  */
 let IN_BATCH = false;
 
