@@ -46,8 +46,7 @@ interface CreateQuery extends Omit<OriginalCreateQuery, 'model' | 'to'> {
 }
 
 /**
- * Used to track whether queries run in batches if `AsyncLocalStorage` is not
- * available for use.
+ * Used to track whether RONIN queries are run in batches.
  */
 let IN_BATCH = false;
 
@@ -396,3 +395,4 @@ const wrapExpressions = (obj: NestedObject): NestedObject =>
 
 export { getProperty, setProperty } from '@/src/utils';
 export type { ResultRecord, DeepCallable } from '@/src/queries/types';
+export { getSyntaxProxySQL, getBatchProxySQL } from '@/src/queries/statements';

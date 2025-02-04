@@ -336,7 +336,7 @@ describe('syntax proxy', () => {
     expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
-  test('using async context', () => {
+  test('using queries in batch', () => {
     const get = getSyntaxProxy({ rootProperty: 'get' });
 
     const queries = getBatchProxy(() => [get.account()]);
