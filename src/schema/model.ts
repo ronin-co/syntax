@@ -100,25 +100,22 @@ export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
 }
 
 // This type maps the fields of a model to their types.
+type FieldToTypeMap = {
+  blob: StoredObject;
+  boolean: boolean;
+  date: Date;
+  json: object;
+  link: string;
+  number: number;
+  string: string;
+};
 type FieldsToTypes<F> = F extends Record<string, Primitives>
   ? {
       [K in keyof F]: F[K] extends Record<string, Primitives>
         ? FieldsToTypes<F[K]>
-        : F[K]['type'] extends 'string'
-          ? string
-          : F[K]['type'] extends 'number'
-            ? number
-            : F[K]['type'] extends 'boolean'
-              ? boolean
-              : F[K]['type'] extends 'link'
-                ? string
-                : F[K]['type'] extends 'json'
-                  ? object
-                  : F[K]['type'] extends 'blob'
-                    ? StoredObject
-                    : F[K]['type'] extends 'date'
-                      ? Date
-                      : object;
+        : F[K]['type'] extends keyof FieldToTypeMap
+          ? FieldToTypeMap[F[K]['type']]
+          : object;
     }
   : RoninFields;
 
