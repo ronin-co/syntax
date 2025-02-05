@@ -66,7 +66,7 @@ export type ModelFieldExpressions<Type> = {
     value: Type;
     kind: 'VIRTUAL' | 'STORED';
   };
-  defaultValue?: () => Type | Type;
+  defaultValue?: (() => Type) | Type;
 };
 
 export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutput<Type>>;
