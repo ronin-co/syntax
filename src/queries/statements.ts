@@ -30,7 +30,9 @@ export const getSyntaxProxySQL = (options: {
     });
 
     const statement: Statement = {
-      statement: text,
+      // Collapse whitespace and newlines into single spaces, then trim leading or
+      // trailing spaces.
+      statement: text.replace(/\s+/g, ' ').trim(),
       params,
     };
 

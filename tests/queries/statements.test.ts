@@ -43,3 +43,27 @@ test('using raw SQL in batch', async () => {
 
   expect(statementHandlerSpy).not.toHaveBeenCalled();
 });
+
+test('using raw SQL with multiple lines', async () => {
+  let statement: Statement | undefined;
+
+  const sqlProxy = getSyntaxProxySQL({
+    callback: (value) => {
+      statement = value;
+    },
+  });
+
+  const accountHandle = 'elaine';
+
+  sqlProxy`
+    UPDATE accounts
+    SET "points" = 11
+    WHERE "handle" = ${accountHandle}
+    RETURNING *
+  `;
+
+  expect(statement).toMatchObject({
+    statement: 'UPDATE accounts SET "points" = 11 WHERE "handle" = $1 RETURNING *',
+    params: ['elaine'],
+  });
+});
