@@ -3,7 +3,6 @@ import { describe, expect, spyOn, test } from 'bun:test';
 import { op } from '@/src/expressions';
 import { getBatchProxy, getSyntaxProxy } from '@/src/queries';
 import { string } from '@/src/schema';
-import { op } from '@/src/utils/expressions';
 import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
