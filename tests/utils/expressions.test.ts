@@ -1,5 +1,4 @@
 import { describe, expect, test } from 'bun:test';
-import { date, model, number, string } from '@/src/schema';
 import {
   abs,
   json_insert,
@@ -12,7 +11,8 @@ import {
   strftime,
   wrapExpression,
   wrapExpressions,
-} from '@/src/utils/expressions';
+} from '@/src/expressions';
+import { date, model, number, string } from '@/src/schema';
 
 describe('expressions', () => {
   test('sql expression', () => {

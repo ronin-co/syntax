@@ -5,6 +5,7 @@
   "format": "esm",
   "entry": {
     "schema": "src/schema/index.ts",
-    "queries": "src/queries/index.ts"
+    "queries": "src/queries/index.ts",
+    "expressions": "src/expressions/index.ts"
   }
 }
