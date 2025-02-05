@@ -24,8 +24,12 @@ export type Chain<Attrs, Used extends keyof Attrs = never> = {
     ...args: Array<AttributeSignature<TypeToTSType<Attrs['type']>, K>>
   ) => Chain<Attrs, Used | K>;
   // 2) If `type` is defined in `Attrs`, add it as a read-only property
-  // biome-ignore lint/complexity/noBannedTypes: This is a valid use case.
-} & ('type' extends keyof Attrs ? { readonly type: Attrs['type'] } : {});
+} & ('type' extends keyof Attrs
+  ? {
+      readonly required: boolean;
+      readonly type: Attrs['type'];
+    }
+  : object);
 
 type TypeToTSType<Type> = Type extends 'string'
   ? string
