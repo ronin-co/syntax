@@ -2,6 +2,7 @@ import { describe, expect, spyOn, test } from 'bun:test';
 
 import { getBatchProxy, getSyntaxProxy } from '@/src/queries';
 import { string } from '@/src/schema';
+import { op } from '@/src/utils/expressions';
 import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
@@ -185,6 +186,120 @@ describe('syntax proxy', () => {
     };
 
     expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+  });
+
+  test('using field with `defaultValue` expression', () => {
+    const createQueryHandler = { callback: () => undefined };
+    const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
+
+    const createProxy = getSyntaxProxy({
+      rootProperty: 'create',
+      callback: createQueryHandlerSpy,
+    });
+
+    createProxy.model({
+      slug: 'account',
+      fields: {
+        name: string().defaultValue(() => op('Hello', '||', 'World')),
+      },
+    });
+
+    const finalQuery = {
+      create: {
+        model: {
+          slug: 'account',
+          fields: [
+            {
+              slug: 'name',
+              type: 'string',
+              defaultValue: {
+                __RONIN_EXPRESSION: "('Hello' || 'World')",
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+  });
+
+  test('using field with `check` expression', () => {
+    const createQueryHandler = { callback: () => undefined };
+    const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
+
+    const createProxy = getSyntaxProxy({
+      rootProperty: 'create',
+      callback: createQueryHandlerSpy,
+    });
+
+    createProxy.model({
+      slug: 'account',
+      fields: {
+        name: string().check((fields) => op(fields.name, '=', 'World')),
+      },
+    });
+
+    const finalQuery = {
+      create: {
+        model: {
+          slug: 'account',
+          fields: [
+            {
+              slug: 'name',
+              type: 'string',
+              check: {
+                __RONIN_EXPRESSION: "(__RONIN_FIELD_name = 'World')",
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+  });
+
+  test('using field with `computedAs` expression', () => {
+    const createQueryHandler = { callback: () => undefined };
+    const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
+
+    const createProxy = getSyntaxProxy({
+      rootProperty: 'create',
+      callback: createQueryHandlerSpy,
+    });
+
+    createProxy.model({
+      slug: 'account',
+      fields: {
+        name: string().computedAs((fields) => ({
+          kind: 'VIRTUAL',
+          value: op(fields.name, '||', 'World'),
+        })),
+      },
+    });
+
+    const finalQuery = {
+      create: {
+        model: {
+          slug: 'account',
+          fields: [
+            {
+              slug: 'name',
+              type: 'string',
+              computedAs: {
+                kind: 'VIRTUAL',
+                value: {
+                  __RONIN_EXPRESSION: "(__RONIN_FIELD_name || 'World')",
+                },
+              },
+            },
+          ],
+        },
+      },
+    };
+
+    expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
   });
 
   test('using multiple fields with expressions', () => {
