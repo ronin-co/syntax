@@ -87,7 +87,9 @@ export const json_set = (json: string, path: string, value: string): string => {
  * @returns SQL expression that evaluates to the modified JSON document.
  */
 export const json_replace = (json: string, path: string, value: string): string => {
-  return expression(`json_replace('${json}', '${path}', '${value}')`) as unknown as string;
+  return expression(
+    `json_replace('${json}', '${path}', '${value}')`,
+  ) as unknown as string;
 };
 
 /**
