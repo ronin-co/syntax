@@ -1,6 +1,6 @@
 import { describe, expect, spyOn, test } from 'bun:test';
 
-import { op } from '@/src/expressions';
+import { op } from '@/src/helpers/expressions';
 import { getBatchProxy, getSyntaxProxy } from '@/src/queries';
 import { string } from '@/src/schema';
 import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';

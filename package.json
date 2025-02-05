@@ -11,8 +11,7 @@
   ],
   "exports": {
     "./schema": "./dist/schema.js",
-    "./queries": "./dist/queries.js",
-    "./expressions": "./dist/expressions.js"
+    "./queries": "./dist/queries.js"
   },
   "typesVersions": {
     "*": {
@@ -21,9 +20,6 @@
       ],
       "queries": [
         "./dist/queries"
-      ],
-      "expressions": [
-        "./dist/expressions"
       ]
     }
   },
