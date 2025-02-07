@@ -1,5 +1,5 @@
 import { expression } from '@/src/helpers/expressions';
-import { QUERY_SYMBOLS } from '@ronin/compiler';
+import { QUERY_SYMBOLS, getQuerySymbol } from '@ronin/compiler';
 
 /**
  * Wraps a raw SQL expression as-is.
@@ -103,4 +103,22 @@ export const json_replace = (json: string, path: string, value: string): string 
  */
 export const json_insert = (json: string, path: string, value: string): string => {
   return expression(`json_insert('${json}', '${path}', '${value}')`) as unknown as string;
+};
+
+/**
+ * Concatenates a list of strings together.
+ *
+ * @param values - The list of strings to concatenate.
+ *
+ * @returns An expression representing the concatenated string.
+ */
+export const concat = (
+  ...values: Array<string | unknown | Record<typeof QUERY_SYMBOLS.EXPRESSION, string>>
+): string => {
+  const formattedValues = values.map((value) => {
+    const symbol = getQuerySymbol(value);
+    return symbol?.type === 'expression' ? symbol.value : `'${value}'`;
+  });
+
+  return expression(`concat(${formattedValues.join(', ')})`) as unknown as string;
 };

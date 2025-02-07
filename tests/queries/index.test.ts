@@ -2,7 +2,7 @@ import { describe, expect, spyOn, test } from 'bun:test';
 
 import { op } from '@/src/helpers/expressions';
 import { getBatchProxy, getSyntaxProxy } from '@/src/queries';
-import { string } from '@/src/schema';
+import { concat, string } from '@/src/schema';
 import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
@@ -99,31 +99,32 @@ describe('syntax proxy', () => {
   });
 
   test('using field with expression', () => {
-    const setQueryHandler = { callback: () => undefined };
-    const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
+    let setQuery: Query | undefined;
 
     const setProxy = getSyntaxProxy({
       rootProperty: 'set',
-      callback: setQueryHandlerSpy,
+      callback: (value) => {
+        setQuery = value;
+      },
     });
 
-    setProxy.accounts.to.name(
-      (f: Record<string, unknown>) => `${f.firstName} ${f.lastName}`,
-    );
+    setProxy.accounts.to((f) => ({
+      name: concat(f.firstName, ' ', f.lastName),
+    }));
 
     const finalQuery = {
       set: {
         accounts: {
           to: {
             name: {
-              [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}firstName || ' ' || ${QUERY_SYMBOLS.FIELD}lastName`,
+              [QUERY_SYMBOLS.EXPRESSION]: `concat(__RONIN_FIELD_firstName, ' ', __RONIN_FIELD_lastName)`,
             },
           },
         },
       },
     };
 
-    expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(setQuery).toMatchObject(finalQuery);
   });
 
   test('using field with date', () => {

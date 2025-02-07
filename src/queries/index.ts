@@ -206,24 +206,24 @@ export function getSyntaxProxy(config?: {
                 const name = property.toString();
                 const split = RONIN_EXPRESSION_SEPARATOR;
 
-                return `${split}${QUERY_SYMBOLS.FIELD}${name}${split}`;
+                return {
+                  [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}${name}`,
+                };
+
+                // return `${split}${QUERY_SYMBOLS.FIELD}${name}${split}`;
               },
             },
           );
 
-          const instructions = value(fieldProxy);
+          value = value(fieldProxy);
 
-          if (instructions.structure) {
-            value = { [QUERY_SYMBOLS.QUERY]: instructions.structure };
-          } else {
-            value = instructions;
-
-            if (isExpression(value)) {
-              value = wrapExpression(value as string);
-            } else if (typeof value === 'object') {
-              value = wrapExpressions(value);
-            }
+          /*
+          if (isExpression(value)) {
+            value = wrapExpression(value as string);
+          } else if (typeof value === 'object') {
+            value = wrapExpressions(value);
           }
+            */
 
           // Restore the original value of `IN_BATCH`.
           IN_BATCH = ORIGINAL_IN_BATCH;
@@ -281,7 +281,13 @@ export function getSyntaxProxy(config?: {
           // holds an `undefined` value.
           if (options) details.options = options;
 
-          return createProxy(newPath, details);
+          const argument = config?.rootProperty
+            ? {
+                [QUERY_SYMBOLS.QUERY]: structure,
+              }
+            : details;
+
+          return createProxy(newPath, argument);
         }
 
         return config.callback(structure, options);
