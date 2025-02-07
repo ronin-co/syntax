@@ -151,6 +151,8 @@ export const mutateStructure = (
       if (isPlainObject(obj[key])) {
         // Recursively mutate nested objects.
         mutateStructure(obj[key] as NestedObject, callback);
+      } else if (Array.isArray(obj[key])) {
+        obj[key].map((item) => mutateStructure(item, callback));
       } else {
         // Call the mutation function for the value.
         obj[key] = callback(obj[key]);

@@ -112,15 +112,13 @@ export const getSyntaxProxy = (config?: {
             },
           );
 
-          value = value(fieldProxy);
+          value = { ...value(fieldProxy) };
 
           // Restore the original value of `IN_BATCH`.
           IN_BATCH = ORIGINAL_IN_BATCH;
         }
 
-        if (value?.structure) {
-          value = value.structure;
-        } else if (typeof value !== 'undefined') {
+        if (typeof value !== 'undefined') {
           // Serialize the value to ensure that the final structure can be sent over the
           // network and/or passed to the query compiler.
           //
@@ -128,8 +126,6 @@ export const getSyntaxProxy = (config?: {
           value = mutateStructure(value, (value) => {
             // Never serialize `undefined` values, as they are not valid JSON.
             if (typeof value === 'undefined') return value;
-
-            if (value?.structure) return value.structure;
 
             // If a custom replacer function was provided, serialize the value with it.
             if (config?.replacer) {
@@ -185,7 +181,7 @@ export const getSyntaxProxy = (config?: {
           // the function after which they are called, we need to remove the last
           // path segment.
           const newPath = path.slice(0, -1);
-          const details: SyntaxItem = { structure };
+          const details: SyntaxItem = { ...structure };
 
           // Only add options if any are available, to avoid adding a property that
           // holds an `undefined` value.

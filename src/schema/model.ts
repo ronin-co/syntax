@@ -244,5 +244,5 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     RoninFields & FieldsToTypes<Fields>
   >;
 
-  return finalModel.structure;
+  return { ...finalModel };
 };
