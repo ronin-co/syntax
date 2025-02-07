@@ -536,7 +536,7 @@ describe('models', () => {
   test('create model with triggers', () => {
     const add = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.add` });
 
-    const Account = model({
+    const Account = model(() => ({
       slug: 'account',
       pluralSlug: 'accounts',
       name: 'Account',
@@ -549,10 +549,12 @@ describe('models', () => {
           when: 'AFTER',
           fields: [{ slug: 'name' }],
           // @ts-expect-error: The queries need to be adjusted in the TS client.
-          effects: () => [add.account.with({ name: 'Lorena' })],
+          effects: [add.account.with({ name: 'Lorena' })],
         },
       ],
-    });
+    }));
+
+    console.log('ACCOUNT', Account);
     expect(Account).toBeTypeOf('object');
     // @ts-expect-error: The Account object has 'fields'.
     expect(Account.fields).toHaveLength(1);

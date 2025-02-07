@@ -172,57 +172,8 @@ type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
  *
  * @returns The generated model definition.
  */
-/*
 export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
-  model: Model<Fields>,
-): Expand<RoninFields & FieldsToTypes<Fields>> => {
-  const newModel = { ...model };
-
-  if (newModel.fields) {
-    newModel.fields = serializeFields(
-      newModel.fields as RecordWithoutForbiddenKeys<PrimitivesItem>,
-    ) as unknown as typeof newModel.fields;
-  }
-
-
-  if (newModel.triggers) {
-    newModel.triggers = serializeTriggers(
-      newModel.triggers,
-    ) as unknown as typeof newModel.triggers;
-  }
-
-  if (newModel.presets) {
-    newModel.presets = serializePresets(
-      newModel.presets,
-    ) as unknown as typeof newModel.presets;
-  }
-
-  return newModel as unknown as Expand<RoninFields & FieldsToTypes<Fields>>;
-};
-*/
-
-/**
- * Generates a model definition and adds default fields to the provided model.
- *
- * @example
- * ```ts
- * const Account = model({
- *   slug: 'account',
- *   pluralSlug: 'accounts',
- *   fields: {
- *     name: string()
- *   },
- * });
- * ```
- *
- * @template T - A generic type representing the model structure, which contains a slug
- * and fields.
- * @param model - An object containing the slug and fields of the model.
- *
- * @returns The generated model definition.
- */
-export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
-  model: Model<Fields>,
+  model: Model<Fields> | (() => Model<Fields>),
 ): Expand<RoninFields & FieldsToTypes<Fields>> => {
   const newModel = { ...model };
 
@@ -240,9 +191,9 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     }));
   }
 
-  const finalModel = getSyntaxProxy()(newModel) as unknown as Expand<
-    RoninFields & FieldsToTypes<Fields>
-  >;
+  const finalModel = getSyntaxProxy()(
+    typeof model === 'function' ? model : newModel,
+  ) as unknown as Expand<RoninFields & FieldsToTypes<Fields>>;
 
   return finalModel;
 };

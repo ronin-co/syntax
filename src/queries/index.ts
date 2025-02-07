@@ -61,7 +61,12 @@ export const getSyntaxProxy = (config?: {
     targetProps?: SyntaxItem,
     assign?: boolean,
   ) => {
-    return new Proxy(assign ? { ...targetProps } : () => undefined, {
+    const target = assign ? { ...targetProps } : () => undefined;
+
+    // @ts-expect-error Deleting this property is required for fields called `name`.
+    if (!assign) delete target.name;
+
+    return new Proxy(target, {
       apply(_: unknown, __: unknown, args: Array<any>) {
         let value = args[0];
         const options = args[1];
