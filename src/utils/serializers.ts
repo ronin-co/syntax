@@ -1,12 +1,6 @@
 import { type SyntaxItem, getBatchProxy } from '@/src/queries';
-import type { PrimitivesItem } from '@/src/schema/model';
-import type {
-  GetInstructions,
-  ModelField,
-  ModelTrigger,
-  Query,
-  WithInstruction,
-} from '@ronin/compiler';
+import type { Model, PrimitivesItem } from '@/src/schema/model';
+import type { ModelField, ModelTrigger, Query } from '@ronin/compiler';
 
 /**
  * Serialize fields from `Record<string, Primitives>` to `Model<Fields>`.
@@ -42,16 +36,21 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
 };
 
 /**
- * Serialize fields from `Record<string, Primitives>` to `Model<Fields>`.
+ * Serialize presets.
  *
- * @param fields - The fields to serialize.
+ * @param fields - The fields that can be referenced in the presets.
+ * @param presets - The presets to serialize.
  *
- * @returns The serialized fields.
+ * @returns The serialized presets.
  */
 export const serializePresets = (
-  presets: Record<string, WithInstruction | GetInstructions>,
+  fields: Record<string, { [key: string]: string }>,
+  presets: NonNullable<Model['presets']>,
 ) => {
-  return Object.entries(presets).map(([key, value]) => {
+  const cleanPresets =
+    typeof presets === 'function' ? getBatchProxy(() => presets(fields)) : presets;
+
+  return Object.entries(cleanPresets).map(([key, value]) => {
     return {
       slug: key,
       instructions: value,

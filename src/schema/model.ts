@@ -15,14 +15,15 @@ import {
   serializePresets,
   serializeTriggers,
 } from '@/src/utils/serializers';
-import type {
-  GetInstructions,
-  ModelField,
-  ModelIndex,
-  ModelTrigger,
-  Model as RawModel,
-  StoredObject,
-  WithInstruction,
+import {
+  type GetInstructions,
+  type ModelField,
+  type ModelIndex,
+  type ModelTrigger,
+  QUERY_SYMBOLS,
+  type Model as RawModel,
+  type StoredObject,
+  type WithInstruction,
 } from '@ronin/compiler';
 
 // This is used to ensure that any object adhering to this interface has both fields.
@@ -76,6 +77,17 @@ export interface NestedFieldsPrimitivesItem {
   [key: string]: PrimitivesItem;
 }
 
+type FieldReferences<Fields> = Record<keyof Fields, unknown> & {
+  id: string;
+  ronin: {
+    updatedAt: Date;
+    updatedBy: string;
+    createdAt: Date;
+    createdBy: string;
+    locked: boolean;
+  };
+};
+
 export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
   extends Omit<RawModel, 'fields' | 'indexes' | 'triggers' | 'presets'> {
   /**
@@ -96,7 +108,11 @@ export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
   /**
    * Predefined query instructions that can be reused across multiple different queries.
    */
-  presets?: Record<string, GetInstructions | WithInstruction>;
+  presets?:
+    | Record<string, GetInstructions | WithInstruction>
+    | ((
+        fields: FieldReferences<Fields>,
+      ) => Record<string, GetInstructions | WithInstruction>);
 }
 
 // This type maps the fields of a model to their types.
@@ -172,6 +188,15 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     ) as unknown as typeof newModel.fields;
   }
 
+  const fieldReferences = Object.fromEntries(
+    ((newModel.fields as unknown as Array<ModelField>) || []).map(({ slug }) => [
+      slug,
+      {
+        [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}${slug}`,
+      },
+    ]),
+  );
+
   if (newModel.triggers) {
     newModel.triggers = serializeTriggers(
       newModel.triggers,
@@ -180,6 +205,7 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
 
   if (newModel.presets) {
     newModel.presets = serializePresets(
+      fieldReferences,
       newModel.presets,
     ) as unknown as typeof newModel.presets;
   }

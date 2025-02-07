@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { getSyntaxProxy } from '@/src/queries';
 import { blob, boolean, date, json, link, model, number, string } from '@/src/schema';
+import { QUERY_SYMBOLS } from '@ronin/compiler';
 
 describe('models', () => {
   test('create empty model', () => {
@@ -617,6 +618,57 @@ describe('models', () => {
               },
             },
             selecting: ['name'],
+          },
+        },
+      ],
+    });
+  });
+
+  test('create model with presets including sub queries', () => {
+    const get = getSyntaxProxy({ rootProperty: 'get' });
+
+    const Member = model({
+      slug: 'member',
+      fields: {
+        account: string(),
+      },
+      presets: (f) => ({
+        account: {
+          including: {
+            account: get.account.with.id(f.account),
+          },
+        },
+      }),
+    });
+
+    expect(Member).toEqual({
+      // @ts-expect-error: The Account object has 'slug'.
+      slug: 'member',
+      fields: [
+        {
+          slug: 'account',
+          type: 'string',
+        },
+      ],
+      presets: [
+        {
+          slug: 'account',
+          instructions: {
+            including: {
+              account: {
+                [QUERY_SYMBOLS.QUERY]: {
+                  get: {
+                    account: {
+                      with: {
+                        id: {
+                          [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}account`,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       ],

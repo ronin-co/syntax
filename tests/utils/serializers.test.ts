@@ -23,16 +23,19 @@ describe('serializers', () => {
   });
 
   test('serializePresets', () => {
-    const preset = serializePresets({
-      test: {
-        with: {
-          space: {
-            being: 'spa_m9h8oha94helaji',
+    const preset = serializePresets(
+      {},
+      {
+        test: {
+          with: {
+            space: {
+              being: 'spa_m9h8oha94helaji',
+            },
           },
+          selecting: ['name'],
         },
-        selecting: ['name'],
       },
-    });
+    );
 
     expect(preset).toStrictEqual([
       {
