@@ -24,7 +24,7 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
           result[`${key}.${k}`] = value[k];
         }
 
-        return serializeFields(result) || [];
+        return [];
       }
 
       return {
