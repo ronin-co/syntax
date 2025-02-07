@@ -57,11 +57,11 @@ export const getSyntaxProxy = (config?: {
     typeof config?.propertyValue === 'undefined' ? {} : config.propertyValue;
 
   const createProxy = (
-    kind: 'function' | 'object',
-    path: Array<string>,
+    path: Array<string> = [],
     targetProps?: SyntaxItem,
+    assign?: boolean,
   ) => {
-    return new Proxy(kind === 'function' ? () => undefined : { ...targetProps }, {
+    return new Proxy(assign ? { ...targetProps } : () => undefined, {
       apply(_: unknown, __: unknown, args: Array<any>) {
         let value = args[0];
         const options = args[1];
@@ -169,7 +169,7 @@ export const getSyntaxProxy = (config?: {
           // holds an `undefined` value.
           if (options) details.options = options;
 
-          return createProxy('object', newPath, details);
+          return createProxy(newPath, details, true);
         }
 
         return config.callback(structure, options);
@@ -184,12 +184,12 @@ export const getSyntaxProxy = (config?: {
 
         // If the target object does not have a matching static property, return a
         // new proxy, to allow for chaining `get` accessors.
-        return createProxy('function', path.concat([nextProp]), targetProps);
+        return createProxy(path.concat([nextProp]), targetProps);
       },
     });
   };
 
-  return createProxy('function', []);
+  return createProxy();
 };
 
 /**
