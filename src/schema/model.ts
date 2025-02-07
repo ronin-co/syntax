@@ -72,17 +72,6 @@ export interface NestedFieldsPrimitivesItem {
   [key: string]: PrimitivesItem;
 }
 
-type FieldReferences<Fields> = Record<keyof Fields, unknown> & {
-  id: string;
-  ronin: {
-    updatedAt: Date;
-    updatedBy: string;
-    createdAt: Date;
-    createdBy: string;
-    locked: boolean;
-  };
-};
-
 export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
   extends Omit<RawModel, 'fields' | 'indexes' | 'triggers' | 'presets'> {
   /**
@@ -103,11 +92,7 @@ export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
   /**
    * Predefined query instructions that can be reused across multiple different queries.
    */
-  presets?:
-    | Record<string, GetInstructions | WithInstruction>
-    | ((
-        fields: FieldReferences<Fields>,
-      ) => Record<string, GetInstructions | WithInstruction>);
+  presets?: Record<string, GetInstructions | WithInstruction>;
 }
 
 // This type maps the fields of a model to their types.
