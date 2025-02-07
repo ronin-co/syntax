@@ -68,16 +68,6 @@ export const getSyntaxProxy = (config?: {
     // function is called when it's called via a Proxy.
     proxyTarget();
 
-    if (kind === 'function') {
-      // Ensure that the target can be serialized by `JSON.stringify()`.
-      Object.defineProperty(proxyTarget, 'toJSON', {
-        value() {
-          return targetProps;
-        },
-        enumerable: false, // The property hould not appear during enumeration.
-      });
-    }
-
     return new Proxy(kind === 'function' ? proxyTarget : { ...targetProps }, {
       apply(_: unknown, __: unknown, args: Array<any>) {
         let value = args[0];
