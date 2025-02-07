@@ -229,7 +229,7 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
   if (newModel.fields) {
     newModel.fields = Object.entries(newModel.fields).map(([slug, rest]) => ({
       slug,
-      ...(rest.toJSON ? rest.toJSON() : rest),
+      ...rest,
     }));
   }
 
@@ -244,5 +244,5 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     RoninFields & FieldsToTypes<Fields>
   >;
 
-  return finalModel.toJSON();
+  return finalModel;
 };

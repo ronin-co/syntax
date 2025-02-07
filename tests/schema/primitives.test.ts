@@ -13,11 +13,10 @@ import {
 test('create string field', () => {
   const field = string({ displayAs: 'secret' }) as unknown as SyntaxField<'string'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'string',
-    name: undefined,
     displayAs: 'secret',
   });
 });
@@ -28,9 +27,9 @@ test('create string field with attributes', () => {
     name: 'Surname',
   }) as unknown as SyntaxField<'string'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'string',
     name: 'Surname',
     required: true,
@@ -40,11 +39,10 @@ test('create string field with attributes', () => {
 test('create number field', () => {
   const field = number() as unknown as SyntaxField<'number'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'number',
-    name: undefined,
   });
 });
 
@@ -54,9 +52,9 @@ test('create number field with attributes', () => {
     name: 'Follower',
   }) as unknown as SyntaxField<'number'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'number',
     name: 'Follower',
     required: true,
@@ -66,11 +64,10 @@ test('create number field with attributes', () => {
 test('create boolean field', () => {
   const field = boolean() as unknown as SyntaxField<'boolean'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'boolean',
-    name: undefined,
   });
 });
 
@@ -80,9 +77,9 @@ test('create boolean field with attributes', () => {
     name: 'Registered',
   }) as unknown as SyntaxField<'boolean'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'boolean',
     name: 'Registered',
     required: true,
@@ -92,11 +89,10 @@ test('create boolean field with attributes', () => {
 test('create date field', () => {
   const field = date() as unknown as SyntaxField<'date'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'date',
-    name: undefined,
   });
 });
 
@@ -106,9 +102,9 @@ test('create date field with attributes', () => {
     name: 'Registered',
   }) as unknown as SyntaxField<'date'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'date',
     name: 'Registered',
     required: true,
@@ -118,11 +114,10 @@ test('create date field with attributes', () => {
 test('create blob field', () => {
   const field = blob() as unknown as SyntaxField<'blob'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'blob',
-    name: undefined,
   });
 });
 
@@ -132,9 +127,9 @@ test('create blob field with attributes', () => {
     name: 'Registered',
   }) as unknown as SyntaxField<'blob'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'blob',
     name: 'Registered',
     required: true,
@@ -144,9 +139,9 @@ test('create blob field with attributes', () => {
 test('create json field', () => {
   const field = json() as unknown as SyntaxField<'json'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'json',
     name: undefined,
     displayAs: undefined,
@@ -159,12 +154,11 @@ test('create json field with attributes', () => {
     name: 'Registered',
   }) as unknown as SyntaxField<'json'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'json',
     name: 'Registered',
-    displayAs: undefined,
     required: true,
   });
 });
@@ -174,12 +168,10 @@ test('create link field', () => {
     target: 'account',
   }) as unknown as SyntaxField<'link'>;
 
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'link',
-    actions: undefined,
-    name: undefined,
     target: 'account',
   });
 });
@@ -190,13 +182,12 @@ test('create link field with attributes', () => {
     required: true,
     name: 'Profile',
   }) as unknown as SyntaxField<'link'>;
-  expect(field.structure).toBeTypeOf('object');
+  expect(field).toBeTypeOf('object');
 
-  expect(field.structure).toEqual({
+  expect(field).toEqual({
     type: 'link',
     target: 'account',
     name: 'Profile',
-    actions: undefined,
     required: true,
   });
 });

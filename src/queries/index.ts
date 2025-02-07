@@ -57,7 +57,7 @@ export const getSyntaxProxy = (config?: {
     typeof config?.propertyValue === 'undefined' ? {} : config.propertyValue;
 
   const createProxy = (
-    _kind: 'function' | 'object',
+    kind: 'function' | 'object',
     path: Array<string>,
     targetProps?: SyntaxItem,
   ) => {
@@ -68,15 +68,17 @@ export const getSyntaxProxy = (config?: {
     // function is called when it's called via a Proxy.
     proxyTarget();
 
-    // Ensure that the target can be serialized by `JSON.stringify()`.
-    Object.defineProperty(proxyTarget, 'toJSON', {
-      value() {
-        return targetProps;
-      },
-      enumerable: false, // The property hould not appear during enumeration.
-    });
+    if (kind === 'function') {
+      // Ensure that the target can be serialized by `JSON.stringify()`.
+      Object.defineProperty(proxyTarget, 'toJSON', {
+        value() {
+          return targetProps;
+        },
+        enumerable: false, // The property hould not appear during enumeration.
+      });
+    }
 
-    return new Proxy(proxyTarget, {
+    return new Proxy(kind === 'function' ? proxyTarget : { ...targetProps }, {
       apply(_: unknown, __: unknown, args: Array<any>) {
         let value = args[0];
         const options = args[1];
@@ -110,10 +112,6 @@ export const getSyntaxProxy = (config?: {
           );
 
           value = value(fieldProxy);
-
-          if (value.toJSON) {
-            value = value.toJSON();
-          }
 
           // Restore the original value of `IN_BATCH`.
           IN_BATCH = ORIGINAL_IN_BATCH;
@@ -241,9 +239,8 @@ export const getBatchProxy = (
   // objects, thereby making development more difficult. To avoid this, we are creating a
   // plain object containing the same properties as the `Proxy` instances.
   return queries.map((details) => {
-    const query = details.toJSON();
-    const item = { structure: query[QUERY_SYMBOLS.QUERY], options: query.options };
-    if (query.options) item.options = query.options;
+    const item = { structure: details[QUERY_SYMBOLS.QUERY] };
+    if ('options' in details) item.options = details.options;
     return item;
   }) as Array<SyntaxItem<Query>>;
 };
