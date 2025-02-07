@@ -45,6 +45,59 @@ describe('syntax proxy', () => {
     expect(query).toMatchObject(finalQuery);
   });
 
+  test('using multiple sub queries', () => {
+    let getQuery: Query | undefined;
+
+    const getProxy = getSyntaxProxy({
+      rootProperty: 'get',
+      callback: (value) => {
+        getQuery = value;
+      },
+    });
+
+    getProxy.member.including((f) => ({
+      account: getProxy.account.with.id(f.account),
+      team: getProxy.team.with.id(f.team),
+    }));
+
+    const finalQuery = {
+      get: {
+        member: {
+          including: {
+            account: {
+              __RONIN_QUERY: {
+                get: {
+                  account: {
+                    with: {
+                      id: {
+                        [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}account`,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+            team: {
+              __RONIN_QUERY: {
+                get: {
+                  team: {
+                    with: {
+                      id: {
+                        [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}team`,
+                      },
+                    },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    };
+
+    expect(getQuery).toMatchObject(finalQuery);
+  });
+
   test('using field with expression', () => {
     const setQueryHandler = { callback: () => undefined };
     const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');

@@ -227,7 +227,9 @@ export function getSyntaxProxy(config?: {
 
           // Restore the original value of `IN_BATCH`.
           IN_BATCH = ORIGINAL_IN_BATCH;
-        } else if (typeof value !== 'undefined') {
+        }
+
+        if (typeof value !== 'undefined') {
           // Serialize the value to ensure that the final structure can be sent over the
           // network and/or passed to the query compiler.
           //
