@@ -19,9 +19,6 @@ import {
   type SetQuery,
 } from '@ronin/compiler';
 
-/** Used to separate the components of an expression from each other. */
-const RONIN_EXPRESSION_SEPARATOR = '//.//';
-
 /**
  * Utility type to convert a tuple of promises into a tuple of their resolved types.
  */
@@ -336,65 +333,6 @@ export const getBatchProxy = (
   // plain object containing the same properties as the `Proxy` instances.
   return queries.map((details) => ({ ...details })) as Array<SyntaxItem<Query>>;
 };
-
-type NestedObject = {
-  [key: string]: unknown | NestedObject;
-};
-
-/**
- * Checks whether a given value is a query expression.
- *
- * @param value - The value to check.
- *
- * @returns A boolean indicating whether or not the provided value is an expression.
- */
-const isExpression = (value: unknown): boolean => {
-  return typeof value === 'string' && value.includes(RONIN_EXPRESSION_SEPARATOR);
-};
-
-/**
- * Wraps an expression string into a query symbol that allows the compiler to easily
- * detect and process it.
- *
- * @param value - The expression to wrap.
- *
- * @returns The provided expression wrapped in a query symbol.
- */
-const wrapExpression = (
-  value: string,
-): Record<typeof QUERY_SYMBOLS.EXPRESSION, string> => {
-  const components = value
-    .split(RONIN_EXPRESSION_SEPARATOR)
-    .filter((part) => part.length > 0)
-    .map((part) => {
-      return part.startsWith(QUERY_SYMBOLS.FIELD) ? part : `'${part}'`;
-    })
-    .join(' || ');
-
-  return { [QUERY_SYMBOLS.EXPRESSION]: components };
-};
-
-/**
- * Recursively checks an object for query expressions and, if they are found, wraps them
- * in a query symbol that allows the compiler to easily detect and process them.
- *
- * @param obj - The object containing potential expressions.
- *
- * @returns The updated object.
- */
-const wrapExpressions = (obj: NestedObject): NestedObject =>
-  Object.fromEntries(
-    Object.entries(obj).map(([key, value]) => {
-      if (isExpression(value)) return [key, wrapExpression(value as string)];
-
-      return [
-        key,
-        value && typeof value === 'object'
-          ? wrapExpressions(value as NestedObject)
-          : value,
-      ];
-    }),
-  );
 
 export { getProperty, setProperty } from '@/src/utils';
 export type { ResultRecord, DeepCallable } from '@/src/queries/types';
