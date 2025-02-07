@@ -57,30 +57,23 @@ export const getSyntaxProxy = (config?: {
     typeof config?.propertyValue === 'undefined' ? {} : config.propertyValue;
 
   function createProxy(path: Array<string>, targetProps?: SyntaxItem) {
-    const proxyTargetFunction = () => undefined;
+    const proxyTarget = () => undefined;
 
     // This is workaround to avoid "uncalled functions" in the test
     // coverage report. Test coverage tools fail to recognize that the
     // function is called when it's called via a Proxy.
-    proxyTargetFunction();
-
-    // Since the proxy target must always be a function (so that it can be called),
-    // we need to assign properties to the function itself.
-    if (targetProps) Object.assign(proxyTargetFunction, targetProps);
-
-    // @ts-expect-error Deleting this property is required for fields called `name`.
-    delete proxyTargetFunction.name;
+    proxyTarget();
 
     // Ensure that the target can be serialized by `JSON.stringify()`.
-    Object.defineProperty(proxyTargetFunction, 'toJSON', {
+    Object.defineProperty(proxyTarget, 'toJSON', {
       value() {
-        return { ...this };
+        return targetProps;
       },
       enumerable: false, // The property hould not appear during enumeration.
     });
 
-    return new Proxy(proxyTargetFunction, {
-      apply(target: any, _thisArg: any, args: Array<any>) {
+    return new Proxy(proxyTarget, {
+      apply(_: unknown, __: unknown, args: Array<any>) {
         let value = args[0];
         const options = args[1];
 
@@ -112,7 +105,11 @@ export const getSyntaxProxy = (config?: {
             },
           );
 
-          value = { ...value(fieldProxy) };
+          value = value(fieldProxy);
+
+          if (value.toJSON) {
+            value = value.toJSON();
+          }
 
           // Restore the original value of `IN_BATCH`.
           IN_BATCH = ORIGINAL_IN_BATCH;
@@ -143,14 +140,12 @@ export const getSyntaxProxy = (config?: {
         // If the function call is happening after an existing function call in the
         // same query, the existing query will be available as `target.structure`, and
         // we should extend it. If none is available, we should create a new query.
-        const structure = target || {};
+        const structure = { ...targetProps };
         const targetValue = typeof value === 'undefined' ? propertyValue : value;
 
         const pathParts = config?.root ? [config.root, ...path] : path;
         const pathJoined = pathParts.length > 0 ? pathParts.join('.') : '.';
 
-        console.log('TARGET', structure)
-        console.log('PROPERTY ASSIGNMENT', targetValue)
         setProperty(structure, pathJoined, targetValue);
 
         // If a `create.model` query was provided, serialize the model structure.
@@ -204,7 +199,7 @@ export const getSyntaxProxy = (config?: {
 
         // If the target object does not have a matching static property, return a
         // new proxy, to allow for chaining `get` accessors.
-        return createProxy(path.concat([nextProp]), target);
+        return createProxy(path.concat([nextProp]), targetProps);
       },
     });
   }
@@ -242,8 +237,9 @@ export const getBatchProxy = (
   // objects, thereby making development more difficult. To avoid this, we are creating a
   // plain object containing the same properties as the `Proxy` instances.
   return queries.map((details) => {
-    const item = { structure: details.structure[QUERY_SYMBOLS.QUERY] };
-    if ('options' in details) item.options = details.options;
+    const query = details.toJSON();
+    const item = { structure: query[QUERY_SYMBOLS.QUERY], options: query.options };
+    if (query.options) item.options = query.options;
     return item;
   }) as Array<SyntaxItem<Query>>;
 };
