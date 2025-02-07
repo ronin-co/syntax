@@ -13,9 +13,9 @@ import {
 test('create string field', () => {
   const field = string({ displayAs: 'secret' }) as unknown as SyntaxField<'string'>;
 
-  expect(field).toBeTypeOf('object');
+  expect(field.structure).toBeTypeOf('object');
 
-  expect(field).toEqual({
+  expect(field.structure).toEqual({
     type: 'string',
     name: undefined,
     displayAs: 'secret',
