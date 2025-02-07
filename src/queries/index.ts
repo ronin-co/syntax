@@ -143,12 +143,14 @@ export const getSyntaxProxy = (config?: {
         // If the function call is happening after an existing function call in the
         // same query, the existing query will be available as `target.structure`, and
         // we should extend it. If none is available, we should create a new query.
-        const structure = target.structure || {};
+        const structure = target || {};
         const targetValue = typeof value === 'undefined' ? propertyValue : value;
 
         const pathParts = config?.root ? [config.root, ...path] : path;
         const pathJoined = pathParts.length > 0 ? pathParts.join('.') : '.';
 
+        console.log('TARGET', structure)
+        console.log('PROPERTY ASSIGNMENT', targetValue)
         setProperty(structure, pathJoined, targetValue);
 
         // If a `create.model` query was provided, serialize the model structure.
