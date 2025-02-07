@@ -1,3 +1,4 @@
+import { getSyntaxProxy } from '@/src/queries';
 import type {
   Chain,
   FieldOutput,
@@ -10,20 +11,14 @@ import type {
   number,
   string,
 } from '@/src/schema';
-import {
-  serializeFields,
-  serializePresets,
-  serializeTriggers,
-} from '@/src/utils/serializers';
-import {
-  type GetInstructions,
-  type ModelField,
-  type ModelIndex,
-  type ModelTrigger,
-  QUERY_SYMBOLS,
-  type Model as RawModel,
-  type StoredObject,
-  type WithInstruction,
+import type {
+  GetInstructions,
+  ModelField,
+  ModelIndex,
+  ModelTrigger,
+  Model as RawModel,
+  StoredObject,
+  WithInstruction,
 } from '@ronin/compiler';
 
 // This is used to ensure that any object adhering to this interface has both fields.
@@ -177,6 +172,7 @@ type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
  *
  * @returns The generated model definition.
  */
+/*
 export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
   model: Model<Fields>,
 ): Expand<RoninFields & FieldsToTypes<Fields>> => {
@@ -188,14 +184,6 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
     ) as unknown as typeof newModel.fields;
   }
 
-  const fieldReferences = Object.fromEntries(
-    ((newModel.fields as unknown as Array<ModelField>) || []).map(({ slug }) => [
-      slug,
-      {
-        [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}${slug}`,
-      },
-    ]),
-  );
 
   if (newModel.triggers) {
     newModel.triggers = serializeTriggers(
@@ -205,10 +193,32 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
 
   if (newModel.presets) {
     newModel.presets = serializePresets(
-      fieldReferences,
       newModel.presets,
     ) as unknown as typeof newModel.presets;
   }
 
   return newModel as unknown as Expand<RoninFields & FieldsToTypes<Fields>>;
 };
+*/
+
+/**
+ * Generates a model definition and adds default fields to the provided model.
+ *
+ * @example
+ * ```ts
+ * const Account = model({
+ *   slug: 'account',
+ *   pluralSlug: 'accounts',
+ *   fields: {
+ *     name: string()
+ *   },
+ * });
+ * ```
+ *
+ * @template T - A generic type representing the model structure, which contains a slug
+ * and fields.
+ * @param model - An object containing the slug and fields of the model.
+ *
+ * @returns The generated model definition.
+ */
+export const model = getSyntaxProxy({});

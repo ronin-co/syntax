@@ -38,19 +38,12 @@ export const serializeFields = (fields: Record<string, PrimitivesItem>) => {
 /**
  * Serialize presets.
  *
- * @param fields - The fields that can be referenced in the presets.
  * @param presets - The presets to serialize.
  *
  * @returns The serialized presets.
  */
-export const serializePresets = (
-  fields: Record<string, { [key: string]: string }>,
-  presets: NonNullable<Model['presets']>,
-) => {
-  const cleanPresets =
-    typeof presets === 'function' ? getBatchProxy(() => presets(fields)) : presets;
-
-  return Object.entries(cleanPresets).map(([key, value]) => {
+export const serializePresets = (presets: NonNullable<Model['presets']>) => {
+  return Object.entries(presets).map(([key, value]) => {
     return {
       slug: key,
       instructions: value,

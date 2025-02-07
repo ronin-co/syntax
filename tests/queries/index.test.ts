@@ -154,8 +154,6 @@ describe('syntax proxy', () => {
       },
     };
 
-    // It's important to assert the object directly here, because `toHaveBeenCalledWith`
-    // does not work correctly with `Date` objects.
     expect(setQuery).toMatchObject(finalQuery);
   });
 
@@ -188,8 +186,6 @@ describe('syntax proxy', () => {
       },
     };
 
-    // It's important to assert the object directly here, because `toHaveBeenCalledWith`
-    // does not work correctly with `File` objects.
     expect(setQuery).toMatchObject(finalQuery);
   });
 
@@ -219,12 +215,13 @@ describe('syntax proxy', () => {
   // Since `name` is a native property of functions and queries contain function calls,
   // we have to explicitly assert whether it can be used as a field slug.
   test('using field with slug `name`', () => {
-    const getQueryHandler = { callback: () => undefined };
-    const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
+    let getQuery: Query | undefined;
 
     const getProxy = getSyntaxProxy({
       rootProperty: 'get',
-      callback: getQueryHandlerSpy,
+      callback: (value) => {
+        getQuery = value;
+      },
     });
 
     getProxy.accounts.with.name('test');
@@ -239,16 +236,17 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(getQuery).toMatchObject(finalQuery);
   });
 
   test('using field with `defaultValue` expression', () => {
-    const createQueryHandler = { callback: () => undefined };
-    const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
+    let createQuery: Query | undefined;
 
     const createProxy = getSyntaxProxy({
       rootProperty: 'create',
-      callback: createQueryHandlerSpy,
+      callback: (value) => {
+        createQuery = value;
+      },
     });
 
     createProxy.model({
@@ -275,16 +273,17 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(createQuery).toMatchObject(finalQuery);
   });
 
   test('using field with `check` expression', () => {
-    const createQueryHandler = { callback: () => undefined };
-    const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
+    let createQuery: Query | undefined;
 
     const createProxy = getSyntaxProxy({
       rootProperty: 'create',
-      callback: createQueryHandlerSpy,
+      callback: (value) => {
+        createQuery = value;
+      },
     });
 
     createProxy.model({
@@ -311,16 +310,17 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(createQuery).toMatchObject(finalQuery);
   });
 
   test('using field with `computedAs` expression', () => {
-    const createQueryHandler = { callback: () => undefined };
-    const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
+    let createQuery: Query | undefined;
 
     const createProxy = getSyntaxProxy({
       rootProperty: 'create',
-      callback: createQueryHandlerSpy,
+      callback: (value) => {
+        createQuery = value;
+      },
     });
 
     createProxy.model({
@@ -353,7 +353,7 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(createQuery).toMatchObject(finalQuery);
   });
 
   test('using multiple fields with expressions', () => {
@@ -626,12 +626,13 @@ describe('syntax proxy', () => {
   });
 
   test('using a function call at the root', () => {
-    const getQueryHandler = { callback: () => undefined };
-    const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
+    let getQuery: Query | undefined;
 
     const getProxy = getSyntaxProxy({
       rootProperty: 'get',
-      callback: getQueryHandlerSpy,
+      callback: (value) => {
+        getQuery = value;
+      },
     });
 
     getProxy({ account: null });
@@ -642,16 +643,17 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(getQuery).toMatchObject(finalQuery);
   });
 
   test('creating a model via query using primitive helpers', () => {
-    const getQueryHandler = { callback: () => undefined };
-    const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
+    let createQuery: Query | undefined;
 
     const createProxy = getSyntaxProxy({
       rootProperty: 'create',
-      callback: getQueryHandlerSpy,
+      callback: (value) => {
+        createQuery = value;
+      },
     });
 
     createProxy.model({
@@ -677,6 +679,6 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(createQuery).toMatchObject(finalQuery);
   });
 });

@@ -43,16 +43,9 @@ interface CreateQuery extends Omit<OriginalCreateQuery, 'model' | 'to'> {
 }
 
 /**
- * Used to track whether RONIN queries are run in batches. In that case, it will be
- * possible for individual queries to provide options.
+ * Used to track whether RONIN queries are run in batches.
  */
 let IN_BATCH = false;
-
-/**
- * Used to track whether RONIN queries are nested. In that case, it will be not be
- * possible for individual queries to provide options.
- */
-const IN_STRUCTURE = false;
 
 export function getSyntaxProxy(config?: {
   rootProperty?: never;
@@ -266,13 +259,13 @@ export function getSyntaxProxy(config?: {
 
         // If a `create.model` query was provided, serialize the model structure.
         if (config?.rootProperty === 'create' && structure?.create?.model) {
-          structure.create.model = model(structure.create.model);
+          structure.create.model = model(structure.create.model).structure;
         }
 
         // If the function call is happening inside a batch, return a new proxy, to
         // allow for continuing to chain `get` accessors and function calls after
         // existing function calls in the same query.
-        if (IN_BATCH || IN_STRUCTURE || !config?.callback) {
+        if (IN_BATCH || !config?.callback) {
           // To ensure that `get` accessor calls are mounted to the same level as
           // the function after which they are called, we need to remove the last
           // path segment.
