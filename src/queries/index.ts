@@ -61,14 +61,7 @@ export const getSyntaxProxy = (config?: {
     path: Array<string>,
     targetProps?: SyntaxItem,
   ) => {
-    const proxyTarget = () => undefined;
-
-    // This is workaround to avoid "uncalled functions" in the test
-    // coverage report. Test coverage tools fail to recognize that the
-    // function is called when it's called via a Proxy.
-    proxyTarget();
-
-    return new Proxy(kind === 'function' ? proxyTarget : { ...targetProps }, {
+    return new Proxy(kind === 'function' ? () => undefined : { ...targetProps }, {
       apply(_: unknown, __: unknown, args: Array<any>) {
         let value = args[0];
         const options = args[1];
