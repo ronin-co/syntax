@@ -46,9 +46,16 @@ interface CreateQuery extends Omit<OriginalCreateQuery, 'model' | 'to'> {
 }
 
 /**
- * Used to track whether RONIN queries are run in batches.
+ * Used to track whether RONIN queries are run in batches. In that case, it will be
+ * possible for individual queries to provide options.
  */
 let IN_BATCH = false;
+
+/**
+ * Used to track whether RONIN queries are nested. In that case, it will be not be
+ * possible for individual queries to provide options.
+ */
+let IN_STRUCTURE = false;
 
 export function getSyntaxProxy(config?: {
   rootProperty?: never;
@@ -189,13 +196,12 @@ export function getSyntaxProxy(config?: {
         if (typeof value === 'function') {
           // Temporarily store the original value of `IN_BATCH`, so that we can resume it
           // after the nested function has been called.
-          const ORIGINAL_IN_BATCH = IN_BATCH;
+          const ORIGINAL_IN_STRUCTURE = IN_STRUCTURE;
 
-          // Since `value()` is synchronous, `IN_BATCH` should not affect any
-          // other queries somewhere else in the app, even if those are run inside
-          // an asynchronous function, so we don't need to use `IN_BATCH_ASYNC`,
-          // which avoids the need to pass it as an option to the client.
-          IN_BATCH = true;
+          // Since `value()` is synchronous, `IN_STRUCTURE` should not affect any other
+          // queries somewhere else in the app, even if those are run inside an
+          // asynchronous function.
+          IN_STRUCTURE = true;
 
           // A proxy object providing a property for every field of the model. It allows
           // for referencing fields inside of an expression.
@@ -204,29 +210,18 @@ export function getSyntaxProxy(config?: {
             {
               get(_target, property) {
                 const name = property.toString();
-                const split = RONIN_EXPRESSION_SEPARATOR;
 
                 return {
                   [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}${name}`,
                 };
-
-                // return `${split}${QUERY_SYMBOLS.FIELD}${name}${split}`;
               },
             },
           );
 
           value = value(fieldProxy);
 
-          /*
-          if (isExpression(value)) {
-            value = wrapExpression(value as string);
-          } else if (typeof value === 'object') {
-            value = wrapExpressions(value);
-          }
-            */
-
-          // Restore the original value of `IN_BATCH`.
-          IN_BATCH = ORIGINAL_IN_BATCH;
+          // Restore the original value of `IN_STRUCTURE`.
+          IN_STRUCTURE = ORIGINAL_IN_STRUCTURE;
         }
 
         if (typeof value !== 'undefined') {
@@ -270,7 +265,7 @@ export function getSyntaxProxy(config?: {
         // If the function call is happening inside a batch, return a new proxy, to
         // allow for continuing to chain `get` accessors and function calls after
         // existing function calls in the same query.
-        if (IN_BATCH || !config?.callback) {
+        if (IN_BATCH || IN_STRUCTURE || !config?.callback) {
           // To ensure that `get` accessor calls are mounted to the same level as
           // the function after which they are called, we need to remove the last
           // path segment.
@@ -281,7 +276,7 @@ export function getSyntaxProxy(config?: {
           // holds an `undefined` value.
           if (options) details.options = options;
 
-          const argument = config?.rootProperty
+          const argument = IN_STRUCTURE
             ? {
                 [QUERY_SYMBOLS.QUERY]: structure,
               }

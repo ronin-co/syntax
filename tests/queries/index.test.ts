@@ -7,7 +7,7 @@ import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
   test('using sub query', () => {
-    let query: Query | undefined;
+    let addQuery: Query | undefined;
 
     const getQueryHandler = { callback: () => undefined };
     const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
@@ -19,7 +19,7 @@ describe('syntax proxy', () => {
     const addProxy = getSyntaxProxy({
       rootProperty: 'add',
       callback: (value) => {
-        query = value;
+        addQuery = value;
       },
     });
 
@@ -29,7 +29,7 @@ describe('syntax proxy', () => {
       add: {
         accounts: {
           with: {
-            __RONIN_QUERY: {
+            [QUERY_SYMBOLS.QUERY]: {
               get: {
                 oldAccounts: {
                   selecting: ['handle'],
@@ -42,7 +42,7 @@ describe('syntax proxy', () => {
     };
 
     expect(getQueryHandlerSpy).not.toHaveBeenCalled();
-    expect(query).toMatchObject(finalQuery);
+    expect(addQuery).toMatchObject(finalQuery);
   });
 
   test('using multiple sub queries', () => {
@@ -117,7 +117,7 @@ describe('syntax proxy', () => {
         accounts: {
           to: {
             name: {
-              [QUERY_SYMBOLS.EXPRESSION]: `concat(__RONIN_FIELD_firstName, ' ', __RONIN_FIELD_lastName)`,
+              [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}firstName, ' ', ${QUERY_SYMBOLS.FIELD}lastName)`,
             },
           },
         },
@@ -357,17 +357,18 @@ describe('syntax proxy', () => {
   });
 
   test('using multiple fields with expressions', () => {
-    const setQueryHandler = { callback: () => undefined };
-    const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
+    let setQuery: Query | undefined;
 
     const setProxy = getSyntaxProxy({
       rootProperty: 'set',
-      callback: setQueryHandlerSpy,
+      callback: (value) => {
+        setQuery = value;
+      },
     });
 
     setProxy.accounts.to((f: Record<string, unknown>) => ({
-      name: `${f.firstName} ${f.lastName}`,
-      email: `${f.handle}@site.co`,
+      name: concat(f.firstName, ' ', f.lastName),
+      email: concat(f.handle, '@site.co'),
       handle: 'newHandle',
     }));
 
@@ -376,10 +377,10 @@ describe('syntax proxy', () => {
         accounts: {
           to: {
             name: {
-              [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}firstName || ' ' || ${QUERY_SYMBOLS.FIELD}lastName`,
+              [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}firstName, ' ', ${QUERY_SYMBOLS.FIELD}lastName)`,
             },
             email: {
-              [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}handle || '@site.co'`,
+              [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}handle, '@site.co')`,
             },
             handle: 'newHandle',
           },
@@ -387,7 +388,7 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(setQuery).toMatchObject(finalQuery);
   });
 
   test('using queries in batch', () => {
