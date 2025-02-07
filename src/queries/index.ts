@@ -56,7 +56,11 @@ export const getSyntaxProxy = (config?: {
   const propertyValue =
     typeof config?.propertyValue === 'undefined' ? {} : config.propertyValue;
 
-  function createProxy(path: Array<string>, targetProps?: SyntaxItem) {
+  const createProxy = (
+    _kind: 'function' | 'object',
+    path: Array<string>,
+    targetProps?: SyntaxItem,
+  ) => {
     const proxyTarget = () => undefined;
 
     // This is workaround to avoid "uncalled functions" in the test
@@ -184,7 +188,7 @@ export const getSyntaxProxy = (config?: {
           // holds an `undefined` value.
           if (options) details.options = options;
 
-          return createProxy(newPath, details);
+          return createProxy('object', newPath, details);
         }
 
         return config.callback(structure, options);
@@ -199,12 +203,12 @@ export const getSyntaxProxy = (config?: {
 
         // If the target object does not have a matching static property, return a
         // new proxy, to allow for chaining `get` accessors.
-        return createProxy(path.concat([nextProp]), targetProps);
+        return createProxy('function', path.concat([nextProp]), targetProps);
       },
     });
-  }
+  };
 
-  return createProxy([]);
+  return createProxy('function', []);
 };
 
 /**
