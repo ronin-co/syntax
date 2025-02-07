@@ -138,21 +138,9 @@ export const getSyntaxProxy = (config?: {
           config?.root === `${QUERY_SYMBOLS.QUERY}.create` &&
           structure?.[QUERY_SYMBOLS.QUERY]?.create?.model
         ) {
-          // Temporarily store the original value of `IN_BATCH`, so that we can resume it
-          // after the nested function has been called.
-          const ORIGINAL_IN_BATCH = IN_BATCH;
-
-          // Since `value()` is synchronous, `IN_BATCH` should not affect any other
-          // queries somewhere else in the app, even if those are run inside an
-          // asynchronous function.
-          IN_BATCH = true;
-
           structure[QUERY_SYMBOLS.QUERY].create.model = model(
             structure?.[QUERY_SYMBOLS.QUERY]?.create.model,
           );
-
-          // Restore the original value of `IN_BATCH`.
-          IN_BATCH = ORIGINAL_IN_BATCH;
         }
 
         // If the function call is happening inside a batch, return a new proxy, to
