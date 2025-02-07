@@ -534,7 +534,7 @@ describe('models', () => {
   });
 
   test('create model with triggers', () => {
-    const add = getSyntaxProxy({ rootProperty: 'add' });
+    const add = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.add` });
 
     const Account = model({
       slug: 'account',
@@ -625,7 +625,7 @@ describe('models', () => {
   });
 
   test('create model with presets including sub queries', () => {
-    const get = getSyntaxProxy({ rootProperty: 'get' });
+    const get = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.get` });
 
     const Member = model({
       slug: 'member',

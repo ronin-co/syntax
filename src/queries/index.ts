@@ -1,23 +1,6 @@
-import type { DeepCallable } from '@/src/queries/types';
 import { model } from '@/src/schema';
-import type { Model } from '@/src/schema/model';
 import { mutateStructure, setProperty } from '@/src/utils';
-import {
-  type AddQuery,
-  type AlterQuery,
-  type CountQuery,
-  type DropQuery,
-  type GetQuery,
-  type ModelField,
-  type ModelIndex,
-  type ModelPreset,
-  type ModelTrigger,
-  type CreateQuery as OriginalCreateQuery,
-  QUERY_SYMBOLS,
-  type Query,
-  type RemoveQuery,
-  type SetQuery,
-} from '@ronin/compiler';
+import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 /**
  * Utility type to convert a tuple of promises into a tuple of their resolved types.
@@ -37,81 +20,10 @@ export interface SyntaxItem<Structure = unknown> {
   options?: Record<string, unknown>;
 }
 
-interface CreateQuery extends Omit<OriginalCreateQuery, 'model' | 'to'> {
-  model: string | Model;
-  to?: Model;
-}
-
 /**
  * Used to track whether RONIN queries are run in batches.
  */
 let IN_BATCH = false;
-
-export function getSyntaxProxy(config?: {
-  rootProperty?: never;
-  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
-  propertyValue?: unknown;
-}): any;
-
-export function getSyntaxProxy(config?: {
-  rootProperty?: 'get';
-  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
-  propertyValue?: unknown;
-}): DeepCallable<GetQuery>;
-
-export function getSyntaxProxy(config?: {
-  rootProperty?: 'set';
-  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
-  propertyValue?: unknown;
-}): DeepCallable<SetQuery>;
-
-export function getSyntaxProxy(config?: {
-  rootProperty?: 'add';
-  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
-  propertyValue?: unknown;
-}): DeepCallable<AddQuery>;
-
-export function getSyntaxProxy(config?: {
-  rootProperty?: 'remove';
-  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
-  propertyValue?: unknown;
-}): DeepCallable<RemoveQuery>;
-
-export function getSyntaxProxy(config?: {
-  rootProperty?: 'count';
-  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
-  propertyValue?: unknown;
-}): DeepCallable<CountQuery, number>;
-
-export function getSyntaxProxy(config?: {
-  rootProperty?: 'create';
-  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
-  propertyValue?: unknown;
-}): DeepCallable<CreateQuery, Model>;
-
-export function getSyntaxProxy(config?: {
-  rootProperty?: 'alter';
-  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
-  propertyValue?: unknown;
-}): DeepCallable<
-  AlterQuery,
-  Model | ModelField | ModelIndex | ModelTrigger | ModelPreset
->;
-
-export function getSyntaxProxy(config?: {
-  rootProperty?: 'drop';
-  callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
-  propertyValue?: unknown;
-}): DeepCallable<DropQuery, Model>;
 
 /**
  * A utility function that creates a proxy object to handle dynamic property access and
@@ -124,7 +36,7 @@ export function getSyntaxProxy(config?: {
  * ### Usage
  * ```typescript
  * const get = getSyntaxProxy({
- *   rootProperty: 'get',
+ *   root: `${QUERY_SYMBOLS.QUERY}.get`,
  *   // Execute the query and return the result
  *   callback: async (query) => {}
  * });
@@ -134,20 +46,12 @@ export function getSyntaxProxy(config?: {
  * const result = await get.account.with.email('mike@gmail.com');
  * ```
  */
-export function getSyntaxProxy(config?: {
-  rootProperty?: string;
+export const getSyntaxProxy = (config?: {
+  root?: string;
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
   replacer?: (value: unknown) => { value: unknown; serialize: boolean };
   propertyValue?: unknown;
-}):
-  | DeepCallable<GetQuery>
-  | DeepCallable<SetQuery>
-  | DeepCallable<AddQuery>
-  | DeepCallable<RemoveQuery>
-  | DeepCallable<CountQuery, number>
-  | DeepCallable<CreateQuery, Model>
-  | DeepCallable<AlterQuery, Model | ModelField | ModelIndex | ModelTrigger | ModelPreset>
-  | DeepCallable<DropQuery, Model> {
+}) => {
   // The default value of a property within the composed structure.
   const propertyValue =
     typeof config?.propertyValue === 'undefined' ? {} : config.propertyValue;
@@ -215,9 +119,7 @@ export function getSyntaxProxy(config?: {
         }
 
         if (value?.structure) {
-          value = {
-            [QUERY_SYMBOLS.QUERY]: value.structure,
-          };
+          value = value.structure;
         } else if (typeof value !== 'undefined') {
           // Serialize the value to ensure that the final structure can be sent over the
           // network and/or passed to the query compiler.
@@ -227,11 +129,7 @@ export function getSyntaxProxy(config?: {
             // Never serialize `undefined` values, as they are not valid JSON.
             if (typeof value === 'undefined') return value;
 
-            if (value?.structure) {
-              return {
-                [QUERY_SYMBOLS.QUERY]: value.structure,
-              };
-            }
+            if (value?.structure) return value.structure;
 
             // If a custom replacer function was provided, serialize the value with it.
             if (config?.replacer) {
@@ -252,14 +150,31 @@ export function getSyntaxProxy(config?: {
         const structure = target.structure || {};
         const targetValue = typeof value === 'undefined' ? propertyValue : value;
 
-        const pathParts = config?.rootProperty ? [config.rootProperty, ...path] : path;
+        const pathParts = config?.root ? [config.root, ...path] : path;
         const pathJoined = pathParts.length > 0 ? pathParts.join('.') : '.';
 
         setProperty(structure, pathJoined, targetValue);
 
         // If a `create.model` query was provided, serialize the model structure.
-        if (config?.rootProperty === 'create' && structure?.create?.model) {
-          structure.create.model = model(structure.create.model).structure;
+        if (
+          config?.root === `${QUERY_SYMBOLS.QUERY}.create` &&
+          structure?.[QUERY_SYMBOLS.QUERY]?.create?.model
+        ) {
+          // Temporarily store the original value of `IN_BATCH`, so that we can resume it
+          // after the nested function has been called.
+          const ORIGINAL_IN_BATCH = IN_BATCH;
+
+          // Since `value()` is synchronous, `IN_BATCH` should not affect any other
+          // queries somewhere else in the app, even if those are run inside an
+          // asynchronous function.
+          IN_BATCH = true;
+
+          structure[QUERY_SYMBOLS.QUERY].create.model = model(
+            structure?.[QUERY_SYMBOLS.QUERY]?.create.model,
+          );
+
+          // Restore the original value of `IN_BATCH`.
+          IN_BATCH = ORIGINAL_IN_BATCH;
         }
 
         // If the function call is happening inside a batch, return a new proxy, to
@@ -297,7 +212,7 @@ export function getSyntaxProxy(config?: {
   }
 
   return createProxy([]);
-}
+};
 
 /**
  * Obtains a list of queries from a function by wrapping the queries into a context.
@@ -328,7 +243,11 @@ export const getBatchProxy = (
   // therefore return the respective `Proxy` instances, which wouldn't be logged as plain
   // objects, thereby making development more difficult. To avoid this, we are creating a
   // plain object containing the same properties as the `Proxy` instances.
-  return queries.map((details) => ({ ...details })) as Array<SyntaxItem<Query>>;
+  return queries.map((details) => {
+    const item = { structure: details.structure[QUERY_SYMBOLS.QUERY] };
+    if ('options' in details) item.options = details.options;
+    return item;
+  }) as Array<SyntaxItem<Query>>;
 };
 
 export { getProperty, setProperty } from '@/src/utils';

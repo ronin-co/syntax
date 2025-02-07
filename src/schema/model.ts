@@ -221,4 +221,28 @@ export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
  *
  * @returns The generated model definition.
  */
-export const model = getSyntaxProxy({});
+export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
+  model: Model<Fields>,
+): Expand<RoninFields & FieldsToTypes<Fields>> => {
+  const newModel = { ...model };
+
+  if (newModel.fields) {
+    newModel.fields = Object.entries(newModel.fields).map(([slug, rest]) => ({
+      slug,
+      ...rest,
+    }));
+  }
+
+  if (newModel.presets) {
+    newModel.presets = Object.entries(newModel.presets).map(([slug, rest]) => ({
+      slug,
+      ...rest,
+    }));
+  }
+
+  const finalModel = getSyntaxProxy()(newModel) as unknown as Expand<
+    RoninFields & FieldsToTypes<Fields>
+  >;
+
+  return finalModel.structure;
+};

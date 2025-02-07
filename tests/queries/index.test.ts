@@ -13,11 +13,11 @@ describe('syntax proxy', () => {
     const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
 
     const getProxy = getSyntaxProxy({
-      rootProperty: 'get',
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: getQueryHandlerSpy,
     });
     const addProxy = getSyntaxProxy({
-      rootProperty: 'add',
+      root: `${QUERY_SYMBOLS.QUERY}.add`,
       callback: (value) => {
         addQuery = value;
       },
@@ -26,13 +26,15 @@ describe('syntax proxy', () => {
     addProxy.accounts.with(() => getProxy.oldAccounts.selecting(['handle']));
 
     const finalQuery = {
-      add: {
-        accounts: {
-          with: {
-            [QUERY_SYMBOLS.QUERY]: {
-              get: {
-                oldAccounts: {
-                  selecting: ['handle'],
+      [QUERY_SYMBOLS.QUERY]: {
+        add: {
+          accounts: {
+            with: {
+              [QUERY_SYMBOLS.QUERY]: {
+                get: {
+                  oldAccounts: {
+                    selecting: ['handle'],
+                  },
                 },
               },
             },
@@ -49,7 +51,7 @@ describe('syntax proxy', () => {
     let getQuery: Query | undefined;
 
     const getProxy = getSyntaxProxy({
-      rootProperty: 'get',
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: (value) => {
         getQuery = value;
       },
@@ -61,29 +63,31 @@ describe('syntax proxy', () => {
     }));
 
     const finalQuery = {
-      get: {
-        member: {
-          including: {
-            account: {
-              __RONIN_QUERY: {
-                get: {
-                  account: {
-                    with: {
-                      id: {
-                        [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}account`,
+      [QUERY_SYMBOLS.QUERY]: {
+        get: {
+          member: {
+            including: {
+              account: {
+                __RONIN_QUERY: {
+                  get: {
+                    account: {
+                      with: {
+                        id: {
+                          [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}account`,
+                        },
                       },
                     },
                   },
                 },
               },
-            },
-            team: {
-              __RONIN_QUERY: {
-                get: {
-                  team: {
-                    with: {
-                      id: {
-                        [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}team`,
+              team: {
+                __RONIN_QUERY: {
+                  get: {
+                    team: {
+                      with: {
+                        id: {
+                          [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}team`,
+                        },
                       },
                     },
                   },
@@ -102,7 +106,7 @@ describe('syntax proxy', () => {
     let setQuery: Query | undefined;
 
     const setProxy = getSyntaxProxy({
-      rootProperty: 'set',
+      root: `${QUERY_SYMBOLS.QUERY}.set`,
       callback: (value) => {
         setQuery = value;
       },
@@ -113,11 +117,13 @@ describe('syntax proxy', () => {
     }));
 
     const finalQuery = {
-      set: {
-        accounts: {
-          to: {
-            name: {
-              [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}firstName, ' ', ${QUERY_SYMBOLS.FIELD}lastName)`,
+      [QUERY_SYMBOLS.QUERY]: {
+        set: {
+          accounts: {
+            to: {
+              name: {
+                [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}firstName, ' ', ${QUERY_SYMBOLS.FIELD}lastName)`,
+              },
             },
           },
         },
@@ -131,7 +137,7 @@ describe('syntax proxy', () => {
     let setQuery: Query | undefined;
 
     const setProxy = getSyntaxProxy({
-      rootProperty: 'set',
+      root: `${QUERY_SYMBOLS.QUERY}.set`,
       callback: (value) => {
         setQuery = value;
       },
@@ -146,10 +152,12 @@ describe('syntax proxy', () => {
     });
 
     const finalQuery = {
-      set: {
-        member: {
-          with: { id: '1234' },
-          to: { activeAt: date.toISOString() },
+      [QUERY_SYMBOLS.QUERY]: {
+        set: {
+          member: {
+            with: { id: '1234' },
+            to: { activeAt: date.toISOString() },
+          },
         },
       },
     };
@@ -161,7 +169,7 @@ describe('syntax proxy', () => {
     let setQuery: Query | undefined;
 
     const setProxy = getSyntaxProxy({
-      rootProperty: 'set',
+      root: `${QUERY_SYMBOLS.QUERY}.set`,
       callback: (value) => {
         setQuery = value;
       },
@@ -178,10 +186,12 @@ describe('syntax proxy', () => {
     });
 
     const finalQuery = {
-      set: {
-        account: {
-          with: { id: '1234' },
-          to: { avatar: file },
+      [QUERY_SYMBOLS.QUERY]: {
+        set: {
+          account: {
+            with: { id: '1234' },
+            to: { avatar: file },
+          },
         },
       },
     };
@@ -193,7 +203,7 @@ describe('syntax proxy', () => {
     let getQuery: Query | undefined;
 
     const getProxy = getSyntaxProxy({
-      rootProperty: 'get',
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: (value) => {
         getQuery = value;
       },
@@ -204,8 +214,10 @@ describe('syntax proxy', () => {
     });
 
     const finalQuery = {
-      get: {
-        accounts: {},
+      [QUERY_SYMBOLS.QUERY]: {
+        get: {
+          accounts: {},
+        },
       },
     };
 
@@ -218,7 +230,7 @@ describe('syntax proxy', () => {
     let getQuery: Query | undefined;
 
     const getProxy = getSyntaxProxy({
-      rootProperty: 'get',
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: (value) => {
         getQuery = value;
       },
@@ -227,10 +239,12 @@ describe('syntax proxy', () => {
     getProxy.accounts.with.name('test');
 
     const finalQuery = {
-      get: {
-        accounts: {
-          with: {
-            name: 'test',
+      [QUERY_SYMBOLS.QUERY]: {
+        get: {
+          accounts: {
+            with: {
+              name: 'test',
+            },
           },
         },
       },
@@ -243,7 +257,7 @@ describe('syntax proxy', () => {
     let createQuery: Query | undefined;
 
     const createProxy = getSyntaxProxy({
-      rootProperty: 'create',
+      root: `${QUERY_SYMBOLS.QUERY}.create`,
       callback: (value) => {
         createQuery = value;
       },
@@ -257,18 +271,20 @@ describe('syntax proxy', () => {
     });
 
     const finalQuery = {
-      create: {
-        model: {
-          slug: 'account',
-          fields: [
-            {
-              slug: 'name',
-              type: 'string',
-              defaultValue: {
-                __RONIN_EXPRESSION: "('Hello' || 'World')",
+      [QUERY_SYMBOLS.QUERY]: {
+        create: {
+          model: {
+            slug: 'account',
+            fields: [
+              {
+                slug: 'name',
+                type: 'string',
+                defaultValue: {
+                  __RONIN_EXPRESSION: "('Hello' || 'World')",
+                },
               },
-            },
-          ],
+            ],
+          },
         },
       },
     };
@@ -280,7 +296,7 @@ describe('syntax proxy', () => {
     let createQuery: Query | undefined;
 
     const createProxy = getSyntaxProxy({
-      rootProperty: 'create',
+      root: `${QUERY_SYMBOLS.QUERY}.create`,
       callback: (value) => {
         createQuery = value;
       },
@@ -294,18 +310,20 @@ describe('syntax proxy', () => {
     });
 
     const finalQuery = {
-      create: {
-        model: {
-          slug: 'account',
-          fields: [
-            {
-              slug: 'name',
-              type: 'string',
-              check: {
-                __RONIN_EXPRESSION: "(__RONIN_FIELD_name = 'World')",
+      [QUERY_SYMBOLS.QUERY]: {
+        create: {
+          model: {
+            slug: 'account',
+            fields: [
+              {
+                slug: 'name',
+                type: 'string',
+                check: {
+                  __RONIN_EXPRESSION: "(__RONIN_FIELD_name = 'World')",
+                },
               },
-            },
-          ],
+            ],
+          },
         },
       },
     };
@@ -317,7 +335,7 @@ describe('syntax proxy', () => {
     let createQuery: Query | undefined;
 
     const createProxy = getSyntaxProxy({
-      rootProperty: 'create',
+      root: `${QUERY_SYMBOLS.QUERY}.create`,
       callback: (value) => {
         createQuery = value;
       },
@@ -334,21 +352,23 @@ describe('syntax proxy', () => {
     });
 
     const finalQuery = {
-      create: {
-        model: {
-          slug: 'account',
-          fields: [
-            {
-              slug: 'name',
-              type: 'string',
-              computedAs: {
-                kind: 'VIRTUAL',
-                value: {
-                  __RONIN_EXPRESSION: "(__RONIN_FIELD_name || 'World')",
+      [QUERY_SYMBOLS.QUERY]: {
+        create: {
+          model: {
+            slug: 'account',
+            fields: [
+              {
+                slug: 'name',
+                type: 'string',
+                computedAs: {
+                  kind: 'VIRTUAL',
+                  value: {
+                    __RONIN_EXPRESSION: "(__RONIN_FIELD_name || 'World')",
+                  },
                 },
               },
-            },
-          ],
+            ],
+          },
         },
       },
     };
@@ -360,7 +380,7 @@ describe('syntax proxy', () => {
     let setQuery: Query | undefined;
 
     const setProxy = getSyntaxProxy({
-      rootProperty: 'set',
+      root: `${QUERY_SYMBOLS.QUERY}.set`,
       callback: (value) => {
         setQuery = value;
       },
@@ -373,16 +393,18 @@ describe('syntax proxy', () => {
     }));
 
     const finalQuery = {
-      set: {
-        accounts: {
-          to: {
-            name: {
-              [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}firstName, ' ', ${QUERY_SYMBOLS.FIELD}lastName)`,
+      [QUERY_SYMBOLS.QUERY]: {
+        set: {
+          accounts: {
+            to: {
+              name: {
+                [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}firstName, ' ', ${QUERY_SYMBOLS.FIELD}lastName)`,
+              },
+              email: {
+                [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}handle, '@site.co')`,
+              },
+              handle: 'newHandle',
             },
-            email: {
-              [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}handle, '@site.co')`,
-            },
-            handle: 'newHandle',
           },
         },
       },
@@ -392,7 +414,7 @@ describe('syntax proxy', () => {
   });
 
   test('using queries in batch', () => {
-    const get = getSyntaxProxy({ rootProperty: 'get' });
+    const get = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.get` });
 
     const queries = getBatchProxy(() => [get.account()]);
 
@@ -402,7 +424,7 @@ describe('syntax proxy', () => {
   });
 
   test('using options for query in batch', () => {
-    const get = getSyntaxProxy({ rootProperty: 'get' });
+    const get = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.get` });
 
     const queryList = getBatchProxy(() => [
       get.account(
@@ -432,7 +454,10 @@ describe('syntax proxy', () => {
   });
 
   test('using function chaining in batch', () => {
-    const getProxy = getSyntaxProxy({ rootProperty: 'get', callback: () => undefined });
+    const getProxy = getSyntaxProxy({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
+      callback: () => undefined,
+    });
 
     const queryList = getBatchProxy(() => [
       // Test queries where the second function is called right after the first one.
@@ -482,9 +507,9 @@ describe('syntax proxy', () => {
     // queries are executed standalone if no batch context is detected.
     const callback = () => undefined;
 
-    const addProxy = getSyntaxProxy({ rootProperty: 'add', callback });
-    const getProxy = getSyntaxProxy({ rootProperty: 'get', callback });
-    const alterProxy = getSyntaxProxy({ rootProperty: 'alter', callback });
+    const addProxy = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.add`, callback });
+    const getProxy = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.get`, callback });
+    const alterProxy = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.alter`, callback });
 
     const queryList = getBatchProxy(() => [
       addProxy.newUsers.with(() => getProxy.oldUsers()),
@@ -526,9 +551,12 @@ describe('syntax proxy', () => {
   test('using schema query types', () => {
     const callback = () => undefined;
 
-    const createProxy = getSyntaxProxy({ rootProperty: 'create', callback });
-    const alterProxy = getSyntaxProxy({ rootProperty: 'alter', callback });
-    const dropProxy = getSyntaxProxy({ rootProperty: 'drop', callback });
+    const createProxy = getSyntaxProxy({
+      root: `${QUERY_SYMBOLS.QUERY}.create`,
+      callback,
+    });
+    const alterProxy = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.alter`, callback });
+    const dropProxy = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.drop`, callback });
 
     const queryList = getBatchProxy(() => [
       createProxy.model({
@@ -629,7 +657,7 @@ describe('syntax proxy', () => {
     let getQuery: Query | undefined;
 
     const getProxy = getSyntaxProxy({
-      rootProperty: 'get',
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: (value) => {
         getQuery = value;
       },
@@ -638,8 +666,10 @@ describe('syntax proxy', () => {
     getProxy({ account: null });
 
     const finalQuery = {
-      get: {
-        account: null,
+      [QUERY_SYMBOLS.QUERY]: {
+        get: {
+          account: null,
+        },
       },
     };
 
@@ -650,7 +680,7 @@ describe('syntax proxy', () => {
     let createQuery: Query | undefined;
 
     const createProxy = getSyntaxProxy({
-      rootProperty: 'create',
+      root: `${QUERY_SYMBOLS.QUERY}.create`,
       callback: (value) => {
         createQuery = value;
       },
@@ -665,16 +695,18 @@ describe('syntax proxy', () => {
     });
 
     const finalQuery = {
-      create: {
-        model: {
-          slug: 'account',
-          fields: [
-            {
-              type: 'string',
-              slug: 'handle',
-              required: true,
-            },
-          ],
+      [QUERY_SYMBOLS.QUERY]: {
+        create: {
+          model: {
+            slug: 'account',
+            fields: [
+              {
+                type: 'string',
+                slug: 'handle',
+                required: true,
+              },
+            ],
+          },
         },
       },
     };
