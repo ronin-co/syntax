@@ -173,9 +173,7 @@ describe('syntax proxy', () => {
       callback: (value) => {
         setQuery = value;
       },
-      replacer: (value: unknown) => {
-        return value instanceof File ? value : JSON.parse(JSON.stringify(value));
-      },
+      replacer: (value: unknown) => (value instanceof File ? value : undefined),
     });
 
     const file = new File(['test'], 'test.txt');

@@ -49,7 +49,7 @@ let IN_BATCH = false;
 export const getSyntaxProxy = (config?: {
   root?: string;
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
-  replacer?: (value: unknown) => { value: unknown; serialize: boolean };
+  replacer?: (value: unknown) => unknown | undefined;
   propertyValue?: unknown;
 }) => {
   // The default value of a property within the composed structure.
@@ -61,49 +61,28 @@ export const getSyntaxProxy = (config?: {
     targetProps?: SyntaxItem,
     assign?: boolean,
   ) => {
-    const target = assign ? { ...targetProps } : () => undefined;
+    let target: object;
 
-    // @ts-expect-error Deleting this property is required for fields called `name`.
-    if (!assign) delete target.name;
+    if (assign) {
+      target = { ...targetProps };
+
+      Object.defineProperty(target, 'toJSON', {
+        value() {
+          return { ...this };
+        },
+        enumerable: false, // The property hould not appear during enumeration.
+      });
+    } else {
+      target = () => undefined;
+
+      // @ts-expect-error Deleting this property is required for fields called `name`.
+      delete target.name;
+    }
 
     return new Proxy(target, {
       apply(_: unknown, __: unknown, args: Array<any>) {
         let value = args[0];
         const options = args[1];
-
-        // If a function is provided as the argument for the query, call it and make
-        // all queries within it think they are running inside a batch transaction,
-        // in order to retrieve their serialized values.
-        if (typeof value === 'function') {
-          // Temporarily store the original value of `IN_BATCH`, so that we can resume it
-          // after the nested function has been called.
-          const ORIGINAL_IN_BATCH = IN_BATCH;
-
-          // Since `value()` is synchronous, `IN_BATCH` should not affect any other
-          // queries somewhere else in the app, even if those are run inside an
-          // asynchronous function.
-          IN_BATCH = true;
-
-          // A proxy object providing a property for every field of the model. It allows
-          // for referencing fields inside of an expression.
-          const fieldProxy = new Proxy(
-            {},
-            {
-              get(_target, property) {
-                const name = property.toString();
-
-                return {
-                  [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}${name}`,
-                };
-              },
-            },
-          );
-
-          value = value(fieldProxy);
-
-          // Restore the original value of `IN_BATCH`.
-          IN_BATCH = ORIGINAL_IN_BATCH;
-        }
 
         if (typeof value !== 'undefined') {
           // Serialize the value to ensure that the final structure can be sent over the
@@ -113,6 +92,40 @@ export const getSyntaxProxy = (config?: {
           value = mutateStructure(value, (value) => {
             // Never serialize `undefined` values, as they are not valid JSON.
             if (typeof value === 'undefined') return value;
+
+            // If a function is provided as the argument for the query, call it and make
+            // all queries within it think they are running inside a batch transaction,
+            // in order to retrieve their serialized values.
+            if (typeof value === 'function') {
+              // Temporarily store the original value of `IN_BATCH`, so that we can resume it
+              // after the nested function has been called.
+              const ORIGINAL_IN_BATCH = IN_BATCH;
+
+              // Since `value()` is synchronous, `IN_BATCH` should not affect any other
+              // queries somewhere else in the app, even if those are run inside an
+              // asynchronous function.
+              IN_BATCH = true;
+
+              // A proxy object providing a property for every field of the model. It allows
+              // for referencing fields inside of an expression.
+              const fieldProxy = new Proxy(
+                {},
+                {
+                  get(_target, property) {
+                    const name = property.toString();
+
+                    return {
+                      [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}${name}`,
+                    };
+                  },
+                },
+              );
+
+              value = value(fieldProxy);
+
+              // Restore the original value of `IN_BATCH`.
+              IN_BATCH = ORIGINAL_IN_BATCH;
+            }
 
             // If a custom replacer function was provided, serialize the value with it.
             if (config?.replacer) {

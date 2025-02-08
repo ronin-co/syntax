@@ -143,22 +143,29 @@ export const mutateStructure = (
   obj: NestedObject,
   callback: (value: unknown) => unknown,
 ) => {
-  // If it's not a plain object, return as-is (e.g., Date, Blob, etc.)
-  if (!isPlainObject(obj)) return obj;
-
-  for (const key in obj) {
-    if (Object.prototype.hasOwnProperty.call(obj, key)) {
-      if (isPlainObject(obj[key])) {
-        // Recursively mutate nested objects.
-        mutateStructure(obj[key] as NestedObject, callback);
-      } else if (Array.isArray(obj[key])) {
-        obj[key].map((item) => mutateStructure(item, callback));
-      } else {
-        // Call the mutation function for the value.
-        obj[key] = callback(obj[key]);
-      }
-    }
+  if (Array.isArray(obj)) {
+    obj.map((item) => mutateStructure(item, callback));
+    return obj;
   }
 
-  return obj; // Return the mutated object.
+  if (isPlainObject(obj)) {
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (isPlainObject(obj[key])) {
+          // Recursively mutate nested objects.
+          mutateStructure(obj[key] as NestedObject, callback);
+        } else if (Array.isArray(obj[key])) {
+          obj[key].map((item) => mutateStructure(item, callback));
+        } else {
+          // Call the mutation function for the value.
+          obj[key] = callback(obj[key]);
+        }
+      }
+    }
+
+    return obj;
+  }
+
+  // If it's not a plain object, return as-is (e.g., Date, Blob, etc.)
+  return callback(obj);
 };
