@@ -84,7 +84,9 @@ export const getSyntaxProxy = (config?: {
         let value = args[0];
         const options = args[1];
 
-        if (typeof value !== 'undefined') {
+        if (typeof value === 'undefined') {
+          value = propertyValue;
+        } else {
           // Serialize the value to ensure that the final structure can be sent over the
           // network and/or passed to the query compiler.
           //
@@ -144,12 +146,11 @@ export const getSyntaxProxy = (config?: {
         // same query, the existing query will be available as `target.structure`, and
         // we should extend it. If none is available, we should create a new query.
         const structure = { ...targetProps };
-        const targetValue = typeof value === 'undefined' ? propertyValue : value;
 
         const pathParts = config?.root ? [config.root, ...path] : path;
         const pathJoined = pathParts.length > 0 ? pathParts.join('.') : '.';
 
-        setProperty(structure, pathJoined, targetValue);
+        setProperty(structure, pathJoined, value);
 
         // If a `create.model` query was provided, serialize the model structure.
         if (
