@@ -1,5 +1,6 @@
+import type { Model } from '@/src/schema';
 import { mutateStructure, setProperty } from '@/src/utils';
-import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
+import { type ModelField, QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 /**
  * Utility type to convert a tuple of promises into a tuple of their resolved types.
@@ -96,24 +97,31 @@ export const getSyntaxProxy = (config?: {
         setProperty(structure, pathJoined, value);
 
         const isModelQuery = config?.root === `${QUERY_SYMBOLS.QUERY}.create`;
+        const modelQueryValue = structure?.[QUERY_SYMBOLS.QUERY]?.create?.model;
 
         // If a `create.model` query was provided or a `model` is being constructed,
         // serialize the model structure.
-        if (
-          (isModelQuery && structure?.[QUERY_SYMBOLS.QUERY]?.create?.model) ||
-          config?.modelType
-        ) {
-          const createdModel = isModelQuery
-            ? structure?.[QUERY_SYMBOLS.QUERY]?.create.model
-            : structure;
-
+        if ((isModelQuery && modelQueryValue) || config?.modelType) {
+          const createdModel = isModelQuery ? modelQueryValue : structure;
           const newModel = { ...createdModel };
 
           if (newModel.fields) {
-            newModel.fields = Object.entries(newModel.fields).map(([slug, rest]) => ({
-              slug,
-              ...rest,
-            }));
+            const formatFields = (
+              fields: Record<string, ModelField>,
+              parent?: string,
+            ): Array<ModelField> => {
+              return Object.entries(fields).flatMap(([slug, rest]) => {
+                if (rest.type) {
+                  return [
+                    { slug: parent ? `${parent}.${slug}` : slug, ...(rest as object) },
+                  ];
+                }
+
+                return formatFields(rest as unknown as Record<string, ModelField>, slug);
+              });
+            };
+
+            newModel.fields = formatFields(newModel.fields);
           }
 
           if (newModel.presets) {
@@ -128,8 +136,10 @@ export const getSyntaxProxy = (config?: {
           if (isModelQuery) {
             structure[QUERY_SYMBOLS.QUERY].create.model = newModel;
           } else {
-            if (newModel.fields) structure.fields = newModel.fields;
-            if (newModel.presets) structure.presets = newModel.presets;
+            const model = structure as Model;
+
+            if (newModel.fields) model.fields = newModel.fields;
+            if (newModel.presets) model.presets = newModel.presets;
           }
         }
 
