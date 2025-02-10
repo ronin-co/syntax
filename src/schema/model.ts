@@ -92,7 +92,9 @@ export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
   /**
    * Predefined query instructions that can be reused across multiple different queries.
    */
-  presets?: Record<string, GetInstructions | WithInstruction>;
+  presets?:
+    | Record<string, GetInstructions | WithInstruction>
+    | ((fields: keyof Fields) => Record<string, GetInstructions | WithInstruction>);
 }
 
 // This type maps the fields of a model to their types.

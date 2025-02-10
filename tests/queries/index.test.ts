@@ -3,7 +3,21 @@ import { describe, expect, spyOn, test } from 'bun:test';
 import { op } from '@/src/helpers/expressions';
 import { getBatchProxy, getSyntaxProxy } from '@/src/queries';
 import { concat, string } from '@/src/schema';
-import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
+import {
+  type AddQuery,
+  type AlterQuery,
+  type CreateQuery,
+  type DropQuery,
+  type GetQuery,
+  type Model,
+  type ModelField,
+  type ModelIndex,
+  type ModelPreset,
+  type ModelTrigger,
+  QUERY_SYMBOLS,
+  type Query,
+  type SetQuery,
+} from '@ronin/compiler';
 
 describe('syntax proxy', () => {
   test('using sub query', () => {
@@ -12,11 +26,11 @@ describe('syntax proxy', () => {
     const getQueryHandler = { callback: () => undefined };
     const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
 
-    const getProxy = getSyntaxProxy({
+    const getProxy = getSyntaxProxy<GetQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: getQueryHandlerSpy,
     });
-    const addProxy = getSyntaxProxy({
+    const addProxy = getSyntaxProxy<AddQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.add`,
       callback: (value) => {
         addQuery = value;
@@ -50,7 +64,7 @@ describe('syntax proxy', () => {
   test('using multiple sub queries', () => {
     let getQuery: Query | undefined;
 
-    const getProxy = getSyntaxProxy({
+    const getProxy = getSyntaxProxy<GetQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: (value) => {
         getQuery = value;
@@ -58,7 +72,9 @@ describe('syntax proxy', () => {
     });
 
     getProxy.member.including((f) => ({
+      // @ts-expect-error This will be improved shortly.
       account: getProxy.account.with.id(f.account),
+      // @ts-expect-error This will be improved shortly.
       team: getProxy.team.with.id(f.team),
     }));
 
@@ -105,7 +121,7 @@ describe('syntax proxy', () => {
   test('using field with expression', () => {
     let setQuery: Query | undefined;
 
-    const setProxy = getSyntaxProxy({
+    const setProxy = getSyntaxProxy<SetQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.set`,
       callback: (value) => {
         setQuery = value;
@@ -136,7 +152,7 @@ describe('syntax proxy', () => {
   test('using field with date', () => {
     let setQuery: Query | undefined;
 
-    const setProxy = getSyntaxProxy({
+    const setProxy = getSyntaxProxy<SetQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.set`,
       callback: (value) => {
         setQuery = value;
@@ -168,7 +184,7 @@ describe('syntax proxy', () => {
   test('using field with file', () => {
     let setQuery: Query | undefined;
 
-    const setProxy = getSyntaxProxy({
+    const setProxy = getSyntaxProxy<SetQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.set`,
       callback: (value) => {
         setQuery = value;
@@ -200,7 +216,7 @@ describe('syntax proxy', () => {
   test('using `undefined` instruction`', () => {
     let getQuery: Query | undefined;
 
-    const getProxy = getSyntaxProxy({
+    const getProxy = getSyntaxProxy<GetQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: (value) => {
         getQuery = value;
@@ -227,7 +243,7 @@ describe('syntax proxy', () => {
   test('using field with slug `name`', () => {
     let getQuery: Query | undefined;
 
-    const getProxy = getSyntaxProxy({
+    const getProxy = getSyntaxProxy<GetQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: (value) => {
         getQuery = value;
@@ -254,7 +270,7 @@ describe('syntax proxy', () => {
   test('using field with `defaultValue` expression', () => {
     let createQuery: Query | undefined;
 
-    const createProxy = getSyntaxProxy({
+    const createProxy = getSyntaxProxy<CreateQuery, Model>({
       root: `${QUERY_SYMBOLS.QUERY}.create`,
       callback: (value) => {
         createQuery = value;
@@ -265,7 +281,7 @@ describe('syntax proxy', () => {
       slug: 'account',
       fields: {
         name: string().defaultValue(() => op('Hello', '||', 'World')),
-      },
+      } as any,
     });
 
     const finalQuery = {
@@ -293,7 +309,7 @@ describe('syntax proxy', () => {
   test('using field with `check` expression', () => {
     let createQuery: Query | undefined;
 
-    const createProxy = getSyntaxProxy({
+    const createProxy = getSyntaxProxy<CreateQuery, Model>({
       root: `${QUERY_SYMBOLS.QUERY}.create`,
       callback: (value) => {
         createQuery = value;
@@ -304,7 +320,7 @@ describe('syntax proxy', () => {
       slug: 'account',
       fields: {
         name: string().check((fields) => op(fields.name, '=', 'World')),
-      },
+      } as any,
     });
 
     const finalQuery = {
@@ -332,7 +348,7 @@ describe('syntax proxy', () => {
   test('using field with `computedAs` expression', () => {
     let createQuery: Query | undefined;
 
-    const createProxy = getSyntaxProxy({
+    const createProxy = getSyntaxProxy<CreateQuery, Model>({
       root: `${QUERY_SYMBOLS.QUERY}.create`,
       callback: (value) => {
         createQuery = value;
@@ -346,7 +362,7 @@ describe('syntax proxy', () => {
           kind: 'VIRTUAL',
           value: op(fields.name, '||', 'World'),
         })),
-      },
+      } as any,
     });
 
     const finalQuery = {
@@ -377,7 +393,7 @@ describe('syntax proxy', () => {
   test('using multiple fields with expressions', () => {
     let setQuery: Query | undefined;
 
-    const setProxy = getSyntaxProxy({
+    const setProxy = getSyntaxProxy<SetQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.set`,
       callback: (value) => {
         setQuery = value;
@@ -412,9 +428,9 @@ describe('syntax proxy', () => {
   });
 
   test('using queries in batch', () => {
-    const get = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.get` });
+    const getProxy = getSyntaxProxy<GetQuery>({ root: `${QUERY_SYMBOLS.QUERY}.get` });
 
-    const queries = getBatchProxy(() => [get.account()]);
+    const queries = getBatchProxy(() => [getProxy.account()]);
 
     expect(queries.length === 1 ? { result: true } : null).toMatchObject({
       result: true,
@@ -422,10 +438,10 @@ describe('syntax proxy', () => {
   });
 
   test('using options for query in batch', () => {
-    const get = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.get` });
+    const getProxy = getSyntaxProxy<GetQuery>({ root: `${QUERY_SYMBOLS.QUERY}.get` });
 
     const queryList = getBatchProxy(() => [
-      get.account(
+      getProxy.account(
         {
           with: { handle: 'juri' },
         },
@@ -452,7 +468,7 @@ describe('syntax proxy', () => {
   });
 
   test('using function chaining in batch', () => {
-    const getProxy = getSyntaxProxy({
+    const getProxy = getSyntaxProxy<GetQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: () => undefined,
     });
@@ -505,9 +521,18 @@ describe('syntax proxy', () => {
     // queries are executed standalone if no batch context is detected.
     const callback = () => undefined;
 
-    const addProxy = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.add`, callback });
-    const getProxy = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.get`, callback });
-    const alterProxy = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.alter`, callback });
+    const addProxy = getSyntaxProxy<AddQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.add`,
+      callback,
+    });
+    const getProxy = getSyntaxProxy<GetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
+      callback,
+    });
+    const alterProxy = getSyntaxProxy<
+      AlterQuery,
+      Model | ModelField | ModelIndex | ModelTrigger | ModelPreset
+    >({ root: `${QUERY_SYMBOLS.QUERY}.alter`, callback });
 
     const queryList = getBatchProxy(() => [
       addProxy.newUsers.with(() => getProxy.oldUsers()),
@@ -549,12 +574,18 @@ describe('syntax proxy', () => {
   test('using schema query types', () => {
     const callback = () => undefined;
 
-    const createProxy = getSyntaxProxy({
+    const createProxy = getSyntaxProxy<CreateQuery, Model>({
       root: `${QUERY_SYMBOLS.QUERY}.create`,
       callback,
     });
-    const alterProxy = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.alter`, callback });
-    const dropProxy = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.drop`, callback });
+    const alterProxy = getSyntaxProxy<
+      AlterQuery,
+      Model | ModelField | ModelIndex | ModelTrigger | ModelPreset
+    >({ root: `${QUERY_SYMBOLS.QUERY}.alter`, callback });
+    const dropProxy = getSyntaxProxy<DropQuery, Model>({
+      root: `${QUERY_SYMBOLS.QUERY}.drop`,
+      callback,
+    });
 
     const queryList = getBatchProxy(() => [
       createProxy.model({
@@ -654,7 +685,7 @@ describe('syntax proxy', () => {
   test('using a function call at the root', () => {
     let getQuery: Query | undefined;
 
-    const getProxy = getSyntaxProxy({
+    const getProxy = getSyntaxProxy<GetQuery>({
       root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: (value) => {
         getQuery = value;
@@ -677,7 +708,7 @@ describe('syntax proxy', () => {
   test('creating a model via query using primitive helpers', () => {
     let createQuery: Query | undefined;
 
-    const createProxy = getSyntaxProxy({
+    const createProxy = getSyntaxProxy<CreateQuery, Model>({
       root: `${QUERY_SYMBOLS.QUERY}.create`,
       callback: (value) => {
         createQuery = value;
@@ -688,8 +719,8 @@ describe('syntax proxy', () => {
       slug: 'account',
 
       fields: {
-        handle: string().required() as any,
-      },
+        handle: string().required(),
+      } as any,
     });
 
     const finalQuery = {

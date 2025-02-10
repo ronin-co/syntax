@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { getSyntaxProxy } from '@/src/queries';
 import { blob, boolean, date, json, link, model, number, string } from '@/src/schema';
-import { QUERY_SYMBOLS } from '@ronin/compiler';
+import { type GetQuery, QUERY_SYMBOLS } from '@ronin/compiler';
 
 describe('models', () => {
   test('create empty model', () => {
@@ -628,7 +628,7 @@ describe('models', () => {
   });
 
   test('create model with presets including sub queries', () => {
-    const get = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.get` });
+    const getProxy = getSyntaxProxy<GetQuery>({ root: `${QUERY_SYMBOLS.QUERY}.get` });
 
     const Member = model({
       slug: 'member',
@@ -638,7 +638,8 @@ describe('models', () => {
       presets: (f) => ({
         account: {
           including: {
-            account: get.account.with.id(f.account),
+            // @ts-expect-error This will be improved shortly.
+            account: getProxy.account.with.id(f.account),
           },
         },
       }),

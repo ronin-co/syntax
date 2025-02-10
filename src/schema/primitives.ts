@@ -69,7 +69,9 @@ export type ModelFieldExpressions<Type> = {
   defaultValue?: (() => Type) | Type;
 };
 
-export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutput<Type>>;
+// export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutput<Type>>;
+export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutput<Type>> &
+  any;
 
 /**
  * Creates a primitive field definition returning an object that includes the field type
@@ -84,7 +86,7 @@ const primitive = <T extends ModelField['type']>(type: T) => {
     return getSyntaxProxy({ propertyValue: true })({
       ...initialAttributes,
       type,
-    }) as Chain<FieldOutput<T>>;
+    }) as unknown as Chain<FieldOutput<T>>;
   };
 };
 
