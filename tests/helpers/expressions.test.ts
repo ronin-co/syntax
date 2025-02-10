@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { op, wrapExpression, wrapExpressions } from '@/src/helpers/expressions';
+import { op } from '@/src/helpers/expressions';
 import {
   abs,
   json_insert,
@@ -449,60 +449,6 @@ describe('expressions', () => {
     // @ts-expect-error This exists
     expect(Test.fields[2].defaultValue).toEqual({
       __RONIN_EXPRESSION: 'abs((random() * (2 + 3)))',
-    });
-  });
-
-  test('wrap expressions', () => {
-    const input = {
-      simple: 'hello//.//world',
-      nested: {
-        value: 'foo//.//bar',
-        normal: 'unchanged',
-      },
-      array: [{ __RONIN_EXPRESSION: "'not' || 'wrapped'" }],
-      unchanged: 'no separator',
-    };
-
-    const result = wrapExpressions(input);
-
-    expect(result).toEqual({
-      simple: {
-        __RONIN_EXPRESSION: "'hello' || 'world'",
-      },
-      nested: {
-        value: {
-          __RONIN_EXPRESSION: "'foo' || 'bar'",
-        },
-        normal: 'unchanged',
-      },
-      array: {
-        '0': { __RONIN_EXPRESSION: "'not' || 'wrapped'" },
-      },
-      unchanged: 'no separator',
-    });
-
-    // Test with null/undefined values
-    const inputWithNull = {
-      nullValue: null,
-      undefinedValue: undefined,
-      nested: {
-        nullValue: null,
-        undefinedValue: undefined,
-      },
-    };
-    const resultWithNull = wrapExpressions(inputWithNull);
-    expect(resultWithNull).toEqual({
-      nullValue: null,
-      undefinedValue: undefined,
-      nested: {
-        nullValue: null,
-        undefinedValue: undefined,
-      },
-    });
-
-    // Test wrapExpression directly
-    expect(wrapExpression('hello//.//world')).toEqual({
-      __RONIN_EXPRESSION: "'hello' || 'world'",
     });
   });
 

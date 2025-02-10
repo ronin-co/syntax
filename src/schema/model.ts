@@ -1,3 +1,4 @@
+import { getSyntaxProxy } from '@/src/queries';
 import type {
   Chain,
   FieldOutput,
@@ -10,11 +11,6 @@ import type {
   number,
   string,
 } from '@/src/schema';
-import {
-  serializeFields,
-  serializePresets,
-  serializeTriggers,
-} from '@/src/utils/serializers';
 import type {
   GetInstructions,
   ModelField,
@@ -96,7 +92,9 @@ export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
   /**
    * Predefined query instructions that can be reused across multiple different queries.
    */
-  presets?: Record<string, GetInstructions | WithInstruction>;
+  presets?:
+    | Record<string, GetInstructions | WithInstruction>
+    | ((fields: keyof Fields) => Record<string, GetInstructions | WithInstruction>);
 }
 
 // This type maps the fields of a model to their types.
@@ -162,27 +160,9 @@ type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
  * @returns The generated model definition.
  */
 export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
-  model: Model<Fields>,
+  model: Model<Fields> | (() => Model<Fields>),
 ): Expand<RoninFields & FieldsToTypes<Fields>> => {
-  const newModel = { ...model };
-
-  if (newModel.fields) {
-    newModel.fields = serializeFields(
-      newModel.fields as RecordWithoutForbiddenKeys<PrimitivesItem>,
-    ) as unknown as typeof newModel.fields;
-  }
-
-  if (newModel.triggers) {
-    newModel.triggers = serializeTriggers(
-      newModel.triggers,
-    ) as unknown as typeof newModel.triggers;
-  }
-
-  if (newModel.presets) {
-    newModel.presets = serializePresets(
-      newModel.presets,
-    ) as unknown as typeof newModel.presets;
-  }
-
-  return newModel as unknown as Expand<RoninFields & FieldsToTypes<Fields>>;
+  return getSyntaxProxy({ modelType: true })(model) as unknown as Expand<
+    RoninFields & FieldsToTypes<Fields>
+  >;
 };

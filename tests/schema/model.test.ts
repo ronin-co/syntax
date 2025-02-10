@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'bun:test';
 import { getSyntaxProxy } from '@/src/queries';
 import { blob, boolean, date, json, link, model, number, string } from '@/src/schema';
+import { type GetQuery, QUERY_SYMBOLS } from '@ronin/compiler';
 
 describe('models', () => {
   test('create empty model', () => {
@@ -533,9 +534,9 @@ describe('models', () => {
   });
 
   test('create model with triggers', () => {
-    const add = getSyntaxProxy({ rootProperty: 'add' });
+    const add = getSyntaxProxy({ root: `${QUERY_SYMBOLS.QUERY}.add` });
 
-    const Account = model({
+    const Account = model(() => ({
       slug: 'account',
       pluralSlug: 'accounts',
       name: 'Account',
@@ -548,10 +549,11 @@ describe('models', () => {
           when: 'AFTER',
           fields: [{ slug: 'name' }],
           // @ts-expect-error: The queries need to be adjusted in the TS client.
-          effects: () => [add.account.with({ name: 'Lorena' })],
+          effects: [add.account.with({ name: 'Lorena' })],
         },
       ],
-    });
+    }));
+
     expect(Account).toBeTypeOf('object');
     // @ts-expect-error: The Account object has 'fields'.
     expect(Account.fields).toHaveLength(1);
@@ -574,10 +576,12 @@ describe('models', () => {
           when: 'AFTER',
           effects: [
             {
-              add: {
-                account: {
-                  with: {
-                    name: 'Lorena',
+              [QUERY_SYMBOLS.QUERY]: {
+                add: {
+                  account: {
+                    with: {
+                      name: 'Lorena',
+                    },
                   },
                 },
               },
@@ -617,6 +621,58 @@ describe('models', () => {
               },
             },
             selecting: ['name'],
+          },
+        },
+      ],
+    });
+  });
+
+  test('create model with presets including sub queries', () => {
+    const getProxy = getSyntaxProxy<GetQuery>({ root: `${QUERY_SYMBOLS.QUERY}.get` });
+
+    const Member = model({
+      slug: 'member',
+      fields: {
+        account: string(),
+      },
+      presets: (f) => ({
+        account: {
+          including: {
+            // @ts-expect-error This will be improved shortly.
+            account: getProxy.account.with.id(f.account),
+          },
+        },
+      }),
+    });
+
+    expect(Member).toEqual({
+      // @ts-expect-error: The Account object has 'slug'.
+      slug: 'member',
+      fields: [
+        {
+          slug: 'account',
+          type: 'string',
+        },
+      ],
+      presets: [
+        {
+          slug: 'account',
+          instructions: {
+            including: {
+              account: {
+                [QUERY_SYMBOLS.QUERY]: {
+                  get: {
+                    account: {
+                      with: {
+                        id: {
+                          [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}account`,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
       ],

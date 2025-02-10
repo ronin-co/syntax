@@ -2,37 +2,53 @@ import { describe, expect, spyOn, test } from 'bun:test';
 
 import { op } from '@/src/helpers/expressions';
 import { getBatchProxy, getSyntaxProxy } from '@/src/queries';
-import { string } from '@/src/schema';
-import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
+import { concat, string } from '@/src/schema';
+import {
+  type AddQuery,
+  type AlterQuery,
+  type CreateQuery,
+  type DropQuery,
+  type GetQuery,
+  type Model,
+  type ModelField,
+  type ModelIndex,
+  type ModelPreset,
+  type ModelTrigger,
+  QUERY_SYMBOLS,
+  type Query,
+  type SetQuery,
+} from '@ronin/compiler';
 
 describe('syntax proxy', () => {
   test('using sub query', () => {
-    let query: Query | undefined;
+    let addQuery: Query | undefined;
 
     const getQueryHandler = { callback: () => undefined };
     const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
 
-    const getProxy = getSyntaxProxy({
-      rootProperty: 'get',
+    const getProxy = getSyntaxProxy<GetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: getQueryHandlerSpy,
     });
-    const addProxy = getSyntaxProxy({
-      rootProperty: 'add',
+    const addProxy = getSyntaxProxy<AddQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.add`,
       callback: (value) => {
-        query = value;
+        addQuery = value;
       },
     });
 
     addProxy.accounts.with(() => getProxy.oldAccounts.selecting(['handle']));
 
     const finalQuery = {
-      add: {
-        accounts: {
-          with: {
-            __RONIN_QUERY: {
-              get: {
-                oldAccounts: {
-                  selecting: ['handle'],
+      [QUERY_SYMBOLS.QUERY]: {
+        add: {
+          accounts: {
+            with: {
+              [QUERY_SYMBOLS.QUERY]: {
+                get: {
+                  oldAccounts: {
+                    selecting: ['handle'],
+                  },
                 },
               },
             },
@@ -42,42 +58,102 @@ describe('syntax proxy', () => {
     };
 
     expect(getQueryHandlerSpy).not.toHaveBeenCalled();
-    expect(query).toMatchObject(finalQuery);
+    expect(addQuery).toMatchObject(finalQuery);
   });
 
-  test('using field with expression', () => {
-    const setQueryHandler = { callback: () => undefined };
-    const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
+  test('using multiple sub queries', () => {
+    let getQuery: Query | undefined;
 
-    const setProxy = getSyntaxProxy({
-      rootProperty: 'set',
-      callback: setQueryHandlerSpy,
+    const getProxy = getSyntaxProxy<GetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
+      callback: (value) => {
+        getQuery = value;
+      },
     });
 
-    setProxy.accounts.to.name(
-      (f: Record<string, unknown>) => `${f.firstName} ${f.lastName}`,
-    );
+    getProxy.member.including((f) => ({
+      // @ts-expect-error This will be improved shortly.
+      account: getProxy.account.with.id(f.account),
+      // @ts-expect-error This will be improved shortly.
+      team: getProxy.team.with.id(f.team),
+    }));
 
     const finalQuery = {
-      set: {
-        accounts: {
-          to: {
-            name: {
-              [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}firstName || ' ' || ${QUERY_SYMBOLS.FIELD}lastName`,
+      [QUERY_SYMBOLS.QUERY]: {
+        get: {
+          member: {
+            including: {
+              account: {
+                __RONIN_QUERY: {
+                  get: {
+                    account: {
+                      with: {
+                        id: {
+                          [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}account`,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
+              team: {
+                __RONIN_QUERY: {
+                  get: {
+                    team: {
+                      with: {
+                        id: {
+                          [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}team`,
+                        },
+                      },
+                    },
+                  },
+                },
+              },
             },
           },
         },
       },
     };
 
-    expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(getQuery).toMatchObject(finalQuery);
+  });
+
+  test('using field with expression', () => {
+    let setQuery: Query | undefined;
+
+    const setProxy = getSyntaxProxy<SetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.set`,
+      callback: (value) => {
+        setQuery = value;
+      },
+    });
+
+    setProxy.accounts.to((f) => ({
+      name: concat(f.firstName, ' ', f.lastName),
+    }));
+
+    const finalQuery = {
+      [QUERY_SYMBOLS.QUERY]: {
+        set: {
+          accounts: {
+            to: {
+              name: {
+                [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}firstName, ' ', ${QUERY_SYMBOLS.FIELD}lastName)`,
+              },
+            },
+          },
+        },
+      },
+    };
+
+    expect(setQuery).toMatchObject(finalQuery);
   });
 
   test('using field with date', () => {
     let setQuery: Query | undefined;
 
-    const setProxy = getSyntaxProxy({
-      rootProperty: 'set',
+    const setProxy = getSyntaxProxy<SetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.set`,
       callback: (value) => {
         setQuery = value;
       },
@@ -92,30 +168,28 @@ describe('syntax proxy', () => {
     });
 
     const finalQuery = {
-      set: {
-        member: {
-          with: { id: '1234' },
-          to: { activeAt: date.toISOString() },
+      [QUERY_SYMBOLS.QUERY]: {
+        set: {
+          member: {
+            with: { id: '1234' },
+            to: { activeAt: date.toISOString() },
+          },
         },
       },
     };
 
-    // It's important to assert the object directly here, because `toHaveBeenCalledWith`
-    // does not work correctly with `Date` objects.
     expect(setQuery).toMatchObject(finalQuery);
   });
 
   test('using field with file', () => {
     let setQuery: Query | undefined;
 
-    const setProxy = getSyntaxProxy({
-      rootProperty: 'set',
+    const setProxy = getSyntaxProxy<SetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.set`,
       callback: (value) => {
         setQuery = value;
       },
-      replacer: (value: unknown) => {
-        return value instanceof File ? value : JSON.parse(JSON.stringify(value));
-      },
+      replacer: (value: unknown) => (value instanceof File ? value : undefined),
     });
 
     const file = new File(['test'], 'test.txt');
@@ -126,24 +200,24 @@ describe('syntax proxy', () => {
     });
 
     const finalQuery = {
-      set: {
-        account: {
-          with: { id: '1234' },
-          to: { avatar: file },
+      [QUERY_SYMBOLS.QUERY]: {
+        set: {
+          account: {
+            with: { id: '1234' },
+            to: { avatar: file },
+          },
         },
       },
     };
 
-    // It's important to assert the object directly here, because `toHaveBeenCalledWith`
-    // does not work correctly with `File` objects.
     expect(setQuery).toMatchObject(finalQuery);
   });
 
   test('using `undefined` instruction`', () => {
     let getQuery: Query | undefined;
 
-    const getProxy = getSyntaxProxy({
-      rootProperty: 'get',
+    const getProxy = getSyntaxProxy<GetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
       callback: (value) => {
         getQuery = value;
       },
@@ -154,8 +228,10 @@ describe('syntax proxy', () => {
     });
 
     const finalQuery = {
-      get: {
-        accounts: {},
+      [QUERY_SYMBOLS.QUERY]: {
+        get: {
+          accounts: {},
+        },
       },
     };
 
@@ -165,108 +241,118 @@ describe('syntax proxy', () => {
   // Since `name` is a native property of functions and queries contain function calls,
   // we have to explicitly assert whether it can be used as a field slug.
   test('using field with slug `name`', () => {
-    const getQueryHandler = { callback: () => undefined };
-    const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
+    let getQuery: Query | undefined;
 
-    const getProxy = getSyntaxProxy({
-      rootProperty: 'get',
-      callback: getQueryHandlerSpy,
+    const getProxy = getSyntaxProxy<GetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
+      callback: (value) => {
+        getQuery = value;
+      },
     });
 
     getProxy.accounts.with.name('test');
 
     const finalQuery = {
-      get: {
-        accounts: {
-          with: {
-            name: 'test',
+      [QUERY_SYMBOLS.QUERY]: {
+        get: {
+          accounts: {
+            with: {
+              name: 'test',
+            },
           },
         },
       },
     };
 
-    expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(getQuery).toMatchObject(finalQuery);
   });
 
   test('using field with `defaultValue` expression', () => {
-    const createQueryHandler = { callback: () => undefined };
-    const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
+    let createQuery: Query | undefined;
 
-    const createProxy = getSyntaxProxy({
-      rootProperty: 'create',
-      callback: createQueryHandlerSpy,
+    const createProxy = getSyntaxProxy<CreateQuery, Model>({
+      root: `${QUERY_SYMBOLS.QUERY}.create`,
+      callback: (value) => {
+        createQuery = value;
+      },
     });
 
     createProxy.model({
       slug: 'account',
       fields: {
         name: string().defaultValue(() => op('Hello', '||', 'World')),
-      },
+      } as any,
     });
 
     const finalQuery = {
-      create: {
-        model: {
-          slug: 'account',
-          fields: [
-            {
-              slug: 'name',
-              type: 'string',
-              defaultValue: {
-                __RONIN_EXPRESSION: "('Hello' || 'World')",
+      [QUERY_SYMBOLS.QUERY]: {
+        create: {
+          model: {
+            slug: 'account',
+            fields: [
+              {
+                slug: 'name',
+                type: 'string',
+                defaultValue: {
+                  __RONIN_EXPRESSION: "('Hello' || 'World')",
+                },
               },
-            },
-          ],
+            ],
+          },
         },
       },
     };
 
-    expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(createQuery).toMatchObject(finalQuery);
   });
 
   test('using field with `check` expression', () => {
-    const createQueryHandler = { callback: () => undefined };
-    const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
+    let createQuery: Query | undefined;
 
-    const createProxy = getSyntaxProxy({
-      rootProperty: 'create',
-      callback: createQueryHandlerSpy,
+    const createProxy = getSyntaxProxy<CreateQuery, Model>({
+      root: `${QUERY_SYMBOLS.QUERY}.create`,
+      callback: (value) => {
+        createQuery = value;
+      },
     });
 
     createProxy.model({
       slug: 'account',
       fields: {
         name: string().check((fields) => op(fields.name, '=', 'World')),
-      },
+      } as any,
     });
 
     const finalQuery = {
-      create: {
-        model: {
-          slug: 'account',
-          fields: [
-            {
-              slug: 'name',
-              type: 'string',
-              check: {
-                __RONIN_EXPRESSION: "(__RONIN_FIELD_name = 'World')",
+      [QUERY_SYMBOLS.QUERY]: {
+        create: {
+          model: {
+            slug: 'account',
+            fields: [
+              {
+                slug: 'name',
+                type: 'string',
+                check: {
+                  __RONIN_EXPRESSION: "(__RONIN_FIELD_name = 'World')",
+                },
               },
-            },
-          ],
+            ],
+          },
         },
       },
     };
 
-    expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(createQuery).toMatchObject(finalQuery);
   });
 
   test('using field with `computedAs` expression', () => {
-    const createQueryHandler = { callback: () => undefined };
-    const createQueryHandlerSpy = spyOn(createQueryHandler, 'callback');
+    let createQuery: Query | undefined;
 
-    const createProxy = getSyntaxProxy({
-      rootProperty: 'create',
-      callback: createQueryHandlerSpy,
+    const createProxy = getSyntaxProxy<CreateQuery, Model>({
+      root: `${QUERY_SYMBOLS.QUERY}.create`,
+      callback: (value) => {
+        createQuery = value;
+      },
     });
 
     createProxy.model({
@@ -276,70 +362,75 @@ describe('syntax proxy', () => {
           kind: 'VIRTUAL',
           value: op(fields.name, '||', 'World'),
         })),
-      },
+      } as any,
     });
 
     const finalQuery = {
-      create: {
-        model: {
-          slug: 'account',
-          fields: [
-            {
-              slug: 'name',
-              type: 'string',
-              computedAs: {
-                kind: 'VIRTUAL',
-                value: {
-                  __RONIN_EXPRESSION: "(__RONIN_FIELD_name || 'World')",
+      [QUERY_SYMBOLS.QUERY]: {
+        create: {
+          model: {
+            slug: 'account',
+            fields: [
+              {
+                slug: 'name',
+                type: 'string',
+                computedAs: {
+                  kind: 'VIRTUAL',
+                  value: {
+                    __RONIN_EXPRESSION: "(__RONIN_FIELD_name || 'World')",
+                  },
                 },
               },
-            },
-          ],
-        },
-      },
-    };
-
-    expect(createQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
-  });
-
-  test('using multiple fields with expressions', () => {
-    const setQueryHandler = { callback: () => undefined };
-    const setQueryHandlerSpy = spyOn(setQueryHandler, 'callback');
-
-    const setProxy = getSyntaxProxy({
-      rootProperty: 'set',
-      callback: setQueryHandlerSpy,
-    });
-
-    setProxy.accounts.to((f: Record<string, unknown>) => ({
-      name: `${f.firstName} ${f.lastName}`,
-      email: `${f.handle}@site.co`,
-      handle: 'newHandle',
-    }));
-
-    const finalQuery = {
-      set: {
-        accounts: {
-          to: {
-            name: {
-              [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}firstName || ' ' || ${QUERY_SYMBOLS.FIELD}lastName`,
-            },
-            email: {
-              [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}handle || '@site.co'`,
-            },
-            handle: 'newHandle',
+            ],
           },
         },
       },
     };
 
-    expect(setQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(createQuery).toMatchObject(finalQuery);
+  });
+
+  test('using multiple fields with expressions', () => {
+    let setQuery: Query | undefined;
+
+    const setProxy = getSyntaxProxy<SetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.set`,
+      callback: (value) => {
+        setQuery = value;
+      },
+    });
+
+    setProxy.accounts.to((f: Record<string, unknown>) => ({
+      name: concat(f.firstName, ' ', f.lastName),
+      email: concat(f.handle, '@site.co'),
+      handle: 'newHandle',
+    }));
+
+    const finalQuery = {
+      [QUERY_SYMBOLS.QUERY]: {
+        set: {
+          accounts: {
+            to: {
+              name: {
+                [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}firstName, ' ', ${QUERY_SYMBOLS.FIELD}lastName)`,
+              },
+              email: {
+                [QUERY_SYMBOLS.EXPRESSION]: `concat(${QUERY_SYMBOLS.FIELD}handle, '@site.co')`,
+              },
+              handle: 'newHandle',
+            },
+          },
+        },
+      },
+    };
+
+    expect(setQuery).toMatchObject(finalQuery);
   });
 
   test('using queries in batch', () => {
-    const get = getSyntaxProxy({ rootProperty: 'get' });
+    const getProxy = getSyntaxProxy<GetQuery>({ root: `${QUERY_SYMBOLS.QUERY}.get` });
 
-    const queries = getBatchProxy(() => [get.account()]);
+    const queries = getBatchProxy(() => [getProxy.account()]);
 
     expect(queries.length === 1 ? { result: true } : null).toMatchObject({
       result: true,
@@ -347,10 +438,10 @@ describe('syntax proxy', () => {
   });
 
   test('using options for query in batch', () => {
-    const get = getSyntaxProxy({ rootProperty: 'get' });
+    const getProxy = getSyntaxProxy<GetQuery>({ root: `${QUERY_SYMBOLS.QUERY}.get` });
 
     const queryList = getBatchProxy(() => [
-      get.account(
+      getProxy.account(
         {
           with: { handle: 'juri' },
         },
@@ -377,7 +468,10 @@ describe('syntax proxy', () => {
   });
 
   test('using function chaining in batch', () => {
-    const getProxy = getSyntaxProxy({ rootProperty: 'get', callback: () => undefined });
+    const getProxy = getSyntaxProxy<GetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
+      callback: () => undefined,
+    });
 
     const queryList = getBatchProxy(() => [
       // Test queries where the second function is called right after the first one.
@@ -427,9 +521,18 @@ describe('syntax proxy', () => {
     // queries are executed standalone if no batch context is detected.
     const callback = () => undefined;
 
-    const addProxy = getSyntaxProxy({ rootProperty: 'add', callback });
-    const getProxy = getSyntaxProxy({ rootProperty: 'get', callback });
-    const alterProxy = getSyntaxProxy({ rootProperty: 'alter', callback });
+    const addProxy = getSyntaxProxy<AddQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.add`,
+      callback,
+    });
+    const getProxy = getSyntaxProxy<GetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
+      callback,
+    });
+    const alterProxy = getSyntaxProxy<
+      AlterQuery,
+      Model | ModelField | ModelIndex | ModelTrigger | ModelPreset
+    >({ root: `${QUERY_SYMBOLS.QUERY}.alter`, callback });
 
     const queryList = getBatchProxy(() => [
       addProxy.newUsers.with(() => getProxy.oldUsers()),
@@ -471,9 +574,18 @@ describe('syntax proxy', () => {
   test('using schema query types', () => {
     const callback = () => undefined;
 
-    const createProxy = getSyntaxProxy({ rootProperty: 'create', callback });
-    const alterProxy = getSyntaxProxy({ rootProperty: 'alter', callback });
-    const dropProxy = getSyntaxProxy({ rootProperty: 'drop', callback });
+    const createProxy = getSyntaxProxy<CreateQuery, Model>({
+      root: `${QUERY_SYMBOLS.QUERY}.create`,
+      callback,
+    });
+    const alterProxy = getSyntaxProxy<
+      AlterQuery,
+      Model | ModelField | ModelIndex | ModelTrigger | ModelPreset
+    >({ root: `${QUERY_SYMBOLS.QUERY}.alter`, callback });
+    const dropProxy = getSyntaxProxy<DropQuery, Model>({
+      root: `${QUERY_SYMBOLS.QUERY}.drop`,
+      callback,
+    });
 
     const queryList = getBatchProxy(() => [
       createProxy.model({
@@ -571,57 +683,63 @@ describe('syntax proxy', () => {
   });
 
   test('using a function call at the root', () => {
-    const getQueryHandler = { callback: () => undefined };
-    const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
+    let getQuery: Query | undefined;
 
-    const getProxy = getSyntaxProxy({
-      rootProperty: 'get',
-      callback: getQueryHandlerSpy,
+    const getProxy = getSyntaxProxy<GetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
+      callback: (value) => {
+        getQuery = value;
+      },
     });
 
     getProxy({ account: null });
 
     const finalQuery = {
-      get: {
-        account: null,
+      [QUERY_SYMBOLS.QUERY]: {
+        get: {
+          account: null,
+        },
       },
     };
 
-    expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(getQuery).toMatchObject(finalQuery);
   });
 
   test('creating a model via query using primitive helpers', () => {
-    const getQueryHandler = { callback: () => undefined };
-    const getQueryHandlerSpy = spyOn(getQueryHandler, 'callback');
+    let createQuery: Query | undefined;
 
-    const createProxy = getSyntaxProxy({
-      rootProperty: 'create',
-      callback: getQueryHandlerSpy,
+    const createProxy = getSyntaxProxy<CreateQuery, Model>({
+      root: `${QUERY_SYMBOLS.QUERY}.create`,
+      callback: (value) => {
+        createQuery = value;
+      },
     });
 
     createProxy.model({
       slug: 'account',
 
       fields: {
-        handle: string().required() as any,
-      },
+        handle: string().required(),
+      } as any,
     });
 
     const finalQuery = {
-      create: {
-        model: {
-          slug: 'account',
-          fields: [
-            {
-              type: 'string',
-              slug: 'handle',
-              required: true,
-            },
-          ],
+      [QUERY_SYMBOLS.QUERY]: {
+        create: {
+          model: {
+            slug: 'account',
+            fields: [
+              {
+                type: 'string',
+                slug: 'handle',
+                required: true,
+              },
+            ],
+          },
         },
       },
     };
 
-    expect(getQueryHandlerSpy).toHaveBeenCalledWith(finalQuery, undefined);
+    expect(createQuery).toMatchObject(finalQuery);
   });
 });
