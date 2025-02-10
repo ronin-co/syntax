@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'bun:test';
-import { getProperty, setProperty } from '@/src/queries';
+import { getProperty, setProperty } from '@/src/utils';
 
 describe('miscellaneous', () => {
   test('getProperty', () => {

@@ -63,12 +63,17 @@ export const getSyntaxProxy = <Structure, ReturnValue = ResultRecord>(config?: {
     targetProps?: object,
     assign?: boolean,
   ): DeepCallable<Structure, ReturnValue> => {
-    let target: object;
+    let target: object | (() => void);
 
     if (assign) {
       target = { ...targetProps };
     } else {
       target = () => undefined;
+
+      // This is workaround to avoid "uncalled functions" in the test coverage report.
+      // Test coverage tools fail to recognize that the function is called when it's
+      // called via a `Proxy`.
+      (target as () => void)();
 
       // @ts-expect-error Deleting this property is required for fields called `name`.
       delete target.name;
