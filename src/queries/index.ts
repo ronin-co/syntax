@@ -95,16 +95,17 @@ export const getSyntaxProxy = (config?: {
 
         setProperty(structure, pathJoined, value);
 
-        // If a `create.model` query was provided, serialize the model structure.
+        const isModelQuery = config?.root === `${QUERY_SYMBOLS.QUERY}.create`;
+
+        // If a `create.model` query was provided or a `model` is being constructed,
+        // serialize the model structure.
         if (
-          (config?.root === `${QUERY_SYMBOLS.QUERY}.create` &&
-            structure?.[QUERY_SYMBOLS.QUERY]?.create?.model) ||
+          (isModelQuery && structure?.[QUERY_SYMBOLS.QUERY]?.create?.model) ||
           config?.modelType
         ) {
-          const createdModel =
-            config?.root === `${QUERY_SYMBOLS.QUERY}.create`
-              ? structure?.[QUERY_SYMBOLS.QUERY]?.create.model
-              : structure;
+          const createdModel = isModelQuery
+            ? structure?.[QUERY_SYMBOLS.QUERY]?.create.model
+            : structure;
 
           const newModel = { ...createdModel };
 
@@ -124,7 +125,7 @@ export const getSyntaxProxy = (config?: {
             );
           }
 
-          if (config?.root === `${QUERY_SYMBOLS.QUERY}.create`) {
+          if (isModelQuery) {
             structure[QUERY_SYMBOLS.QUERY].create.model = newModel;
           } else {
             if (newModel.fields) structure.fields = newModel.fields;
