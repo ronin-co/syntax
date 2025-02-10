@@ -65,13 +65,6 @@ export const getSyntaxProxy = (config?: {
 
     if (assign) {
       target = { ...targetProps };
-
-      Object.defineProperty(target, 'toJSON', {
-        value() {
-          return { ...this };
-        },
-        enumerable: false, // The property hould not appear during enumeration.
-      });
     } else {
       target = () => undefined;
 
@@ -138,6 +131,9 @@ export const getSyntaxProxy = (config?: {
         if (Object.hasOwn(target, nextProp)) {
           return Reflect.get(target, nextProp, receiver);
         }
+
+        // Allow for serializing the current target structure.
+        if (nextProp === 'toJSON') return targetProps;
 
         // If the target object does not have a matching static property, return a
         // new proxy, to allow for chaining `get` accessors.
