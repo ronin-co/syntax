@@ -554,7 +554,6 @@ describe('models', () => {
       ],
     }));
 
-    console.log('ACCOUNT', Account);
     expect(Account).toBeTypeOf('object');
     // @ts-expect-error: The Account object has 'fields'.
     expect(Account.fields).toHaveLength(1);
@@ -577,10 +576,12 @@ describe('models', () => {
           when: 'AFTER',
           effects: [
             {
-              add: {
-                account: {
-                  with: {
-                    name: 'Lorena',
+              [QUERY_SYMBOLS.QUERY]: {
+                add: {
+                  account: {
+                    with: {
+                      name: 'Lorena',
+                    },
                   },
                 },
               },

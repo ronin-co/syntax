@@ -1,4 +1,3 @@
-import { model } from '@/src/schema';
 import { mutateStructure, setProperty } from '@/src/utils';
 import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
@@ -51,6 +50,7 @@ export const getSyntaxProxy = (config?: {
   callback?: (query: Query, options?: Record<string, unknown>) => Promise<any> | any;
   replacer?: (value: unknown) => unknown | undefined;
   propertyValue?: unknown;
+  modelType?: boolean;
 }) => {
   // The default value of a property within the composed structure.
   const propertyValue =
@@ -97,12 +97,39 @@ export const getSyntaxProxy = (config?: {
 
         // If a `create.model` query was provided, serialize the model structure.
         if (
-          config?.root === `${QUERY_SYMBOLS.QUERY}.create` &&
-          structure?.[QUERY_SYMBOLS.QUERY]?.create?.model
+          (config?.root === `${QUERY_SYMBOLS.QUERY}.create` &&
+            structure?.[QUERY_SYMBOLS.QUERY]?.create?.model) ||
+          config?.modelType
         ) {
-          structure[QUERY_SYMBOLS.QUERY].create.model = model(
-            structure?.[QUERY_SYMBOLS.QUERY]?.create.model,
-          );
+          const createdModel =
+            config?.root === `${QUERY_SYMBOLS.QUERY}.create`
+              ? structure?.[QUERY_SYMBOLS.QUERY]?.create.model
+              : structure;
+
+          const newModel = { ...createdModel };
+
+          if (newModel.fields) {
+            newModel.fields = Object.entries(newModel.fields).map(([slug, rest]) => ({
+              slug,
+              ...rest,
+            }));
+          }
+
+          if (newModel.presets) {
+            newModel.presets = Object.entries(newModel.presets).map(
+              ([slug, instructions]) => ({
+                slug,
+                instructions,
+              }),
+            );
+          }
+
+          if (config?.root === `${QUERY_SYMBOLS.QUERY}.create`) {
+            structure[QUERY_SYMBOLS.QUERY].create.model = newModel;
+          } else {
+            if (newModel.fields) structure.fields = newModel.fields;
+            if (newModel.presets) structure.presets = newModel.presets;
+          }
         }
 
         // If the function call is happening inside a batch, return a new proxy, to

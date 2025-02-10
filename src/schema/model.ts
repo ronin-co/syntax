@@ -160,25 +160,7 @@ type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
 export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
   model: Model<Fields> | (() => Model<Fields>),
 ): Expand<RoninFields & FieldsToTypes<Fields>> => {
-  const newModel = { ...model };
-
-  if (newModel.fields) {
-    newModel.fields = Object.entries(newModel.fields).map(([slug, rest]) => ({
-      slug,
-      ...rest,
-    }));
-  }
-
-  if (newModel.presets) {
-    newModel.presets = Object.entries(newModel.presets).map(([slug, instructions]) => ({
-      slug,
-      instructions,
-    }));
-  }
-
-  const finalModel = getSyntaxProxy()(
-    typeof model === 'function' ? model : newModel,
-  ) as unknown as Expand<RoninFields & FieldsToTypes<Fields>>;
-
-  return finalModel;
+  return getSyntaxProxy({ modelType: true })(model) as unknown as Expand<
+    RoninFields & FieldsToTypes<Fields>
+  >;
 };
