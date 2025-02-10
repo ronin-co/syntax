@@ -69,7 +69,6 @@ export type ModelFieldExpressions<Type> = {
   defaultValue?: (() => Type) | Type;
 };
 
-// export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutput<Type>>;
 export type SyntaxField<Type extends ModelField['type']> = SyntaxItem<FieldOutput<Type>> &
   any;
 
