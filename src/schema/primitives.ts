@@ -1,5 +1,8 @@
-import { type SyntaxItem, getSyntaxProxy } from '@/src/queries';
+import { getSyntaxProxy } from '@/src/queries';
+
 import type { ModelField } from '@ronin/compiler';
+
+import type { SyntaxItem } from '@/src/queries';
 
 /** A utility type that maps an attribute's type to a function signature. */
 type AttributeSignature<T, Attribute> = T extends boolean

@@ -1,5 +1,6 @@
-import { expression } from '@/src/helpers/expressions';
 import { QUERY_SYMBOLS, getQuerySymbol } from '@ronin/compiler';
+
+import { expression } from '@/src/helpers/expressions';
 
 /**
  * Wraps a raw SQL expression as-is.

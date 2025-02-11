@@ -1,4 +1,15 @@
 import { getSyntaxProxy } from '@/src/queries';
+
+import type {
+  GetInstructions,
+  ModelField,
+  ModelIndex,
+  ModelTrigger,
+  Model as RawModel,
+  StoredObject,
+  WithInstruction,
+} from '@ronin/compiler';
+
 import type {
   Chain,
   FieldOutput,
@@ -11,15 +22,6 @@ import type {
   number,
   string,
 } from '@/src/schema';
-import type {
-  GetInstructions,
-  ModelField,
-  ModelIndex,
-  ModelTrigger,
-  Model as RawModel,
-  StoredObject,
-  WithInstruction,
-} from '@ronin/compiler';
 
 // This is used to ensure that any object adhering to this interface has both fields.
 export interface RoninFields {
