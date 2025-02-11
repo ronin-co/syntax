@@ -454,11 +454,11 @@ describe('models', () => {
       fields: {
         name: string({ required: true }),
       },
-      indexes: [
-        {
+      indexes: {
+        name: {
           fields: [{ slug: 'name', order: 'ASC', collation: 'BINARY' }],
         },
-      ],
+      },
     });
     expect(Account).toBeTypeOf('object');
     // @ts-expect-error: The Account object has 'fields'.
@@ -476,11 +476,11 @@ describe('models', () => {
           required: true,
         },
       ],
-      indexes: [
-        {
+      indexes: {
+        name: {
           fields: [{ slug: 'name', order: 'ASC', collation: 'BINARY' }],
         },
-      ],
+      },
     });
   });
 
@@ -493,14 +493,14 @@ describe('models', () => {
         fields: {
           name: string({ required: true }),
         },
-        indexes: [
-          {
+        indexes: {
+          name: {
             fields: [
               // @ts-expect-error This is intended.
               { slug: 'thisFieldDoesNotExist', order: 'ASC', collation: 'BINARY' },
             ],
           },
-        ],
+        },
       });
     } catch (err) {
       const error = err as Error;
@@ -520,11 +520,11 @@ describe('models', () => {
         fields: {
           name: string({ required: true }),
         },
-        indexes: [
-          {
+        indexes: {
+          name: {
             fields: [],
           },
-        ],
+        },
       });
     } catch (err) {
       const error = err as Error;
@@ -543,15 +543,15 @@ describe('models', () => {
       fields: {
         name: string({ required: true }),
       },
-      triggers: [
-        {
+      triggers: {
+        afterInsert: {
           action: 'INSERT',
           when: 'AFTER',
           fields: [{ slug: 'name' }],
           // @ts-expect-error: The queries need to be adjusted in the TS client.
           effects: [add.account.with({ name: 'Lorena' })],
         },
-      ],
+      },
     }));
 
     expect(Account).toBeTypeOf('object');
@@ -570,8 +570,8 @@ describe('models', () => {
           required: true,
         },
       ],
-      triggers: [
-        {
+      triggers: {
+        afterInsert: {
           action: 'INSERT',
           when: 'AFTER',
           effects: [
@@ -589,7 +589,7 @@ describe('models', () => {
           ],
           fields: [{ slug: 'name' }],
         },
-      ],
+      },
     });
   });
 
