@@ -82,12 +82,12 @@ export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
   /**
    * Database indexes to optimize query performance.
    */
-  indexes?: Array<ModelIndex<Array<ModelField & { slug: keyof Fields }>>>;
+  indexes?: Record<string, ModelIndex<Array<ModelField & { slug: keyof Fields }>>>;
 
   /**
    * Queries that run automatically in response to other queries.
    */
-  triggers?: Array<ModelTrigger<Array<ModelField & { slug: keyof Fields }>>>;
+  triggers?: Record<string, ModelTrigger<Array<ModelField & { slug: keyof Fields }>>>;
 
   /**
    * Predefined query instructions that can be reused across multiple different queries.

@@ -14,22 +14,22 @@ export const Account = model({
     birthday: date(),
   },
 
-  indexes: [
-    {
+  indexes: {
+    name: {
       fields: [{ slug: 'name', order: 'ASC', collation: 'BINARY' }],
       unique: true,
     },
-  ],
+  },
 
-  triggers: [
-    {
+  triggers: {
+    afterInsert: {
       when: 'AFTER',
       action: 'INSERT',
       fields: [{ slug: 'name' }],
       // @ts-expect-error: The queries need to be adjusted in the TS client.
       effects: () => [add.member.with({ name: 'admin', email: 'admin@ronin.io' })],
     },
-  ],
+  },
 });
 
 export const Profile = model({
