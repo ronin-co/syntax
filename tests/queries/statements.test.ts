@@ -1,7 +1,5 @@
 import { expect, spyOn, test } from 'bun:test';
-
 import { getBatchProxySQL, getSyntaxProxySQL } from '@/src/queries';
-
 import type { Statement } from '@ronin/compiler';
 
 test('using raw SQL', async () => {

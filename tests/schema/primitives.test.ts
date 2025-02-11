@@ -1,8 +1,14 @@
 import { expect, test } from 'bun:test';
-
-import { blob, boolean, date, json, link, number, string } from '@/src/schema';
-
-import type { SyntaxField } from '@/src/schema';
+import {
+  type SyntaxField,
+  blob,
+  boolean,
+  date,
+  json,
+  link,
+  number,
+  string,
+} from '@/src/schema';
 
 test('create string field', () => {
   const field = string({ displayAs: 'secret' }) as unknown as SyntaxField<'string'>;
