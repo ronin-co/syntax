@@ -1,7 +1,10 @@
 import { describe, expect, test } from 'bun:test';
+import { QUERY_SYMBOLS } from '@ronin/compiler';
+
 import { getSyntaxProxy } from '@/src/queries';
 import { blob, boolean, date, json, link, model, number, string } from '@/src/schema';
-import { type GetQuery, QUERY_SYMBOLS } from '@ronin/compiler';
+
+import type { GetQuery } from '@ronin/compiler';
 
 describe('models', () => {
   test('create empty model', () => {

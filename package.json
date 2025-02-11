@@ -24,13 +24,14 @@
     }
   },
   "scripts": {
-    "lint": "bun run --bun lint:tsc && bun run --bun lint:biome",
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "format": "biome check --write && biome format --write",
     "lint:biome": "biome check",
     "lint:tsc": "tsc --pretty",
-    "format": "biome check --write && biome format --write",
-    "test": "bun test",
-    "build": "tsup",
-    "prepare": "bun run build"
+    "lint": "bun run --bun lint:tsc && bun run --bun lint:biome",
+    "prepare": "bun run build",
+    "test": "bun test"
   },
   "keywords": [
     "database",
