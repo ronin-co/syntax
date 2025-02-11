@@ -1,22 +1,23 @@
 import { describe, expect, spyOn, test } from 'bun:test';
+import { QUERY_SYMBOLS } from '@ronin/compiler';
 
 import { op } from '@/src/helpers/expressions';
 import { getBatchProxy, getSyntaxProxy } from '@/src/queries';
 import { concat, string } from '@/src/schema';
-import {
-  type AddQuery,
-  type AlterQuery,
-  type CreateQuery,
-  type DropQuery,
-  type GetQuery,
-  type Model,
-  type ModelField,
-  type ModelIndex,
-  type ModelPreset,
-  type ModelTrigger,
-  QUERY_SYMBOLS,
-  type Query,
-  type SetQuery,
+
+import type {
+  AddQuery,
+  AlterQuery,
+  CreateQuery,
+  DropQuery,
+  GetQuery,
+  Model,
+  ModelField,
+  ModelIndex,
+  ModelPreset,
+  ModelTrigger,
+  Query,
+  SetQuery,
 } from '@ronin/compiler';
 
 describe('syntax proxy', () => {
