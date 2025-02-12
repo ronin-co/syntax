@@ -126,7 +126,7 @@ export const getProperty = (obj: object, path: string): unknown => {
  *
  * @returns A boolean indicating whether the object is plain, or not.
  */
-const isPlainObject = (value: unknown): boolean => {
+export const isPlainObject = (value: unknown): boolean => {
   return Object.prototype.toString.call(value) === '[object Object]';
 };
 

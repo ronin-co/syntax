@@ -1,7 +1,7 @@
 import { describe, expect, spyOn, test } from 'bun:test';
 
 import { op } from '@/src/helpers/expressions';
-import { getBatchProxy, getSyntaxProxy } from '@/src/queries';
+import { type SyntaxItem, getBatchProxy, getSyntaxProxy } from '@/src/queries';
 import { concat, string } from '@/src/schema';
 import {
   type AddQuery,
@@ -435,6 +435,36 @@ describe('syntax proxy', () => {
     expect(queries.length === 1 ? { result: true } : null).toMatchObject({
       result: true,
     });
+  });
+
+  test('using queries with placeholder in batch', () => {
+    const getProxy = getSyntaxProxy<GetQuery>({ root: `${QUERY_SYMBOLS.QUERY}.get` });
+
+    const queries = getBatchProxy(() => [
+      getProxy.account(),
+      null as unknown as SyntaxItem<Query>,
+      getProxy.team(),
+    ]);
+
+    expect(queries).toMatchObject([
+      {
+        structure: {
+          get: {
+            account: {},
+          },
+        },
+      },
+      {
+        structure: null,
+      },
+      {
+        structure: {
+          get: {
+            team: {},
+          },
+        },
+      },
+    ]);
   });
 
   test('using options for query in batch', () => {
