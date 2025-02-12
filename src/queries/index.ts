@@ -1,6 +1,6 @@
 import type { DeepCallable, ResultRecord } from '@/src/queries/types';
 import type { Model } from '@/src/schema';
-import { mutateStructure, setProperty } from '@/src/utils';
+import { isPlainObject, mutateStructure, setProperty } from '@/src/utils';
 import { type ModelField, QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 /**
@@ -219,6 +219,10 @@ export const getBatchProxy = (
   // objects, thereby making development more difficult. To avoid this, we are creating a
   // plain object containing the same properties as the `Proxy` instances.
   return queries.map((details) => {
+    // If a placeholder value such as `null` is located inside the batch, we need to
+    // return it as-is instead of processing it as a query.
+    if (!isPlainObject(details)) return { structure: details };
+
     const item: SyntaxItem = {
       structure: (details as unknown as Record<typeof QUERY_SYMBOLS.QUERY, Query>)[
         QUERY_SYMBOLS.QUERY
