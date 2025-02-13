@@ -12,13 +12,12 @@ import type {
   string,
 } from '@/src/schema';
 import type {
-  GetInstructions,
   ModelField,
   ModelIndex,
+  ModelPreset,
   ModelTrigger,
   Model as RawModel,
   StoredObject,
-  WithInstruction,
 } from '@ronin/compiler';
 
 // This is used to ensure that any object adhering to this interface has both fields.
@@ -93,8 +92,8 @@ export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
    * Predefined query instructions that can be reused across multiple different queries.
    */
   presets?:
-    | Record<string, GetInstructions | WithInstruction>
-    | ((fields: keyof Fields) => Record<string, GetInstructions | WithInstruction>);
+    | Record<string, ModelPreset['instructions']>
+    | ((fields: keyof Fields) => Record<string, ModelPreset['instructions']>);
 }
 
 // This type maps the fields of a model to their types.
