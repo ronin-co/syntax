@@ -1,5 +1,4 @@
 import type { DeepCallable, ResultRecord } from '@/src/queries/types';
-import type { Model } from '@/src/schema';
 import { isPlainObject, mutateStructure, setProperty } from '@/src/utils';
 import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
@@ -101,25 +100,6 @@ export const getSyntaxProxy = <Structure, ReturnValue = ResultRecord>(config?: {
         const pathJoined = pathParts.length > 0 ? pathParts.join('.') : '.';
 
         setProperty(structure, pathJoined, value);
-
-        const isModelQuery = config?.root === `${QUERY_SYMBOLS.QUERY}.create`;
-        const modelQueryValue = (structure as any)?.[QUERY_SYMBOLS.QUERY]?.create?.model;
-
-        // If a `create.model` query was provided or a `model` is being constructed,
-        // serialize the model structure.
-        if ((isModelQuery && modelQueryValue) || config?.modelType) {
-          const createdModel = isModelQuery ? modelQueryValue : structure;
-          const newModel = { ...createdModel };
-
-          if (isModelQuery) {
-            (structure as any)[QUERY_SYMBOLS.QUERY].create.model = newModel;
-          } else {
-            const model = structure as Model;
-
-            if (newModel.fields) model.fields = newModel.fields;
-            if (newModel.presets) model.presets = newModel.presets;
-          }
-        }
 
         // If the function call is happening inside a batch, return a new proxy, to
         // allow for continuing to chain `get` accessors and function calls after
