@@ -71,7 +71,7 @@ describe('models', () => {
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'account',
       name: 'Account',
-      fields: [],
+      fields: {},
     });
   });
 
@@ -91,7 +91,7 @@ describe('models', () => {
       pluralSlug: 'accounts',
       name: 'Account',
       pluralName: 'Accounts',
-      fields: [],
+      fields: {},
     });
   });
 
@@ -117,7 +117,7 @@ describe('models', () => {
         name: 'Account',
         slug: 'account',
       },
-      fields: [],
+      fields: {},
     });
   });
 
@@ -135,7 +135,7 @@ describe('models', () => {
       slug: 'account',
       pluralSlug: 'accounts',
       idPrefix: 'acc_',
-      fields: [],
+      fields: {},
     });
   });
 
@@ -155,13 +155,12 @@ describe('models', () => {
       slug: 'account',
       pluralSlug: 'accounts',
 
-      fields: [
-        {
-          slug: 'name',
+      fields: {
+        name: {
           type: 'string',
           required: true,
         },
-      ],
+      },
     });
   });
 
@@ -182,17 +181,15 @@ describe('models', () => {
       slug: 'account',
       pluralSlug: 'accounts',
 
-      fields: [
-        {
-          slug: 'name',
+      fields: {
+        name: {
           type: 'string',
           required: true,
         },
-        {
-          slug: 'avatar',
+        avatar: {
           type: 'blob',
         },
-      ],
+      },
     });
   });
 
@@ -213,17 +210,15 @@ describe('models', () => {
       slug: 'account',
       pluralSlug: 'accounts',
 
-      fields: [
-        {
-          slug: 'name',
+      fields: {
+        name: {
           type: 'string',
           required: true,
         },
-        {
-          slug: 'bio',
+        bio: {
           type: 'json',
         },
-      ],
+      },
     });
   });
 
@@ -244,17 +239,15 @@ describe('models', () => {
       slug: 'account',
       pluralSlug: 'accounts',
 
-      fields: [
-        {
-          slug: 'name',
+      fields: {
+        name: {
           type: 'string',
           required: true,
         },
-        {
-          slug: 'birthday',
+        birthday: {
           type: 'date',
         },
-      ],
+      },
     });
   });
 
@@ -274,14 +267,13 @@ describe('models', () => {
       slug: 'account',
       pluralSlug: 'accounts',
 
-      fields: [
-        {
-          slug: 'name',
+      fields: {
+        name: {
           name: 'CusToM NaMe',
           type: 'string',
           required: true,
         },
-      ],
+      },
     });
   });
 
@@ -301,13 +293,12 @@ describe('models', () => {
       slug: 'account',
       pluralSlug: 'accounts',
 
-      fields: [
-        {
-          slug: 'createdAt',
+      fields: {
+        createdAt: {
           type: 'string',
           required: true,
         },
-      ],
+      },
     });
   });
 
@@ -332,29 +323,24 @@ describe('models', () => {
       slug: 'account',
       pluralSlug: 'accounts',
 
-      fields: [
-        {
-          slug: 'name',
+      fields: {
+        name: {
           type: 'string',
           required: true,
         },
-        {
-          slug: 'email',
+        email: {
           type: 'string',
         },
-        {
-          slug: 'emailVerified',
+        emailVerified: {
           type: 'boolean',
         },
-        {
-          slug: 'password',
+        password: {
           type: 'string',
         },
-        {
-          slug: 'follower',
+        follower: {
           type: 'number',
         },
-      ],
+      },
     });
   });
 
@@ -375,13 +361,12 @@ describe('models', () => {
       slug: 'account',
       pluralSlug: 'accounts',
 
-      fields: [
-        {
-          slug: 'name',
+      fields: {
+        name: {
           type: 'string',
           unique: true,
         },
-      ],
+      },
     });
   });
 
@@ -416,13 +401,12 @@ describe('models', () => {
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'account',
       pluralSlug: 'accounts',
-      fields: [
-        {
-          slug: 'name',
+      fields: {
+        name: {
           type: 'string',
           required: true,
         },
-      ],
+      },
     });
 
     expect(Post).toBeTypeOf('object');
@@ -432,9 +416,8 @@ describe('models', () => {
       slug: 'post',
       pluralSlug: 'posts',
 
-      fields: [
-        {
-          slug: 'author',
+      fields: {
+        author: {
           type: 'link',
           target: 'account',
           actions: {
@@ -442,7 +425,7 @@ describe('models', () => {
             onUpdate: 'CASCADE',
           },
         },
-      ],
+      },
     });
   });
 
@@ -462,20 +445,19 @@ describe('models', () => {
     });
     expect(Account).toBeTypeOf('object');
     // @ts-expect-error: The Account object has 'fields'.
-    expect(Account.fields).toHaveLength(1);
+    expect(Object.keys(Account.fields)).toHaveLength(1);
 
     expect(Account).toEqual({
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'account',
       pluralSlug: 'accounts',
       name: 'Account',
-      fields: [
-        {
-          slug: 'name',
+      fields: {
+        name: {
           type: 'string',
           required: true,
         },
-      ],
+      },
       indexes: {
         name: {
           fields: [{ slug: 'name', order: 'ASC', collation: 'BINARY' }],
@@ -556,20 +538,19 @@ describe('models', () => {
 
     expect(Account).toBeTypeOf('object');
     // @ts-expect-error: The Account object has 'fields'.
-    expect(Account.fields).toHaveLength(1);
+    expect(Object.keys(Account.fields)).toHaveLength(1);
 
     expect(Account).toEqual({
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'account',
       pluralSlug: 'accounts',
       name: 'Account',
-      fields: [
-        {
-          slug: 'name',
+      fields: {
+        name: {
           type: 'string',
           required: true,
         },
-      ],
+      },
       triggers: {
         afterInsert: {
           action: 'INSERT',
@@ -611,19 +592,16 @@ describe('models', () => {
     expect(Account).toEqual({
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'account',
-      presets: [
-        {
-          slug: 'onlyName',
-          instructions: {
-            with: {
-              space: {
-                being: 'spa_m9h8oha94helaji',
-              },
+      presets: {
+        onlyName: {
+          with: {
+            space: {
+              being: 'spa_m9h8oha94helaji',
             },
-            selecting: ['name'],
           },
+          selecting: ['name'],
         },
-      ],
+      },
     });
   });
 
@@ -648,25 +626,21 @@ describe('models', () => {
     expect(Member).toEqual({
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'member',
-      fields: [
-        {
-          slug: 'account',
+      fields: {
+        account: {
           type: 'string',
         },
-      ],
-      presets: [
-        {
-          slug: 'account',
-          instructions: {
-            including: {
-              account: {
-                [QUERY_SYMBOLS.QUERY]: {
-                  get: {
-                    account: {
-                      with: {
-                        id: {
-                          [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}account`,
-                        },
+      },
+      presets: {
+        account: {
+          including: {
+            account: {
+              [QUERY_SYMBOLS.QUERY]: {
+                get: {
+                  account: {
+                    with: {
+                      id: {
+                        [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}account`,
                       },
                     },
                   },
@@ -675,7 +649,7 @@ describe('models', () => {
             },
           },
         },
-      ],
+      },
     });
   });
 
@@ -697,17 +671,17 @@ describe('models', () => {
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'account',
       pluralSlug: 'accounts',
-      fields: [
-        {
-          slug: 'address.country',
-          type: 'string',
-          required: true,
+      fields: {
+        address: {
+          country: {
+            type: 'string',
+            required: true,
+          },
+          city: {
+            type: 'string',
+          },
         },
-        {
-          slug: 'address.city',
-          type: 'string',
-        },
-      ],
+      },
     });
   });
 });
