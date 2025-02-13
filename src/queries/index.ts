@@ -52,10 +52,13 @@ export const getSyntaxProxy = <Structure, ReturnValue = ResultRecord>(config?: {
   replacer?: (value: unknown) => unknown | undefined;
   propertyValue?: unknown;
   modelType?: boolean;
+  chaining?: boolean;
 }): DeepCallable<Structure, ReturnValue> => {
   // The default value of a property within the composed structure.
   const propertyValue =
     typeof config?.propertyValue === 'undefined' ? {} : config.propertyValue;
+
+  const shouldAllowChaining = config?.chaining ?? true;
 
   const createProxy = (
     path: Array<string> = [],
@@ -115,7 +118,7 @@ export const getSyntaxProxy = <Structure, ReturnValue = ResultRecord>(config?: {
           // holds an `undefined` value.
           if (options) details.options = options;
 
-          return createProxy(newPath, details, true);
+          return shouldAllowChaining ? createProxy(newPath, details, true) : details;
         }
 
         return config.callback(structure, options);
