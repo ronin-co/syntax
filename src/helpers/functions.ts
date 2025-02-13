@@ -122,3 +122,18 @@ export const concat = (
 
   return expression(`concat(${formattedValues.join(', ')})`) as unknown as string;
 };
+
+/**
+ * Replaces all occurrences of a substring within a string with a replacement value.
+ *
+ * @param input - The string to perform replacements on.
+ * @param search - The substring to search for.
+ * @param replacement - The string to replace matches with.
+ *
+ * @returns SQL expression that evaluates to the modified string.
+ */
+export const replace = (input: string, search: string, replacement: string): string => {
+  return expression(
+    `replace('${input}', '${search}', '${replacement}')`,
+  ) as unknown as string;
+};

@@ -7,6 +7,7 @@ import {
   json_replace,
   json_set,
   random,
+  replace,
   sql,
   strftime,
 } from '@/src/helpers/functions';
@@ -465,6 +466,29 @@ describe('expressions', () => {
     // @ts-expect-error This exists
     expect(Test.fields.test.defaultValue).toEqual({
       __RONIN_EXPRESSION: "(('Hello' || 'World') || ('Hello' || 'World'))",
+    });
+  });
+
+  test('replace expression', () => {
+    const Test = model({
+      slug: 'test',
+      fields: {
+        simpleReplace: string().defaultValue(() =>
+          replace('hello world', 'world', 'there'),
+        ),
+        multiReplace: string().defaultValue(() =>
+          replace('hello hello hello', 'hello', 'hi'),
+        ),
+      },
+    });
+    expect(Test).toBeTypeOf('object');
+    // @ts-expect-error This exists
+    expect(Test.fields.simpleReplace.defaultValue).toEqual({
+      __RONIN_EXPRESSION: "replace('hello world', 'world', 'there')",
+    });
+    // @ts-expect-error This exists
+    expect(Test.fields.multiReplace.defaultValue).toEqual({
+      __RONIN_EXPRESSION: "replace('hello hello hello', 'hello', 'hi')",
     });
   });
 });
