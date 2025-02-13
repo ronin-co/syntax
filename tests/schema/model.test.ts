@@ -579,12 +579,14 @@ describe('models', () => {
       slug: 'account',
       presets: {
         onlyName: {
-          with: {
-            space: {
-              being: 'spa_m9h8oha94helaji',
+          instructions: {
+            with: {
+              space: {
+                being: 'spa_m9h8oha94helaji',
+              },
             },
+            selecting: ['name'],
           },
-          selecting: ['name'],
         },
       },
     });
@@ -594,12 +596,14 @@ describe('models', () => {
       slug: 'account',
       presets: {
         onlyName: {
-          with: {
-            space: {
-              being: 'spa_m9h8oha94helaji',
+          instructions: {
+            with: {
+              space: {
+                being: 'spa_m9h8oha94helaji',
+              },
             },
+            selecting: ['name'],
           },
-          selecting: ['name'],
         },
       },
     });
@@ -615,9 +619,11 @@ describe('models', () => {
       },
       presets: (f) => ({
         account: {
-          including: {
-            // @ts-expect-error This will be improved shortly.
-            account: getProxy.account.with.id(f.account),
+          instructions: {
+            including: {
+              // @ts-expect-error This will be improved shortly.
+              account: getProxy.account.with.id(f.account),
+            },
           },
         },
       }),
@@ -633,14 +639,16 @@ describe('models', () => {
       },
       presets: {
         account: {
-          including: {
-            account: {
-              [QUERY_SYMBOLS.QUERY]: {
-                get: {
-                  account: {
-                    with: {
-                      id: {
-                        [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}account`,
+          instructions: {
+            including: {
+              account: {
+                [QUERY_SYMBOLS.QUERY]: {
+                  get: {
+                    account: {
+                      with: {
+                        id: {
+                          [QUERY_SYMBOLS.EXPRESSION]: `${QUERY_SYMBOLS.FIELD}account`,
+                        },
                       },
                     },
                   },
