@@ -65,12 +65,14 @@ export const Member = model({
 
   presets: {
     specificSpace: {
-      with: {
-        space: {
-          being: 'spa_m9h8oha94helaji',
+      instructions: {
+        with: {
+          space: {
+            being: 'spa_m9h8oha94helaji',
+          },
         },
+        selecting: ['name'],
       },
-      selecting: ['name'],
     },
   },
 });
