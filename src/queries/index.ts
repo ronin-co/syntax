@@ -1,7 +1,7 @@
 import type { DeepCallable, ResultRecord } from '@/src/queries/types';
 import type { Model } from '@/src/schema';
 import { isPlainObject, mutateStructure, setProperty } from '@/src/utils';
-import { type ModelField, QUERY_SYMBOLS, type Query } from '@ronin/compiler';
+import { QUERY_SYMBOLS, type Query } from '@ronin/compiler';
 
 /**
  * Utility type to convert a tuple of promises into a tuple of their resolved types.
@@ -110,34 +110,6 @@ export const getSyntaxProxy = <Structure, ReturnValue = ResultRecord>(config?: {
         if ((isModelQuery && modelQueryValue) || config?.modelType) {
           const createdModel = isModelQuery ? modelQueryValue : structure;
           const newModel = { ...createdModel };
-
-          if (newModel.fields) {
-            const formatFields = (
-              fields: Record<string, ModelField>,
-              parent?: string,
-            ): Array<ModelField> => {
-              return Object.entries(fields).flatMap(([slug, rest]) => {
-                if (rest.type) {
-                  return [
-                    { slug: parent ? `${parent}.${slug}` : slug, ...(rest as object) },
-                  ];
-                }
-
-                return formatFields(rest as unknown as Record<string, ModelField>, slug);
-              });
-            };
-
-            newModel.fields = formatFields(newModel.fields);
-          }
-
-          if (newModel.presets) {
-            newModel.presets = Object.entries(newModel.presets).map(
-              ([slug, instructions]) => ({
-                slug,
-                instructions,
-              }),
-            );
-          }
 
           if (isModelQuery) {
             (structure as any)[QUERY_SYMBOLS.QUERY].create.model = newModel;
