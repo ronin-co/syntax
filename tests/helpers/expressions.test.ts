@@ -22,7 +22,7 @@ describe('expressions', () => {
     });
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
-    expect(Test.fields[0].defaultValue).toEqual({
+    expect(Test.fields.test.defaultValue).toEqual({
       __RONIN_EXPRESSION: "UPPER('test')",
     });
   });
@@ -36,7 +36,7 @@ describe('expressions', () => {
         },
       });
       // @ts-expect-error This exists
-      expect(Test.fields[0].defaultValue).toEqual({
+      expect(Test.fields.stringConcat.defaultValue).toEqual({
         __RONIN_EXPRESSION: "('Hello' || 'World')",
       });
     });
@@ -50,7 +50,7 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].defaultValue).toEqual({
+        expect(Test.fields.add.defaultValue).toEqual({
           __RONIN_EXPRESSION: '(1 + 2)',
         });
       });
@@ -63,7 +63,7 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].defaultValue).toEqual({
+        expect(Test.fields.subtract.defaultValue).toEqual({
           __RONIN_EXPRESSION: '(5 - 3)',
         });
       });
@@ -76,7 +76,7 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].defaultValue).toEqual({
+        expect(Test.fields.multiply.defaultValue).toEqual({
           __RONIN_EXPRESSION: '(4 * 2)',
         });
       });
@@ -89,7 +89,7 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].defaultValue).toEqual({
+        expect(Test.fields.divide.defaultValue).toEqual({
           __RONIN_EXPRESSION: '(10 / 2)',
         });
       });
@@ -102,7 +102,7 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].defaultValue).toEqual({
+        expect(Test.fields.modulo.defaultValue).toEqual({
           __RONIN_EXPRESSION: '(7 % 3)',
         });
       });
@@ -118,11 +118,11 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].check).toEqual({
+        expect(Test.fields.equals.check).toEqual({
           __RONIN_EXPRESSION: "(__RONIN_FIELD_equals = 'test')",
         });
         // @ts-expect-error This exists
-        expect(Test.fields[1].check).toEqual({
+        expect(Test.fields.equalsRight.check).toEqual({
           __RONIN_EXPRESSION: "('test' = __RONIN_FIELD_equalsRight)",
         });
       });
@@ -138,11 +138,11 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].check).toEqual({
+        expect(Test.fields.notEquals.check).toEqual({
           __RONIN_EXPRESSION: "(__RONIN_FIELD_notEquals != 'test')",
         });
         // @ts-expect-error This exists
-        expect(Test.fields[1].check).toEqual({
+        expect(Test.fields.notEqualsRight.check).toEqual({
           __RONIN_EXPRESSION: "('test' != (__RONIN_FIELD_notEqualsRight != 'test'))",
         });
       });
@@ -158,11 +158,11 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].check).toEqual({
+        expect(Test.fields.greaterThan.check).toEqual({
           __RONIN_EXPRESSION: '(__RONIN_FIELD_greaterThan > 5)',
         });
         // @ts-expect-error This exists
-        expect(Test.fields[1].check).toEqual({
+        expect(Test.fields.greaterThanRight.check).toEqual({
           __RONIN_EXPRESSION: '(5 > __RONIN_FIELD_greaterThanRight)',
         });
       });
@@ -180,12 +180,12 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].check).toEqual({
+        expect(Test.fields.lessThan.check).toEqual({
           __RONIN_EXPRESSION:
             '((__RONIN_FIELD_lessThan < 5) < (__RONIN_FIELD_lessThan < 5))',
         });
         // @ts-expect-error This exists
-        expect(Test.fields[1].check).toEqual({
+        expect(Test.fields.lessThanRight.check).toEqual({
           __RONIN_EXPRESSION:
             '((5 < __RONIN_FIELD_lessThanRight) < (5 < __RONIN_FIELD_lessThanRight))',
         });
@@ -204,11 +204,11 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].check).toEqual({
+        expect(Test.fields.greaterThanEqual.check).toEqual({
           __RONIN_EXPRESSION: '(__RONIN_FIELD_greaterThanEqual >= 5)',
         });
         // @ts-expect-error This exists
-        expect(Test.fields[1].check).toEqual({
+        expect(Test.fields.greaterThanEqualRight.check).toEqual({
           __RONIN_EXPRESSION: '(5 >= __RONIN_FIELD_greaterThanEqualRight)',
         });
       });
@@ -224,11 +224,11 @@ describe('expressions', () => {
           },
         });
         // @ts-expect-error This exists
-        expect(Test.fields[0].check).toEqual({
+        expect(Test.fields.lessThanEqual.check).toEqual({
           __RONIN_EXPRESSION: '(__RONIN_FIELD_lessThanEqual <= 5)',
         });
         // @ts-expect-error This exists
-        expect(Test.fields[1].check).toEqual({
+        expect(Test.fields.lessThanEqualRight.check).toEqual({
           __RONIN_EXPRESSION: '(5 <= __RONIN_FIELD_lessThanEqualRight)',
         });
       });
@@ -259,43 +259,43 @@ describe('expressions', () => {
 
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
-    expect(Test.fields[0].defaultValue).toEqual({
+    expect(Test.fields.stringConcat.defaultValue).toEqual({
       __RONIN_EXPRESSION: "('Hello' || 'World')",
     });
     // @ts-expect-error This exists
-    expect(Test.fields[1].defaultValue).toEqual({
+    expect(Test.fields.numberAdd.defaultValue).toEqual({
       __RONIN_EXPRESSION: '(1 + 2)',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[2].defaultValue).toEqual({
+    expect(Test.fields.numberSubtract.defaultValue).toEqual({
       __RONIN_EXPRESSION: '(5 - 3)',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[3].defaultValue).toEqual({
+    expect(Test.fields.numberMultiply.defaultValue).toEqual({
       __RONIN_EXPRESSION: '(4 * 2)',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[4].defaultValue).toEqual({
+    expect(Test.fields.numberDivide.defaultValue).toEqual({
       __RONIN_EXPRESSION: '(10 / 2)',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[5].defaultValue).toEqual({
+    expect(Test.fields.numberModulo.defaultValue).toEqual({
       __RONIN_EXPRESSION: '(7 % 3)',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[6].check).toEqual({
+    expect(Test.fields.stringCompare.check).toEqual({
       __RONIN_EXPRESSION: "(__RONIN_FIELD_stringConcat = 'HelloWorld')",
     });
     // @ts-expect-error This exists
-    expect(Test.fields[7].check).toEqual({
+    expect(Test.fields.numberCompare.check).toEqual({
       __RONIN_EXPRESSION: '(__RONIN_FIELD_numberAdd >= 3)',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[8].check).toEqual({
+    expect(Test.fields.rightSideField.check).toEqual({
       __RONIN_EXPRESSION: "('Hello' = __RONIN_FIELD_stringConcat)",
     });
     // @ts-expect-error This exists
-    expect(Test.fields[9].computedAs).toEqual({
+    expect(Test.fields.computedAs.computedAs).toEqual({
       kind: 'VIRTUAL',
       value: {
         __RONIN_EXPRESSION: '(__RONIN_FIELD_numberAdd || __RONIN_FIELD_numberSubtract)',
@@ -317,17 +317,17 @@ describe('expressions', () => {
     });
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
-    expect(Test.fields[0].defaultValue).toEqual('test');
+    expect(Test.fields.test1.defaultValue).toEqual('test');
     // @ts-expect-error This exists
-    expect(Test.fields[1].defaultValue).toEqual({
+    expect(Test.fields.test2.defaultValue).toEqual({
       __RONIN_EXPRESSION: "('Hello' || 'World')",
     });
     // @ts-expect-error This exists
-    expect(Test.fields[2].defaultValue).toEqual({
+    expect(Test.fields.test3.defaultValue).toEqual({
       __RONIN_EXPRESSION: "(('Hello' || 'World') || 'test')",
     });
     // @ts-expect-error This exists
-    expect(Test.fields[3].defaultValue).toEqual({
+    expect(Test.fields.test4.defaultValue).toEqual({
       __RONIN_EXPRESSION: "(('Hello' || 'World') || ('Hello' || 'World'))",
     });
   });
@@ -341,7 +341,7 @@ describe('expressions', () => {
     });
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
-    expect(Test.fields[0].defaultValue).toEqual({
+    expect(Test.fields.test.defaultValue).toEqual({
       __RONIN_EXPRESSION: 'random()',
     });
   });
@@ -357,12 +357,12 @@ describe('expressions', () => {
 
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
-    expect(Test.fields[0].defaultValue).toEqual({
+    expect(Test.fields.numberAbs.defaultValue).toEqual({
       __RONIN_EXPRESSION: 'abs(-42)',
     });
 
     // @ts-expect-error This exists
-    expect(Test.fields[1].defaultValue).toEqual({
+    expect(Test.fields.expressionAbs.defaultValue).toEqual({
       __RONIN_EXPRESSION: 'abs((1 - 5))',
     });
   });
@@ -377,11 +377,11 @@ describe('expressions', () => {
     });
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
-    expect(Test.fields[0].defaultValue).toEqual({
+    expect(Test.fields.currentDate.defaultValue).toEqual({
       __RONIN_EXPRESSION: "strftime('%Y-%m-%d', 'now')",
     });
     // @ts-expect-error This exists
-    expect(Test.fields[1].defaultValue).toEqual({
+    expect(Test.fields.customFormat.defaultValue).toEqual({
       __RONIN_EXPRESSION: "strftime('%H:%M:%S', 'now')",
     });
   });
@@ -406,22 +406,22 @@ describe('expressions', () => {
     });
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
-    expect(Test.fields[0].defaultValue).toEqual({
+    expect(Test.fields.jsonPatch.defaultValue).toEqual({
       __RONIN_EXPRESSION:
         'json_patch(\'{"op": "add", "path": "/foo", "value": "qux"}\', \'{"foo": "bar"}\')',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[1].defaultValue).toEqual({
+    expect(Test.fields.jsonSet.defaultValue).toEqual({
       __RONIN_EXPRESSION:
         'json_set(\'{"foo": "bar", "baz": "qux"}\', \'$.foo\', \'"updated"\')',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[2].defaultValue).toEqual({
+    expect(Test.fields.jsonReplace.defaultValue).toEqual({
       __RONIN_EXPRESSION:
         'json_replace(\'{"foo": "bar", "baz": "qux"}\', \'$.foo\', \'"replaced"\')',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[3].defaultValue).toEqual({
+    expect(Test.fields.jsonInsert.defaultValue).toEqual({
       __RONIN_EXPRESSION: 'json_insert(\'{"foo": "bar"}\', \'$.newKey\', \'"inserted"\')',
     });
   });
@@ -439,15 +439,15 @@ describe('expressions', () => {
     });
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
-    expect(Test.fields[0].defaultValue).toEqual({
+    expect(Test.fields.randomPlusTwo.defaultValue).toEqual({
       __RONIN_EXPRESSION: '(random() + 2)',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[1].defaultValue).toEqual({
+    expect(Test.fields.absOfRandom.defaultValue).toEqual({
       __RONIN_EXPRESSION: 'abs(random())',
     });
     // @ts-expect-error This exists
-    expect(Test.fields[2].defaultValue).toEqual({
+    expect(Test.fields.complexNesting.defaultValue).toEqual({
       __RONIN_EXPRESSION: 'abs((random() * (2 + 3)))',
     });
   });
@@ -463,7 +463,7 @@ describe('expressions', () => {
     });
     expect(Test).toBeTypeOf('object');
     // @ts-expect-error This exists
-    expect(Test.fields[0].defaultValue).toEqual({
+    expect(Test.fields.test.defaultValue).toEqual({
       __RONIN_EXPRESSION: "(('Hello' || 'World') || ('Hello' || 'World'))",
     });
   });

@@ -289,15 +289,14 @@ describe('syntax proxy', () => {
         create: {
           model: {
             slug: 'account',
-            fields: [
-              {
-                slug: 'name',
+            fields: {
+              name: {
                 type: 'string',
                 defaultValue: {
                   __RONIN_EXPRESSION: "('Hello' || 'World')",
                 },
               },
-            ],
+            },
           },
         },
       },
@@ -328,15 +327,14 @@ describe('syntax proxy', () => {
         create: {
           model: {
             slug: 'account',
-            fields: [
-              {
-                slug: 'name',
+            fields: {
+              name: {
                 type: 'string',
                 check: {
                   __RONIN_EXPRESSION: "(__RONIN_FIELD_name = 'World')",
                 },
               },
-            ],
+            },
           },
         },
       },
@@ -370,9 +368,8 @@ describe('syntax proxy', () => {
         create: {
           model: {
             slug: 'account',
-            fields: [
-              {
-                slug: 'name',
+            fields: {
+              name: {
                 type: 'string',
                 computedAs: {
                   kind: 'VIRTUAL',
@@ -381,7 +378,7 @@ describe('syntax proxy', () => {
                   },
                 },
               },
-            ],
+            },
           },
         },
       },
@@ -758,13 +755,12 @@ describe('syntax proxy', () => {
         create: {
           model: {
             slug: 'account',
-            fields: [
-              {
+            fields: {
+              handle: {
                 type: 'string',
-                slug: 'handle',
                 required: true,
               },
-            ],
+            },
           },
         },
       },
