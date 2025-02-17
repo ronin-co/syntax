@@ -111,9 +111,7 @@ type FieldsToTypes<F> = F extends Record<string, Primitives>
       [K in keyof F]: F[K] extends Record<string, Primitives>
         ? FieldsToTypes<F[K]>
         : F[K]['type'] extends keyof FieldToTypeMap
-          ? F[K]['required'] extends true
-            ? FieldToTypeMap[F[K]['type']]
-            : FieldToTypeMap[F[K]['type']] | null
+          ? FieldToTypeMap[F[K]['type']]
           : object;
     }
   : RoninFields;
