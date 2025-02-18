@@ -44,15 +44,9 @@ type TypeToTSType<Type> = Type extends 'string'
           : object;
 
 type FieldInput<Type extends ModelField['type']> = Partial<
-  Omit<ModelField, keyof ModelFieldExpressions<TypeToTSType<Type>>> & {
-    type: 'link';
-    target: string;
-    kind?: 'one' | 'many';
-    actions?: {
-      onDelete?: 'CASCADE' | 'SET NULL' | 'SET DEFAULT' | 'NO ACTION';
-      onUpdate?: 'CASCADE' | 'SET NULL' | 'SET DEFAULT' | 'NO ACTION';
-    };
-  } & ModelFieldExpressions<TypeToTSType<Type>>
+  Omit<ModelField, keyof ModelFieldExpressions<TypeToTSType<Type>>> &
+    Extract<ModelField, { type: 'link' }> &
+    ModelFieldExpressions<TypeToTSType<Type>>
 >;
 
 export type FieldOutput<Type extends ModelField['type']> = Omit<
