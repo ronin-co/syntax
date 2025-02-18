@@ -9,7 +9,7 @@ import { QUERY_SYMBOLS, getQuerySymbol } from '@ronin/compiler';
  *
  * @returns The wrapped SQL expression
  */
-export const sql = (expressions: string): unknown => expression<unknown>(expressions);
+export const sql = (expressions: string): any => expression<any>(expressions);
 
 /**
  * Generates a pseudo-random integer between -9223372036854775808 and +9223372036854775807.
