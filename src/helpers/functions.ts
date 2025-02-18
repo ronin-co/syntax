@@ -9,18 +9,14 @@ import { QUERY_SYMBOLS, getQuerySymbol } from '@ronin/compiler';
  *
  * @returns The wrapped SQL expression
  */
-export const sql = (expressions: string): any => {
-  return expression(expressions);
-};
+export const sql = (expressions: string): unknown => expression<unknown>(expressions);
 
 /**
  * Generates a pseudo-random integer between -9223372036854775808 and +9223372036854775807.
  *
  * @returns SQL expression that evaluates to a random number.
  */
-export const random = (): number => {
-  return expression('random()') as unknown as number;
-};
+export const random = (): number => expression<number>('random()');
 
 /**
  * Calculates the absolute value of a number.
@@ -34,7 +30,8 @@ export const abs = (value: number | Record<string, string | number>): number => 
     typeof value === 'object' && QUERY_SYMBOLS.EXPRESSION in value
       ? value[QUERY_SYMBOLS.EXPRESSION]
       : value;
-  return expression(`abs(${valueExpression})`) as unknown as number;
+
+  return expression<number>(`abs(${valueExpression})`);
 };
 
 /**
@@ -45,9 +42,8 @@ export const abs = (value: number | Record<string, string | number>): number => 
  *
  * @returns SQL expression that evaluates to the formatted timestamp.
  */
-export const strftime = (format: string, timestamp: string | 'now'): Date => {
-  return expression(`strftime('${format}', '${timestamp}')`) as unknown as Date;
-};
+export const strftime = (format: string, timestamp: string | 'now'): Date =>
+  expression<Date>(`strftime('${format}', '${timestamp}')`);
 
 /**
  * Applies a JSON patch operation to a JSON document.
@@ -57,9 +53,8 @@ export const strftime = (format: string, timestamp: string | 'now'): Date => {
  *
  * @returns SQL expression that evaluates to the patched JSON document.
  */
-export const json_patch = (patch: string, input: string): string => {
-  return expression(`json_patch('${patch}', '${input}')`) as unknown as string;
-};
+export const json_patch = (patch: string, input: string): string =>
+  expression<string>(`json_patch('${patch}', '${input}')`);
 
 /**
  * Sets a value in a JSON document at the specified path.
@@ -71,9 +66,8 @@ export const json_patch = (patch: string, input: string): string => {
  *
  * @returns SQL expression that evaluates to the modified JSON document.
  */
-export const json_set = (json: string, path: string, value: string): string => {
-  return expression(`json_set('${json}', '${path}', '${value}')`) as unknown as string;
-};
+export const json_set = (json: string, path: string, value: string): string =>
+  expression<string>(`json_set('${json}', '${path}', '${value}')`);
 
 /**
  * Replaces a value in a JSON document at the specified path.
@@ -85,11 +79,8 @@ export const json_set = (json: string, path: string, value: string): string => {
  *
  * @returns SQL expression that evaluates to the modified JSON document.
  */
-export const json_replace = (json: string, path: string, value: string): string => {
-  return expression(
-    `json_replace('${json}', '${path}', '${value}')`,
-  ) as unknown as string;
-};
+export const json_replace = (json: string, path: string, value: string): string =>
+  expression<string>(`json_replace('${json}', '${path}', '${value}')`);
 
 /**
  * Inserts a value into a JSON document at the specified path.
@@ -101,9 +92,8 @@ export const json_replace = (json: string, path: string, value: string): string 
  *
  * @returns SQL expression that evaluates to the modified JSON document.
  */
-export const json_insert = (json: string, path: string, value: string): string => {
-  return expression(`json_insert('${json}', '${path}', '${value}')`) as unknown as string;
-};
+export const json_insert = (json: string, path: string, value: string): string =>
+  expression<string>(`json_insert('${json}', '${path}', '${value}')`);
 
 /**
  * Concatenates a list of strings together.
@@ -120,7 +110,7 @@ export const concat = (
     return symbol?.type === 'expression' ? symbol.value : `'${value}'`;
   });
 
-  return expression(`concat(${formattedValues.join(', ')})`) as unknown as string;
+  return expression<string>(`concat(${formattedValues.join(', ')})`);
 };
 
 /**
@@ -132,8 +122,5 @@ export const concat = (
  *
  * @returns SQL expression that evaluates to the modified string.
  */
-export const replace = (input: string, search: string, replacement: string): string => {
-  return expression(
-    `replace('${input}', '${search}', '${replacement}')`,
-  ) as unknown as string;
-};
+export const replace = (input: string, search: string, replacement: string): string =>
+  expression<string>(`replace('${input}', '${search}', '${replacement}')`);

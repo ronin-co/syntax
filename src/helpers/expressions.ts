@@ -7,11 +7,9 @@ import { QUERY_SYMBOLS } from '@ronin/compiler';
  *
  * @returns An object containing the expression wrapped in a query symbol.
  */
-export const expression = (
+export const expression = <T = Record<typeof QUERY_SYMBOLS.EXPRESSION, string>>(
   expression: string,
-): Record<typeof QUERY_SYMBOLS.EXPRESSION, string> => {
-  return { [QUERY_SYMBOLS.EXPRESSION]: expression };
-};
+): T => ({ [QUERY_SYMBOLS.EXPRESSION]: expression }) as T;
 
 /** Valid operators for string concatenation */
 type StringOperator = '||';
@@ -38,16 +36,19 @@ export const op = <
   operator: NumberOperator | ComparisonOperator | StringOperator,
   right: T,
 ): T => {
+  // Unwrap the left and right operands if they are expression objects
   let leftValue = left;
   if (typeof left === 'object' && QUERY_SYMBOLS.EXPRESSION in left) {
     leftValue = left[QUERY_SYMBOLS.EXPRESSION] as T;
   }
 
+  // Unwrap the right operand if it is an expression object
   let rightValue = right;
   if (typeof right === 'object' && QUERY_SYMBOLS.EXPRESSION in right) {
     rightValue = right[QUERY_SYMBOLS.EXPRESSION] as T;
   }
 
+  // Wrap the left and right operands in single quotes if they are strings
   let wrappedLeft = leftValue;
   if (
     typeof leftValue === 'string' &&
@@ -59,6 +60,7 @@ export const op = <
     wrappedLeft = `'${leftValue}'` as T;
   }
 
+  // Wrap the right operand in single quotes if it is a string
   let wrappedRight = rightValue;
   if (
     typeof rightValue === 'string' &&
@@ -70,5 +72,5 @@ export const op = <
     wrappedRight = `'${rightValue}'` as T;
   }
 
-  return expression(`(${wrappedLeft} ${operator} ${wrappedRight})`) as unknown as T;
+  return expression<T>(`(${wrappedLeft} ${operator} ${wrappedRight})`);
 };
