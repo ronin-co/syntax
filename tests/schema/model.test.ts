@@ -1,7 +1,8 @@
 import { describe, expect, test } from 'bun:test';
 import { getSyntaxProxy } from '@/src/queries';
 import { blob, boolean, date, json, link, model, number, string } from '@/src/schema';
-import { type GetQuery, QUERY_SYMBOLS } from '@ronin/compiler';
+import { type GetQuery, QUERY_SYMBOLS, type StoredObject } from '@ronin/compiler';
+import { expectTypeOf } from 'expect-type';
 
 describe('models', () => {
   test('create empty model', () => {
@@ -15,9 +16,13 @@ describe('models', () => {
     expect(Account).toEqual({
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'account',
-      // @ts-expect-error: The Account object has 'pluralSlug'.
       pluralSlug: 'accounts',
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+    }>();
   });
 
   test('create empty model with name', () => {
@@ -31,11 +36,14 @@ describe('models', () => {
     expect(Account).toEqual({
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'account',
-      // @ts-expect-error: The Account object has 'pluralSlug'.
       pluralSlug: 'accounts',
-      // @ts-expect-error: The Account object has 'name'.
       name: 'Account',
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+    }>();
   });
 
   test('create empty model with plural name', () => {
@@ -50,13 +58,15 @@ describe('models', () => {
     expect(Account).toEqual({
       // @ts-expect-error: The Account object has 'slug'.
       slug: 'account',
-      // @ts-expect-error: The Account object has 'pluralSlug'.
       pluralSlug: 'accounts',
-      // @ts-expect-error: The Account object has 'name'.
       name: 'Account',
-      // @ts-expect-error: The Account object has 'pluralName'.
       pluralName: 'Accounts',
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+    }>();
   });
 
   test('create empty model without plural slug', () => {
@@ -73,6 +83,11 @@ describe('models', () => {
       name: 'Account',
       fields: {},
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+    }>();
   });
 
   test('create empty model with name and plural name', () => {
@@ -93,6 +108,11 @@ describe('models', () => {
       pluralName: 'Accounts',
       fields: {},
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+    }>();
   });
 
   test('create empty model with identifier', () => {
@@ -119,6 +139,11 @@ describe('models', () => {
       },
       fields: {},
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+    }>();
   });
 
   test('create empty model with id prefix', () => {
@@ -137,6 +162,11 @@ describe('models', () => {
       idPrefix: 'acc_',
       fields: {},
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+    }>();
   });
 
   test('create simple model', () => {
@@ -162,6 +192,12 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      name: string;
+    }>();
   });
 
   test('create simple model with blob field', () => {
@@ -191,6 +227,13 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      name: string;
+      avatar: StoredObject;
+    }>();
   });
 
   test('create simple model with json field', () => {
@@ -220,6 +263,13 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      name: string;
+      bio: object;
+    }>();
   });
 
   test('create simple model with date field', () => {
@@ -249,6 +299,13 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      name: string;
+      birthday: Date;
+    }>();
   });
 
   test('create simple model with custom field name', () => {
@@ -275,6 +332,12 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      name: string;
+    }>();
   });
 
   test('create simple model with field name inferred from slug', () => {
@@ -300,6 +363,12 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      createdAt: string;
+    }>();
   });
 
   test('create model with multiple fields', () => {
@@ -342,6 +411,16 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      name: string;
+      email: string;
+      emailVerified: boolean;
+      password: string;
+      follower: number;
+    }>();
   });
 
   test('create model with unique field', () => {
@@ -368,6 +447,12 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      name: string;
+    }>();
   });
 
   test('create model with link field', () => {
@@ -409,6 +494,12 @@ describe('models', () => {
       },
     });
 
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      name: string;
+    }>();
+
     expect(Post).toBeTypeOf('object');
 
     expect(Post).toEqual({
@@ -427,6 +518,12 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Post).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      author: string;
+    }>();
   });
 
   test('create model with index', () => {
@@ -464,6 +561,12 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      name: string;
+    }>();
   });
 
   test('create model with invalid index field', () => {
@@ -504,6 +607,7 @@ describe('models', () => {
         },
         indexes: {
           name: {
+            // @ts-expect-error Types should block users from doing this
             fields: [],
           },
         },
@@ -572,11 +676,18 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      name: string;
+    }>();
   });
 
   test('create model with presets', () => {
     const Account = model({
       slug: 'account',
+      // fields: {},
       presets: {
         onlyName: {
           instructions: {
@@ -607,6 +718,11 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+    }>();
   });
 
   test('create model with presets including sub queries', () => {
@@ -659,6 +775,12 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Member).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      account: string;
+    }>();
   });
 
   test('create model with nested fields', () => {
@@ -691,5 +813,14 @@ describe('models', () => {
         },
       },
     });
+
+    expectTypeOf(Account).toEqualTypeOf<{
+      id: string;
+      ronin: string;
+      address: {
+        country: string;
+        city: string;
+      };
+    }>();
   });
 });
