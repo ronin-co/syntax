@@ -1,6 +1,7 @@
 import { expect, spyOn, test } from 'bun:test';
 import { getBatchProxySQL, getSyntaxProxySQL } from '@/src/queries';
 import type { Statement } from '@ronin/compiler';
+import { expectTypeOf } from 'expect-type';
 
 test('using raw SQL', async () => {
   let statement: Statement | undefined;
@@ -40,6 +41,8 @@ test('using raw SQL in batch', async () => {
       params: ['elaine'],
     },
   ]);
+
+  expectTypeOf(batchProxy).toEqualTypeOf<Array<Statement>>();
 
   expect(statementHandlerSpy).not.toHaveBeenCalled();
 });
