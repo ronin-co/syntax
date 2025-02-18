@@ -156,7 +156,10 @@ type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
  *
  * @returns The generated model definition.
  */
-export const model = <Fields extends RecordWithoutForbiddenKeys<Primitives>>(
+export const model = <
+  // biome-ignore lint/complexity/noBannedTypes: `Fields` requires an empty object as a fallback.
+  Fields extends RecordWithoutForbiddenKeys<Primitives> = {},
+>(
   model: Model<Fields> | (() => Model<Fields>),
 ): Expand<RoninFields & FieldsToTypes<Fields>> => {
   return getSyntaxProxy({ modelType: true, chaining: false })(model) as unknown as Expand<
