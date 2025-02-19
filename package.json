@@ -1,6 +1,6 @@
 {
   "name": "@ronin/syntax",
-  "version": "0.2.27",
+  "version": "0.2.28",
   "type": "module",
   "description": "Allows for defining RONIN queries and schemas in code.",
   "publishConfig": {
