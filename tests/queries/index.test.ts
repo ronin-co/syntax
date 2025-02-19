@@ -18,6 +18,7 @@ import {
   type Query,
   type SetQuery,
 } from '@ronin/compiler';
+import { expectTypeOf } from 'expect-type';
 
 describe('syntax proxy', () => {
   test('using sub query', () => {
@@ -432,6 +433,8 @@ describe('syntax proxy', () => {
     expect(queries.length === 1 ? { result: true } : null).toMatchObject({
       result: true,
     });
+
+    expectTypeOf(queries).toEqualTypeOf<Array<SyntaxItem<Query>>>();
   });
 
   test('using queries with placeholder in batch', () => {
@@ -462,6 +465,8 @@ describe('syntax proxy', () => {
         },
       },
     ]);
+
+    expectTypeOf(queries).toEqualTypeOf<Array<SyntaxItem<Query>>>();
   });
 
   test('using options for query in batch', () => {
@@ -492,6 +497,8 @@ describe('syntax proxy', () => {
         },
       },
     ]);
+
+    expectTypeOf(queryList).toEqualTypeOf<Array<SyntaxItem<Query>>>();
   });
 
   test('using function chaining in batch', () => {
@@ -541,6 +548,8 @@ describe('syntax proxy', () => {
         },
       },
     ]);
+
+    expectTypeOf(queryList).toEqualTypeOf<Array<SyntaxItem<Query>>>();
   });
 
   test('using nested function as argument in batch', () => {
@@ -596,6 +605,8 @@ describe('syntax proxy', () => {
         },
       },
     ]);
+
+    expectTypeOf(queryList).toEqualTypeOf<Array<SyntaxItem<Query>>>();
   });
 
   test('using schema query types', () => {
@@ -707,6 +718,8 @@ describe('syntax proxy', () => {
         },
       },
     ]);
+
+    expectTypeOf(queryList).toEqualTypeOf<Array<SyntaxItem<Query>>>();
   });
 
   test('using a function call at the root', () => {
