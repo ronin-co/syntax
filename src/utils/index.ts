@@ -151,6 +151,10 @@ export const mutateStructure = (
   if (isPlainObject(obj)) {
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (obj[key] === undefined) {
+          delete obj[key];
+          continue;
+        }
         if (isPlainObject(obj[key])) {
           // Recursively mutate nested objects.
           mutateStructure(obj[key] as NestedObject, callback);
