@@ -1,4 +1,4 @@
-import { expect, spyOn, test } from 'bun:test';
+import { describe, expect, spyOn, test } from 'bun:test';
 import { getBatchProxySQL, getSyntaxProxySQL } from '@/src/queries';
 import type { Statement } from '@ronin/compiler';
 import { expectTypeOf } from 'expect-type';
@@ -68,5 +68,49 @@ test('using raw SQL with multiple lines', async () => {
   expect(statement).toMatchObject({
     statement: 'UPDATE accounts SET "points" = 11 WHERE "handle" = $1 RETURNING *',
     params: ['elaine'],
+  });
+});
+
+describe('using raw SQL with comments', () => {
+  test('--', async () => {
+    let statement: Statement | undefined;
+
+    const sqlProxy = getSyntaxProxySQL({
+      callback: (value) => {
+        statement = value;
+      },
+    });
+
+    const accountHandle = 'elaine';
+    sqlProxy`
+      -- Select all accounts with the given handle:
+      SELECT * FROM accounts WHERE handle = ${accountHandle}
+    `;
+
+    expect(statement).toMatchObject({
+      statement: 'SELECT * FROM accounts WHERE handle = $1',
+      params: ['elaine'],
+    });
+  });
+
+  test('/* ... */', async () => {
+    let statement: Statement | undefined;
+
+    const sqlProxy = getSyntaxProxySQL({
+      callback: (value) => {
+        statement = value;
+      },
+    });
+
+    const accountHandle = 'elaine';
+    sqlProxy`
+      /* Select all accounts with the given handle */
+      SELECT * FROM accounts WHERE handle = ${accountHandle}
+    `;
+
+    expect(statement).toMatchObject({
+      statement: 'SELECT * FROM accounts WHERE handle = $1',
+      params: ['elaine'],
+    });
   });
 });
