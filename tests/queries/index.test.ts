@@ -236,7 +236,11 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(getQuery).toMatchObject(finalQuery);
+    expect(getQuery).toBeDefined();
+    expect(getQuery).toStrictEqual(
+      // @ts-expect-error `toMatchObject` does not work for nullish properties.
+      finalQuery,
+    );
   });
 
   // Since `name` is a native property of functions and queries contain function calls,
