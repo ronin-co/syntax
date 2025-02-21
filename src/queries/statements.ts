@@ -1,5 +1,8 @@
 import type { Statement } from '@ronin/compiler';
 
+const MULTILINE_SQL_COMMENTS = /\/\*[\s\S]*?\*\//g;
+const SINGLELINE_SQL_COMMENTS = /--[^\n]*\n/g;
+
 /**
  * Used to track whether SQL queries are run in batches.
  */
@@ -21,7 +24,12 @@ export const getSyntaxProxySQL = (options: {
     const params: Array<unknown> = [];
 
     strings.forEach((string, i) => {
-      text += string;
+      // Remove comments but preserve the newline
+      const processedString = string
+        .replace(MULTILINE_SQL_COMMENTS, '')
+        .replace(SINGLELINE_SQL_COMMENTS, '\n');
+
+      text += processedString;
 
       if (i < values.length) {
         text += `$${i + 1}`;
