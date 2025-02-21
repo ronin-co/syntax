@@ -214,7 +214,7 @@ describe('syntax proxy', () => {
     expect(setQuery).toMatchObject(finalQuery);
   });
 
-  test('using `undefined` instruction`', () => {
+  test('using `undefined` instruction options`', () => {
     let getQuery: Query | undefined;
 
     const getProxy = getSyntaxProxy<GetQuery>({
@@ -236,7 +236,40 @@ describe('syntax proxy', () => {
       },
     };
 
-    expect(getQuery).toMatchObject(finalQuery);
+    expect(getQuery).toBeDefined();
+    expect(getQuery).toStrictEqual(
+      // @ts-expect-error `toMatchObject` does not work for nullish properties.
+      finalQuery,
+    );
+  });
+
+  test('using `undefined` instruction callable parameter`', () => {
+    let getQuery: Query | undefined;
+
+    const getProxy = getSyntaxProxy<GetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
+      callback: (value) => {
+        getQuery = value;
+      },
+    });
+
+    getProxy.accounts.after(undefined);
+
+    const finalQuery = {
+      [QUERY_SYMBOLS.QUERY]: {
+        get: {
+          accounts: {
+            after: {},
+          },
+        },
+      },
+    };
+
+    expect(getQuery).toBeDefined();
+    expect(getQuery).toStrictEqual(
+      // @ts-expect-error `toMatchObject` does not work for nullish properties.
+      finalQuery,
+    );
   });
 
   // Since `name` is a native property of functions and queries contain function calls,

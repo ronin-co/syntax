@@ -151,15 +151,26 @@ export const mutateStructure = (
   if (isPlainObject(obj)) {
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        if (isPlainObject(obj[key])) {
-          // Recursively mutate nested objects.
-          mutateStructure(obj[key] as NestedObject, callback);
-        } else if (Array.isArray(obj[key])) {
-          obj[key].map((item) => mutateStructure(item, callback));
-        } else {
-          // Call the mutation function for the value.
-          obj[key] = callback(obj[key]);
+        // Remove any properties that are `undefined`.
+        if (obj[key] === undefined) {
+          delete obj[key];
+          continue;
         }
+
+        // If the property is an object, recursively call the function for nested objects.
+        if (isPlainObject(obj[key])) {
+          mutateStructure(obj[key] as NestedObject, callback);
+          continue;
+        }
+
+        // If the property is an array, recursively call the function for each item in the array.
+        if (Array.isArray(obj[key])) {
+          obj[key].map((item) => mutateStructure(item, callback));
+          continue;
+        }
+
+        // Call the mutation function for the value.
+        obj[key] = callback(obj[key]);
       }
     }
 
