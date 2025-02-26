@@ -1,4 +1,4 @@
-import type { ResultRecord as OriginalRecord } from '@ronin/compiler';
+import type { ResultRecord as OriginalRecord, WithInstruction } from '@ronin/compiler';
 
 export type ResultRecord = Omit<OriginalRecord, 'ronin'> & {
   ronin: Omit<OriginalRecord['ronin'], 'createdAt' | 'updatedAt'> & {
@@ -6,6 +6,10 @@ export type ResultRecord = Omit<OriginalRecord, 'ronin'> & {
     updatedAt: Date;
   };
 };
+
+type WithInstructionKeys<T> = T extends WithInstruction
+  ? keyof (T extends Array<infer U> ? U : T)
+  : never;
 
 /**
  * A recursive type making every property callable and chainable.
@@ -39,7 +43,16 @@ export type DeepCallable<Query, Result = ResultRecord> = [NonNullable<Query>] ex
       [K in keyof NonNullable<Query>]-?: DeepCallable<
         Exclude<NonNullable<Query>[K], null | undefined>,
         Result
-      >;
+      > &
+        (K extends 'with' // TODO(@nurodev): Get all keys from the query type that are possibly an array
+          ? {
+              [P in WithInstructionKeys<NonNullable<Query>[K]>]: ObjectCall<
+                Query,
+                Result,
+                P
+              >;
+            }
+          : object);
     }
   : /**
      * Calls this primitive (or null/undefined) with an optional argument, returning
