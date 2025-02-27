@@ -1,4 +1,8 @@
-import type { ResultRecord as OriginalRecord } from '@ronin/compiler';
+import type {
+  CombinedInstructions,
+  ResultRecord as OriginalRecord,
+  WithInstruction,
+} from '@ronin/compiler';
 
 export type ResultRecord = Omit<OriginalRecord, 'ronin'> & {
   ronin: Omit<OriginalRecord['ronin'], 'createdAt' | 'updatedAt'> & {
@@ -6,6 +10,10 @@ export type ResultRecord = Omit<OriginalRecord, 'ronin'> & {
     updatedAt: Date;
   };
 };
+
+type WithInstructionKeys<T> = T extends WithInstruction
+  ? keyof (T extends Array<infer U> ? U : T)
+  : never;
 
 /**
  * A recursive type making every property callable and chainable.
@@ -39,13 +47,32 @@ export type DeepCallable<Query, Result = ResultRecord> = [NonNullable<Query>] ex
       [K in keyof NonNullable<Query>]-?: DeepCallable<
         Exclude<NonNullable<Query>[K], null | undefined>,
         Result
-      >;
+      > &
+        (K extends 'with' // TODO(@nurodev): Get all keys from the query type that are possibly an array
+          ? {
+              [P in WithInstructionKeys<NonNullable<Query>[K]>]: ObjectCall<
+                Query,
+                Result,
+                P
+              >;
+            }
+          : object);
     }
   : /**
      * Calls this primitive (or null/undefined) with an optional argument, returning
      * a promise that resolves to `Result` and remains chainable as DeepCallable.
      */
     ObjectCall<Query, Result, Query>;
+
+type InstructionMethods<Query, Result> = {
+  // TODO(@nurodev): Add `CombinedInstructions` filtering based on query type.
+  // This is needed in order to stop users from using `.to()` on a `get` query.
+  [K in keyof CombinedInstructions]-?: ObjectCall<
+    Query,
+    Result,
+    NonNullable<CombinedInstructions[K]>
+  >;
+};
 
 /**
  * A helper function type used by `DeepCallable`.
@@ -59,9 +86,11 @@ export type DeepCallable<Query, Result = ResultRecord> = [NonNullable<Query>] ex
  * `DeepCallable<Query, FinalResult>`.
  */
 type ObjectCall<Query, DefaultResult, Arg> = (<FinalResult = DefaultResult>(
-  arg?: ((f: Record<string, unknown>) => Arg | any) | Arg,
+  arg?: ((f: Record<string, unknown>) => Arg | any) | Arg | Array<Arg>,
   options?: Record<string, unknown>,
-) => Promise<FinalResult> & DeepCallable<Query, FinalResult>) &
+) => Promise<FinalResult> &
+  InstructionMethods<Query, FinalResult> &
+  DeepCallable<Query, FinalResult>) &
   ReducedFunction;
 
 /**
