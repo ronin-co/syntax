@@ -544,7 +544,6 @@ describe('syntax proxy', () => {
       // Test queries where the second function is called right after the first one.
       getProxy.members
         .with({ team: 'red' })
-        // @ts-expect-error This will be improved shortly.
         .selecting(['name']),
       // Test queries where the second function is not called right after the first one.
       getProxy.members
@@ -609,7 +608,6 @@ describe('syntax proxy', () => {
       // since the latter is able to manipulate the batch context.
       alterProxy
         .model('newUsers')
-        // @ts-expect-error This will be improved shortly
         .to({ slug: 'accounts' }),
     ]);
 
@@ -662,12 +660,9 @@ describe('syntax proxy', () => {
       createProxy.model({
         slug: 'account',
       }),
-      alterProxy
-        .model('account')
-        // @ts-expect-error This will be improved shortly.
-        .to({
-          slug: 'users',
-        }),
+      alterProxy.model('account').to({
+        slug: 'users',
+      }),
       alterProxy
         .model('users')
         // @ts-expect-error This will be improved shortly.
