@@ -51,7 +51,7 @@ type FieldInput<Type extends ModelField['type']> = Partial<
 
 export type FieldOutput<Type extends ModelField['type']> = Omit<
   Extract<ModelField & ModelFieldExpressions<TypeToTSType<Type>>, { type: Type }>,
-  'slug'
+  'slug' | 'system'
 >;
 
 export type ModelFieldExpressions<Type> = {
