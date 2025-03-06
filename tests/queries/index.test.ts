@@ -584,6 +584,31 @@ describe('syntax proxy', () => {
     expectTypeOf(queryList).toEqualTypeOf<Array<SyntaxItem<Query>>>();
   });
 
+  // Ensure that the batch context is correctly reset, even in the case that one of the
+  // operations inside the batch throws an error.
+  test('using individual queries after batch that throws', () => {
+    const getProxy = getSyntaxProxy<GetQuery>({
+      root: `${QUERY_SYMBOLS.QUERY}.get`,
+      callback: () => ({
+        email: 'elaine@site.co',
+      }),
+    });
+
+    try {
+      getBatchProxy(() => {
+        throw new Error('Test error');
+      });
+    } catch (_err) {
+      // Ignore the error.
+    }
+
+    const result = getProxy.account();
+
+    expect(result).toMatchObject({
+      email: 'elaine@site.co',
+    });
+  });
+
   test('using nested function as argument in batch', () => {
     // It's important to define the `callback` here, in order to guarantee that the
     // queries are executed standalone if no batch context is detected.

@@ -165,8 +165,14 @@ export const getBatchProxy = (
   let queries: Array<SyntaxItem<Query> | Promise<any>> = [];
 
   IN_BATCH = true;
-  queries = operations();
-  IN_BATCH = false;
+
+  try {
+    queries = operations();
+  } finally {
+    // Always restore the original value of `IN_BATCH`, even if `operations()` throws.
+    // This is essential, otherwise `IN_BATCH` might stay outdated.
+    IN_BATCH = false;
+  }
 
   // Within a batch, every query item is a JavaScript `Proxy`, in order to allow for
   // function chaining within every query. Returning the query items directly would
@@ -236,10 +242,13 @@ const serializeValue = (
       },
     );
 
-    value = value(fieldProxy);
-
-    // Restore the original value of `IN_BATCH`.
-    IN_BATCH = ORIGINAL_IN_BATCH;
+    try {
+      value = value(fieldProxy);
+    } finally {
+      // Always restore the original value of `IN_BATCH`, even if `value()` throws.
+      // This is essential, otherwise `IN_BATCH` might stay outdated.
+      IN_BATCH = ORIGINAL_IN_BATCH;
+    }
   }
 
   // If a custom replacer function was provided, serialize the value with it.
