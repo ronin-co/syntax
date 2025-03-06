@@ -86,7 +86,11 @@ type InstructionMethods<Query, Result> = {
  * `DeepCallable<Query, FinalResult>`.
  */
 type ObjectCall<Query, DefaultResult, Arg> = (<FinalResult = DefaultResult>(
-  arg?: ((f: Record<string, unknown>) => Arg | any) | Arg | Array<Arg>,
+  arg?:
+    | ((f: Record<string, unknown>) => Arg | any)
+    | Arg
+    | Array<Arg>
+    | Record<string, Arg>,
   options?: Record<string, unknown>,
 ) => Promise<FinalResult> &
   InstructionMethods<Query, FinalResult> &
