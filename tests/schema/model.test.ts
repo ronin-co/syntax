@@ -823,4 +823,18 @@ describe('models', () => {
       };
     }>();
   });
+
+  test('create model with an invalid slug', () => {
+    model({
+      // @ts-expect-error We're intentionally passing an invalid slug.
+      slug: 'model',
+    });
+  });
+
+  test('create model with an empty slug', () => {
+    model({
+      // @ts-expect-error We're intentionally passing an invalid slug.
+      slug: '',
+    });
+  });
 });
