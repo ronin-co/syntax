@@ -71,29 +71,42 @@ export interface NestedFieldsPrimitivesItem {
   [key: string]: PrimitivesItem;
 }
 
-export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
-  extends Omit<RawModel, 'fields' | 'indexes' | 'triggers' | 'presets'> {
+type NotAllowedModelSlugs = ['', 'model'];
+
+export interface Model<
+  TSlug extends string,
+  TFields extends
+    RecordWithoutForbiddenKeys<Primitives> = RecordWithoutForbiddenKeys<Primitives>,
+> extends Omit<RawModel, 'slug' | 'fields' | 'indexes' | 'triggers' | 'presets'> {
+  /**
+   * The unique identifier for this model.
+   */
+  slug: TSlug extends NotAllowedModelSlugs[number] ? never : TSlug;
+
   /**
    * The fields that make up this model.
    */
-  fields?: Fields;
+  fields?: TFields;
 
   /**
    * Database indexes to optimize query performance.
    */
-  indexes?: Record<string, Omit<ModelIndex<Record<keyof Fields, ModelField>>, 'slug'>>;
+  indexes?: Record<string, Omit<ModelIndex<Record<keyof TFields, ModelField>>, 'slug'>>;
 
   /**
    * Queries that run automatically in response to other queries.
    */
-  triggers?: Record<string, Omit<ModelTrigger<Record<keyof Fields, ModelField>>, 'slug'>>;
+  triggers?: Record<
+    string,
+    Omit<ModelTrigger<Record<keyof TFields, ModelField>>, 'slug'>
+  >;
 
   /**
    * Predefined query instructions that can be reused across multiple different queries.
    */
   presets?:
     | Record<string, Omit<ModelPreset, 'slug'>>
-    | ((fields: keyof Fields) => Record<string, Omit<ModelPreset, 'slug'>>);
+    | ((fields: keyof TFields) => Record<string, Omit<ModelPreset, 'slug'>>);
 }
 
 // This type maps the fields of a model to their types.
@@ -157,10 +170,11 @@ type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
  * @returns The generated model definition.
  */
 export const model = <
+  Slug extends Exclude<string, '' | 'model'> = string,
   // biome-ignore lint/complexity/noBannedTypes: `Fields` requires an empty object as a fallback.
   Fields extends RecordWithoutForbiddenKeys<Primitives> = {},
 >(
-  model: Model<Fields> | (() => Model<Fields>),
+  model: Model<Slug, Fields> | (() => Model<Slug, Fields>),
 ): Expand<RoninFields & FieldsToTypes<Fields>> => {
   return getSyntaxProxy({ modelType: true, chaining: false })(model) as unknown as Expand<
     RoninFields & FieldsToTypes<Fields>
