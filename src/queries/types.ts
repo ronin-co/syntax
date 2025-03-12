@@ -39,7 +39,7 @@ export type DeepCallable<Query, Result = ResultRecord> = [NonNullable<Query>] ex
      * Calls the object with an optional partial argument, returning a promise that
      * resolves to `Result` and also remains a DeepCallable for further nested calls.
      */
-    ObjectCall<Query, Result, Partial<NonNullable<Query>>> & {
+    ObjectCall<Query, Result, NonNullable<Query>> & {
       /**
        * For each key in Query, exclude null/undefined so we can call it without TS
        * complaining about it possibly being undefined.
