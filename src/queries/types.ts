@@ -1,15 +1,10 @@
 import type {
   CombinedInstructions,
-  ResultRecord as OriginalRecord,
+  ResultRecordBase,
   WithInstruction,
 } from '@ronin/compiler';
 
-export type ResultRecord = Omit<OriginalRecord, 'ronin'> & {
-  ronin: Omit<OriginalRecord['ronin'], 'createdAt' | 'updatedAt'> & {
-    createdAt: Date;
-    updatedAt: Date;
-  };
-};
+export type ResultRecord = ResultRecordBase<Date>;
 
 type WithInstructionKeys<T> = T extends WithInstruction
   ? keyof (T extends Array<infer U> ? U : T)
