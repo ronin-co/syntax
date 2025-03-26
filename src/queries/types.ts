@@ -4,6 +4,14 @@ import type {
   WithInstruction,
 } from '@ronin/compiler';
 
+type FlattenObject<T> = {
+  [K in keyof T]: T[K] extends Date
+    ? T[K]
+    : T[K] extends object
+      ? FlattenObject<T[K]>
+      : T[K];
+} & {};
+
 export type ResultRecord = Omit<OriginalRecord, 'ronin'> & {
   ronin: Omit<OriginalRecord['ronin'], 'createdAt' | 'updatedAt'> & {
     createdAt: Date;
