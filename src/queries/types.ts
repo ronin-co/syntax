@@ -1,30 +1,10 @@
-import type { CombinedInstructions, WithInstruction } from '@ronin/compiler';
+import type {
+  CombinedInstructions,
+  ResultRecordBase,
+  WithInstruction,
+} from '@ronin/compiler';
 
-export type ResultRecord = {
-  /**
-   * A unique identifier of the record.
-   */
-  id: string;
-
-  ronin: {
-    /**
-     * A timestamp of when the record was created.
-     */
-    createdAt: Date;
-    /**
-     * The ID of the user who created the record.
-     */
-    createdBy: string | null;
-    /**
-     * A timestamp of when the record was last updated or modified.
-     */
-    updatedAt: Date;
-    /**
-     * The ID of the user who last updated or modified the record.
-     */
-    updatedBy: string | null;
-  };
-};
+export type ResultRecord = ResultRecordBase<Date>;
 
 type WithInstructionKeys<T> = T extends WithInstruction
   ? keyof (T extends Array<infer U> ? U : T)
