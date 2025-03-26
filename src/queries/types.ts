@@ -1,21 +1,28 @@
-import type {
-  CombinedInstructions,
-  ResultRecord as OriginalRecord,
-  WithInstruction,
-} from '@ronin/compiler';
+import type { CombinedInstructions, WithInstruction } from '@ronin/compiler';
 
-type FlattenObject<T> = {
-  [K in keyof T]: T[K] extends Date
-    ? T[K]
-    : T[K] extends object
-      ? FlattenObject<T[K]>
-      : T[K];
-} & {};
+export type ResultRecord = {
+  /**
+   * A unique identifier of the record.
+   */
+  id: string;
 
-export type ResultRecord = Omit<OriginalRecord, 'ronin'> & {
-  ronin: Omit<OriginalRecord['ronin'], 'createdAt' | 'updatedAt'> & {
+  ronin: {
+    /**
+     * A timestamp of when the record was created.
+     */
     createdAt: Date;
+    /**
+     * The ID of the user who created the record.
+     */
+    createdBy: string | null;
+    /**
+     * A timestamp of when the record was last updated or modified.
+     */
     updatedAt: Date;
+    /**
+     * The ID of the user who last updated or modified the record.
+     */
+    updatedBy: string | null;
   };
 };
 
