@@ -1,8 +1,5 @@
 import { blob, boolean, date, json, link, model, number, string } from '@/src/schema';
 
-// @ts-expect-error This dependency must be added in the project.
-import { add } from 'ronin';
-
 export const Account = model({
   slug: 'account',
 
@@ -18,16 +15,6 @@ export const Account = model({
     name: {
       fields: [{ slug: 'name', order: 'ASC', collation: 'BINARY' }],
       unique: true,
-    },
-  },
-
-  triggers: {
-    afterInsert: {
-      when: 'AFTER',
-      action: 'INSERT',
-      fields: [{ slug: 'name' }],
-      // @ts-expect-error: The queries need to be adjusted in the TS client.
-      effects: () => [add.member.with({ name: 'admin', email: 'admin@ronin.io' })],
     },
   },
 });

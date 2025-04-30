@@ -15,7 +15,6 @@ import type {
   ModelField,
   ModelIndex,
   ModelPreset,
-  ModelTrigger,
   Model as RawModel,
   StoredObject,
 } from '@ronin/compiler';
@@ -72,7 +71,7 @@ export interface NestedFieldsPrimitivesItem {
 }
 
 export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
-  extends Omit<RawModel, 'fields' | 'indexes' | 'triggers' | 'presets'> {
+  extends Omit<RawModel, 'fields' | 'indexes' | 'presets'> {
   /**
    * The fields that make up this model.
    */
@@ -82,11 +81,6 @@ export interface Model<Fields = RecordWithoutForbiddenKeys<Primitives>>
    * Database indexes to optimize query performance.
    */
   indexes?: Record<string, Omit<ModelIndex<Record<keyof Fields, ModelField>>, 'slug'>>;
-
-  /**
-   * Queries that run automatically in response to other queries.
-   */
-  triggers?: Record<string, Omit<ModelTrigger<Record<keyof Fields, ModelField>>, 'slug'>>;
 
   /**
    * Predefined query instructions that can be reused across multiple different queries.

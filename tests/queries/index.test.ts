@@ -13,7 +13,6 @@ import {
   type ModelField,
   type ModelIndex,
   type ModelPreset,
-  type ModelTrigger,
   QUERY_SYMBOLS,
   type Query,
   type SetQuery,
@@ -624,7 +623,7 @@ describe('syntax proxy', () => {
     });
     const alterProxy = getSyntaxProxy<
       AlterQuery,
-      Model | ModelField | ModelIndex | ModelTrigger | ModelPreset
+      Model | ModelField | ModelIndex | ModelPreset
     >({ root: `${QUERY_SYMBOLS.QUERY}.alter`, callback });
 
     const queryList = getBatchProxy(() => [
@@ -674,7 +673,7 @@ describe('syntax proxy', () => {
     });
     const alterProxy = getSyntaxProxy<
       AlterQuery,
-      Model | ModelField | ModelIndex | ModelTrigger | ModelPreset
+      Model | ModelField | ModelIndex | ModelPreset
     >({ root: `${QUERY_SYMBOLS.QUERY}.alter`, callback });
     const dropProxy = getSyntaxProxy<DropQuery, Model>({
       root: `${QUERY_SYMBOLS.QUERY}.drop`,
