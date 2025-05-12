@@ -46,6 +46,17 @@ export const strftime = (format: string, timestamp: string | 'now'): Date =>
   expression<Date>(`strftime('${format}', '${timestamp}')`);
 
 /**
+ * Extracts a value from a JSON document at the specified path.
+ *
+ * @param json - The JSON document to extract from.
+ * @param path - The path to extract the value from.
+ *
+ * @returns SQL expression that evaluates to the extracted value.
+ */
+export const json_extract = (json: string, path: string): string =>
+  expression<string>(`json_extract('${json}', '${path}')`);
+
+/**
  * Applies a JSON patch operation to a JSON document.
  *
  * @param patch - The JSON patch document defining the modifications.
