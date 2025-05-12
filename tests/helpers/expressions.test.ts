@@ -2,6 +2,7 @@ import { describe, expect, test } from 'bun:test';
 import { op } from '@/src/helpers/expressions';
 import {
   abs,
+  json_extract,
   json_insert,
   json_patch,
   json_replace,
@@ -514,6 +515,9 @@ describe('expressions', () => {
         jsonInsert: string().defaultValue(() =>
           json_insert('{"foo": "bar"}', '$.newKey', '"inserted"'),
         ),
+        jsonExtract: string().defaultValue(() =>
+          json_extract('{"foo": "bar", "baz": "qux"}', '$.foo'),
+        ),
       },
     });
     expect(Test).toBeTypeOf('object');
@@ -536,6 +540,10 @@ describe('expressions', () => {
     expect(Test.fields.jsonInsert.defaultValue).toEqual({
       __RONIN_EXPRESSION: 'json_insert(\'{"foo": "bar"}\', \'$.newKey\', \'"inserted"\')',
     });
+    // @ts-expect-error This exists
+    expect(Test.fields.jsonExtract.defaultValue).toEqual({
+      __RONIN_EXPRESSION: 'json_extract(\'{"foo": "bar", "baz": "qux"}\', \'$.foo\')',
+    });
     expectTypeOf(Test).toEqualTypeOf<{
       id: string;
       ronin: string;
@@ -543,6 +551,7 @@ describe('expressions', () => {
       jsonSet: string;
       jsonReplace: string;
       jsonInsert: string;
+      jsonExtract: string;
     }>();
   });
 
