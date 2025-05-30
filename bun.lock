@@ -5,7 +5,7 @@
       "name": "@ronin/syntax",
       "devDependencies": {
         "@biomejs/biome": "1.9.4",
-        "@ronin/compiler": "0.18.3",
+        "@ronin/compiler": "0.18.6",
         "@types/bun": "1.2.4",
         "expect-type": "1.2.0",
         "tsup": "8.4.0",
@@ -134,7 +134,7 @@
 
     "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@4.34.9", "", { "os": "win32", "cpu": "x64" }, "sha512-AyleYRPU7+rgkMWbEh71fQlrzRfeP6SyMnRf9XX4fCdDPAJumdSBqYEcWPMzVQ4ScAl7E4oFfK0GUVn77xSwbw=="],
 
-    "@ronin/compiler": ["@ronin/compiler@0.18.3", "", {}, "sha512-t4Wdt/Hwz0j6ymaYNQduTyORJ7b35rAO7LAdSO+1ifQmW2C/tl4OMayaNIBrOLEbAvzdF5xwH7B4vn8pTHn3Hw=="],
+    "@ronin/compiler": ["@ronin/compiler@0.18.6", "", {}, "sha512-uO0wBEW2YnUA32iF2W3qJE4ugZWec7cMr4H9UjKxfScs/zb4OUhnq0Oecpj/t+KWJtPl2zkR/NsEIwSeNdV2wg=="],
 
     "@types/bun": ["@types/bun@1.2.4", "", { "dependencies": { "bun-types": "1.2.4" } }, "sha512-QtuV5OMR8/rdKJs213iwXDpfVvnskPXY/S0ZiFbsTjQZycuqPbMW8Gf/XhLfwE5njW8sxI2WjISURXPlHypMFA=="],
 
