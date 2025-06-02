@@ -11,13 +11,12 @@ import {
 } from '@/src/schema';
 
 test('create string field', () => {
-  const field = string({ displayAs: 'secret' }) as unknown as SyntaxField<'string'>;
+  const field = string() as unknown as SyntaxField<'string'>;
 
   expect(field).toBeTypeOf('object');
 
   expect(field).toEqual({
     type: 'string',
-    displayAs: 'secret',
   });
 });
 
@@ -144,7 +143,6 @@ test('create json field', () => {
   expect(field).toEqual({
     type: 'json',
     name: undefined,
-    displayAs: undefined,
   });
 });
 

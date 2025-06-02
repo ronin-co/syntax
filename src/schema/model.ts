@@ -43,13 +43,7 @@ export type Primitives =
   | NestedFieldsPrimitives
   | Chain<
       FieldOutput<'string' | 'number' | 'boolean' | 'link' | 'json' | 'date' | 'blob'>,
-      | 'name'
-      | 'displayAs'
-      | 'unique'
-      | 'required'
-      | 'defaultValue'
-      | 'computedAs'
-      | 'check'
+      'name' | 'unique' | 'required' | 'defaultValue' | 'computedAs' | 'check'
     >;
 
 export type PrimitivesItem =
