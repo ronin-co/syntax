@@ -48,6 +48,6 @@
     "typescript": "5.8.2"
   },
   "peerDependencies": {
-    "@ronin/compiler": ">=0.18.0"
+    "@ronin/compiler": ">=0.18.8"
   }
 }
