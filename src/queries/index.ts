@@ -102,7 +102,7 @@ export const getSyntaxProxy = <Structure, ReturnValue = ResultRecord>(config?: {
         // If the function call is happening inside a batch, return a new proxy, to
         // allow for continuing to chain `get` accessors and function calls after
         // existing function calls in the same query.
-        if (global.IN_RONIN_BATCH || !config?.callback) {
+        if (globalThis.IN_RONIN_BATCH || !config?.callback) {
           // To ensure that `get` accessor calls are mounted to the same level as
           // the function after which they are called, we need to remove the last
           // path segment.
@@ -159,14 +159,14 @@ export const getBatchProxy = (
 ): Array<SyntaxItem<Query>> => {
   let queries: Array<SyntaxItem<Query> | Promise<any>> = [];
 
-  global.IN_RONIN_BATCH = true;
+  globalThis.IN_RONIN_BATCH = true;
 
   try {
     queries = operations();
   } finally {
     // Always restore the original value of `IN_RONIN_BATCH`, even if `operations()`
     // throws. This is essential, otherwise `IN_RONIN_BATCH` might stay outdated.
-    global.IN_RONIN_BATCH = false;
+    globalThis.IN_RONIN_BATCH = false;
   }
 
   // Within a batch, every query item is a JavaScript `Proxy`, in order to allow for
@@ -215,12 +215,12 @@ const serializeValue = (
   if (typeof value === 'function') {
     // Temporarily store the original value of `IN_RONIN_BATCH`, so that we can resume it
     // after the nested function has been called.
-    const ORIGINAL_IN_RONIN_BATCH = global.IN_RONIN_BATCH;
+    const ORIGINAL_IN_RONIN_BATCH = globalThis.IN_RONIN_BATCH;
 
     // Since `value()` is synchronous, `IN_RONIN_BATCH` should not affect any other
     // queries somewhere else in the app, even if those are run inside an
     // asynchronous function.
-    global.IN_RONIN_BATCH = true;
+    globalThis.IN_RONIN_BATCH = true;
 
     // A proxy object providing a property for every field of the model. It allows
     // for referencing fields inside of an expression.
@@ -242,7 +242,7 @@ const serializeValue = (
     } finally {
       // Always restore the original value of `IN_RONIN_BATCH`, even if `value()` throws.
       // This is essential, otherwise `IN_RONIN_BATCH` might stay outdated.
-      global.IN_RONIN_BATCH = ORIGINAL_IN_RONIN_BATCH;
+      globalThis.IN_RONIN_BATCH = ORIGINAL_IN_RONIN_BATCH;
     }
   }
 
